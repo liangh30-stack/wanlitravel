@@ -76,7 +76,7 @@ const Navbar = () => {
   return (
     <nav className="fixed top-0 left-0 w-full z-[100] py-8 px-16 flex justify-between items-center bg-white/80 backdrop-blur-md border-b border-ink/5 text-ink">
       <div className="flex items-center gap-12">
-        <Link to="/" className="text-xl font-black tracking-tighter text-accent cursor-pointer">WANLITRAVEL</Link>
+        <Link to="/" className="cursor-pointer"><img src="/logo-light-bg.jpeg" alt="Wanli - Bridging China and Europe" className="h-12 object-contain" /></Link>
         <div className="h-4 w-[1px] bg-ink/10"></div>
         <div className="flex gap-10 text-[9px] font-bold uppercase tracking-[0.2em] relative">
           
@@ -242,8 +242,8 @@ const ScrollytellingExperience = () => {
                className="w-full h-full object-cover"
                referrerPolicy="no-referrer"
              />
-             <div className="absolute inset-0 flex items-center justify-center text-white/40 font-serif italic text-6xl tracking-tighter z-10 pointer-events-none">
-                Wanlitravel
+             <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+                <img src="/logo-dark-bg.jpeg" alt="Wanli" className="w-72 opacity-50 rounded-2xl" />
              </div>
           </div>
         </motion.div>
@@ -695,7 +695,7 @@ const Footer = () => {
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-24 mb-48">
           <div className="md:col-span-6">
-            <h2 className="text-5xl font-black tracking-tighter uppercase mb-10 text-ink">Wanlitravel</h2>
+            <img src="/logo-light-bg.jpeg" alt="Wanli - Bridging China and Europe" className="h-24 object-contain mb-10" />
             <p className="text-ink/60 max-w-md leading-relaxed text-lg font-medium">
               {t.footer.description}
             </p>
@@ -725,7 +725,7 @@ const Footer = () => {
       </div>
       
       <div className="absolute -bottom-20 -right-20 pointer-events-none opacity-[0.02]">
-        <h2 className="text-[40vw] font-black leading-none tracking-tighter">WANLI</h2>
+        <h2 className="text-[40vw] font-black leading-none" style={{ letterSpacing: '0.1em' }}>WANLI</h2>
       </div>
     </footer>
   );

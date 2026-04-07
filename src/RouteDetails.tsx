@@ -35,7 +35,7 @@ const RouteDetails = () => {
           <ArrowLeft size={20} />
           <span className="text-[10px] font-bold uppercase tracking-[0.2em]">{t.routeDetails.backToCollections}</span>
         </Link>
-        <h2 className="text-xl font-black tracking-tighter text-accent">WANLITRAVEL</h2>
+        <img src="/logo-light-bg.jpeg" alt="Wanli - Bridging China and Europe" className="h-12 object-contain" />
       </nav>
 
       {/* Hero Section */}

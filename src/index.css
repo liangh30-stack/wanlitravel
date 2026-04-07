@@ -6,9 +6,9 @@
   --font-serif: "Playfair Display", serif;
 
   --color-bg: #FFFFFF;
-  --color-ink: #0F172A; /* Deep Navy/Slate */
-  --color-accent: #2563EB; /* Professional Blue */
-  --color-sun: #F59E0B; /* Amber/Gold for trust */
+  --color-ink: #0F172A; /* Deep Navy — matches logo text */
+  --color-accent: #B22234; /* Crimson Red — matches logo red swoosh */
+  --color-sun: #C4944A; /* Gold — matches logo gold swoosh */
   --color-surface: #F8FAFC; /* Light surface for cards */
 }
 
