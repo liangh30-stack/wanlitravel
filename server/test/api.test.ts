@@ -82,3 +82,26 @@ test('inquirySchema: 必须同意隐私政策、邮箱合法', async () => {
   assert.throws(() => inquirySchema.parse({ ...valid, workEmail: 'not-an-email' }));
   assert.throws(() => inquirySchema.parse({ ...valid, type: 'spam' }));
 });
+
+/* ── 演示数据 ─────────────────────────────────── */
+
+test('buildDemoAvailability: 按目的地过滤、价格随晚数增长', async () => {
+  const { buildDemoAvailability } = await import('../src/t10/demo.js');
+  const base = { rooms: [{ adults: 2, children: 0, units: 1 }] };
+  const r4 = buildDemoAvailability({ ...base, checkIn: '2030-06-01', checkOut: '2030-06-05', destinationCode: 'MAD' });
+  assert.ok(r4.accommodations.length >= 2);
+  assert.ok(r4.accommodations.every(a => a.code.startsWith('D-MAD')));
+  const r8 = buildDemoAvailability({ ...base, checkIn: '2030-06-01', checkOut: '2030-06-09', destinationCode: 'MAD' });
+  const n4 = Number(r4.accommodations[0].neto);
+  const n8 = Number(r8.accommodations[0].neto);
+  assert.equal(n8, n4 * 2, '8 晚价格应为 4 晚的两倍');
+});
+
+test('buildDemoAvailability: onlyConfirmed 过滤 ON_REQUEST', async () => {
+  const { buildDemoAvailability } = await import('../src/t10/demo.js');
+  const r = buildDemoAvailability({
+    checkIn: '2030-06-01', checkOut: '2030-06-05', destinationCode: 'MAD',
+    onlyConfirmed: true, rooms: [{ adults: 2, children: 0, units: 1 }],
+  });
+  assert.ok(r.accommodations.every(a => a.status === 'SALE'));
+});

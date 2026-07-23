@@ -51,6 +51,8 @@ export interface AccommodationOffer {
   /** T10 酒店/产品编码 */
   code: string;
   name?: string;
+  /** 星级/类别（如 "4"） */
+  category?: string;
   /** 餐型编码，如 SA（只住宿） */
   mealPlan?: string;
   pvp?: string;

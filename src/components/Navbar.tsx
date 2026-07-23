@@ -105,6 +105,10 @@ const Navbar = () => {
             className={`px-4 py-2 rounded-full text-[10px] font-bold tracking-[0.18em] uppercase transition-colors ${
               solid ? 'text-ink/70 hover:text-ink' : 'text-white/80 hover:text-white'
             }`}>{t.nav.b2bSolutions}</button>
+          <Link to={`/${language}/hotels`}
+            className={`px-4 py-2 rounded-full text-[10px] font-bold tracking-[0.18em] uppercase transition-colors ${
+              solid ? 'text-crimson hover:text-crimson/70' : 'text-gold hover:text-white'
+            }`} style={{ color: solid ? '#B31C2E' : '#C4923A' }}>{t.nav.hotelSearch}</Link>
         </nav>
 
         {/* Right */}

@@ -15,8 +15,9 @@ import { ZodError } from 'zod';
 import { T10Client, createHttpTransport, T10Error, ConfirmTimeoutError } from '../t10/index.js';
 import { OrderStore } from '../store/orders.js';
 import { InquiryStore } from '../store/inquiries.js';
-import { apiKeyAuth, generalLimiter, bookingLimiter, inquiryLimiter } from './middleware.js';
+import { apiKeyAuth, generalLimiter, bookingLimiter, inquiryLimiter, searchLimiter } from './middleware.js';
 import { searchSchema, valueSchema, confirmSchema, cancelSchema, inquirySchema } from './schemas.js';
+import { buildDemoAvailability, DEMO_DESTINATIONS } from '../t10/demo.js';
 
 const {
   T10_BASE_URL = '',
@@ -82,6 +83,37 @@ app.post('/api/inquiries', inquiryLimiter, async (req, res) => {
   } catch (err) { handleError(err, res); }
 });
 
+/**
+ * 公开酒店搜索 —— 网站访客可直接搜索（限流保护）。
+ * 未配置 T10 凭证或 DEMO_MODE=true 时返回演示数据（demo:true），
+ * 配置真实凭证后自动切换为 T10 实时库存，前端无需改动。
+ * 注意：核价/下单/取消仍需鉴权 —— 公开的只有"看"，不开放"交易"。
+ */
+const t10Configured = Boolean(T10_BASE_URL && T10_USER && T10_PASSWORD);
+const demoMode = !t10Configured || process.env.DEMO_MODE === 'true';
+
+app.get('/api/hotels/destinations', searchLimiter, (_req, res) => {
+  // 演示阶段返回静态目的地；接入真实数据后改为 Mapping 同步库
+  res.json({ demo: demoMode, destinations: DEMO_DESTINATIONS });
+});
+
+app.post('/api/hotels/search', searchLimiter, async (req, res) => {
+  try {
+    const input = searchSchema.parse(req.body);
+    if (demoMode) {
+      const result = buildDemoAvailability(input);
+      res.json({ demo: true, ...result });
+      return;
+    }
+    const result = await client.getAccommodationAvail(input);
+    res.json({
+      demo: false,
+      idOperation: result.idOperation,
+      accommodations: result.accommodations.map(a => ({ ...strip(a), rooms: a.rooms })),
+    });
+  } catch (err) { handleError(err, res); }
+});
+
 // 其余 /api 全部鉴权 + 限流
 app.use('/api', apiKeyAuth(API_SHARED_KEY), generalLimiter);
 
@@ -98,18 +130,6 @@ const strip = <T extends { raw?: unknown }>(o: T): Omit<T, 'raw'> => {
   const { raw, ...rest } = o;
   return rest;
 };
-
-/** 搜索 */
-app.post('/api/hotels/search', async (req, res) => {
-  try {
-    const input = searchSchema.parse(req.body);
-    const result = await client.getAccommodationAvail(input);
-    res.json({
-      idOperation: result.idOperation,
-      accommodations: result.accommodations.map(a => ({ ...strip(a), rooms: a.rooms })),
-    });
-  } catch (err) { handleError(err, res); }
-});
 
 /** 核价（下单前必须调用，防 M12） */
 app.post('/api/hotels/value', async (req, res) => {

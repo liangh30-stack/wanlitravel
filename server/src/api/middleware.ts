@@ -54,3 +54,11 @@ export const inquiryLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
 });
+
+/** 公开酒店搜索限流：每 IP 每分钟 12 次（接入真实 T10 后保护供应商配额） */
+export const searchLimiter = rateLimit({
+  windowMs: 60_000,
+  limit: 12,
+  standardHeaders: true,
+  legacyHeaders: false,
+});

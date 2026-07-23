@@ -19,6 +19,7 @@ import Testimonials from './components/Testimonials';
 import PartnerForm from './components/PartnerForm';
 import Footer from './components/Footer';
 import PrivacyPolicy from './components/PrivacyPolicy';
+import HotelSearch from './components/HotelSearch';
 
 const SUPPORTED: Language[] = ['en', 'zh', 'es'];
 const LANG_KEY = 'wanli.lang';
@@ -138,6 +139,7 @@ export default function App() {
             <Route index element={<HomePage />} />
             <Route path="route/:id" element={<RouteDetails />} />
             <Route path="privacy" element={<PrivacyPolicy />} />
+            <Route path="hotels" element={<HotelSearch />} />
           </Route>
           <Route path="*" element={<Navigate to={`/${storedLang()}`} replace />} />
         </Routes>
