@@ -1,168 +1,335 @@
-import React, { useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { motion } from 'motion/react';
-import { ArrowLeft, MapPin, Calendar, Users, Star, CheckCircle2 } from 'lucide-react';
-import { allRoutes } from './data';
-import { useLanguage } from './App';
+import React, { useRef, useEffect } from 'react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { motion, useScroll, useTransform, useInView } from 'motion/react';
+import {
+  ArrowLeft, MapPin, Calendar, Users, Star, CheckCircle2,
+  ArrowRight, Clock, ShieldCheck, Mail, Phone, ArrowUpRight,
+} from 'lucide-react';
+import { allRoutes, formatDuration } from './data';
+import { useLanguage } from './context';
 
-const RouteDetails = () => {
-  const { id } = useParams();
-  const route = allRoutes.find(r => r.id === id);
+export default function RouteDetails() {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const { t } = useLanguage();
+  const heroRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
+  const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] });
+  const heroImgY   = useTransform(scrollYProgress, [0, 1], ['0%', '28%']);
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
 
-  if (!route) {
+  useEffect(() => { window.scrollTo(0, 0); }, [id]);
+
+  const route = allRoutes.find(r => r.id === id);
+  const tr    = t.routes[id as keyof typeof t.routes];
+
+  if (!route || !tr) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-bg text-ink">
-        <div className="text-center">
-          <h1 className="text-4xl font-black mb-4">{t.routeDetails.routeNotFound}</h1>
-          <Link to="/" className="text-accent hover:underline">{t.routeDetails.returnHome}</Link>
-        </div>
+      <div className="min-h-screen flex items-center justify-center flex-col gap-6 bg-bg">
+        <h1 className="heading" style={{ fontSize: 40 }}>{t.routeDetails.routeNotFound}</h1>
+        <Link to="/" className="btn btn-primary">{t.routeDetails.returnHome}</Link>
       </div>
     );
   }
 
-  const translatedRoute = t.routes[route.id as keyof typeof t.routes];
+  const isSpain   = id?.startsWith('spain');
+  const siblings  = allRoutes.filter(r => r.id !== id).slice(0, 3);
 
   return (
-    <div className="min-h-screen bg-bg text-ink font-sans">
-      {/* Navigation Bar */}
-      <nav className="fixed top-0 left-0 w-full z-[100] py-6 px-12 flex justify-between items-center bg-white/80 backdrop-blur-md border-b border-ink/5">
-        <Link to="/" className="flex items-center gap-2 hover:text-accent transition-colors">
-          <ArrowLeft size={20} />
-          <span className="text-[10px] font-bold uppercase tracking-[0.2em]">{t.routeDetails.backToCollections}</span>
-        </Link>
-        <img src="/logo-light-bg.jpeg" alt="Wanli - Bridging China and Europe" className="h-12 object-contain" />
-      </nav>
+    <div className="bg-bg min-h-screen">
 
-      {/* Hero Section */}
-      <div className="relative h-[70vh] w-full">
-        <img 
-          src={route.img} 
-          alt={translatedRoute.title} 
-          className="w-full h-full object-cover"
-          referrerPolicy="no-referrer"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-ink/40 to-transparent"></div>
-        <div className="absolute bottom-0 left-0 w-full p-12 md:p-24 text-white">
-          <motion.div 
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="max-w-4xl"
-          >
-            <p className="text-[12px] font-bold uppercase tracking-[0.4em] text-accent mb-4">{translatedRoute.region}</p>
-            <h1 className="text-6xl md:text-8xl font-black tracking-tighter mb-6 leading-none">{translatedRoute.title}</h1>
-            <p className="text-xl md:text-2xl font-medium opacity-80 max-w-2xl">{translatedRoute.description}</p>
-          </motion.div>
-        </div>
+      {/* ── Fixed top bar ── */}
+      <div className="fixed top-0 inset-x-0 z-[999] flex items-center justify-between px-8 lg:px-16"
+        style={{ height: 64, background: 'rgba(248,246,242,0.97)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(14,17,23,0.07)' }}>
+        <button onClick={() => navigate(-1)}
+          className="flex items-center gap-2 transition-colors group"
+          style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(14,17,23,0.5)' }}
+          onMouseEnter={e => (e.currentTarget.style.color = '#B31C2E')}
+          onMouseLeave={e => (e.currentTarget.style.color = 'rgba(14,17,23,0.5)')}>
+          <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
+          {t.routeDetails.backToHome}
+        </button>
+
+        <Link to="/"><img src="/logo-light-bg.jpeg" alt="Wanlitravel" style={{ height: 36, objectFit:'contain', borderRadius:8 }} /></Link>
+
+        <button onClick={() => document.getElementById('rd-quote')?.scrollIntoView({ behavior:'smooth' })}
+          className="btn btn-primary" style={{ padding:'10px 20px', fontSize:9 }}>
+          {t.routeDetails.requestQuote}
+        </button>
       </div>
 
-      {/* Content Section */}
-      <div className="max-w-7xl mx-auto px-12 py-24 grid grid-cols-1 lg:grid-cols-12 gap-16">
-        
-        {/* Left Column: Itinerary */}
-        <div className="lg:col-span-8">
-          <h2 className="text-3xl font-black tracking-tighter mb-12">{t.routeDetails.theJourney}</h2>
-          
-          <div className="space-y-16">
-            {translatedRoute.itinerary.map((step, index) => (
-              <motion.div 
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="flex flex-col md:flex-row gap-8 group"
-              >
-                <div className="w-full md:w-1/3 aspect-[4/3] rounded-2xl overflow-hidden relative">
-                  <img 
-                    src={route.itinerary[index].img} 
-                    alt={step.location} 
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                    referrerPolicy="no-referrer"
-                  />
-                  <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest text-ink">
-                    {t.routeDetails.day} {index + 1}
+      {/* ── Hero ── */}
+      <div ref={heroRef} className="relative overflow-hidden" style={{ height: '88vh', marginTop: 64 }}>
+        <motion.div style={{ y: heroImgY }} className="absolute inset-0 scale-110 origin-center">
+          <img src={route.img} alt={tr.title} className="img-cover" style={{ filter:'brightness(0.82) saturate(1.05)' }} />
+          <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(5,8,15,0.1) 0%, rgba(5,8,15,0.08) 40%, rgba(5,8,15,0.72) 100%)' }} />
+          <div className="absolute inset-0" style={{ background: 'linear-gradient(to right, rgba(5,8,15,0.35) 0%, transparent 50%)' }} />
+        </motion.div>
+
+        {/* Hero content */}
+        <motion.div style={{ opacity: heroOpacity }}
+          className="absolute inset-0 flex flex-col justify-end px-8 lg:px-20 pb-16 z-10">
+          <motion.div initial={{ opacity:0, y:32 }} animate={{ opacity:1, y:0 }} transition={{ duration:0.8, ease:[0.22,1,0.36,1] }}>
+            {/* Region tag + product code */}
+            <div className="flex items-center gap-2 mb-5">
+              <MapPin size={12} style={{ color:'#C4923A' }} />
+              <p style={{ fontSize:10, fontWeight:700, letterSpacing:'0.3em', textTransform:'uppercase', color:'rgba(196,146,58,0.9)' }}>
+                {tr.region}
+              </p>
+              <span style={{ fontSize:9, fontWeight:700, letterSpacing:'0.2em', fontFamily:'monospace', color:'rgba(255,255,255,0.45)',
+                border:'1px solid rgba(255,255,255,0.18)', borderRadius:99, padding:'3px 10px', marginLeft:8 }}>
+                {route.code}
+              </span>
+            </div>
+
+            <h1 className="text-white mb-6"
+              style={{ fontFamily:'"Cormorant Garamond",serif', fontStyle:'italic', fontWeight:300, fontSize:'clamp(52px,7vw,100px)', lineHeight:0.9 }}>
+              {tr.title}
+            </h1>
+
+            <p className="text-white/60 mb-10" style={{ fontSize:15, maxWidth:520, lineHeight:1.65 }}>{tr.description}</p>
+
+            {/* Quick specs */}
+            <div className="flex flex-wrap gap-3">
+              {[
+                { icon: <Calendar size={13}/>, label: t.routeDetails.duration, val: formatDuration(t.routeDetails.durationFormat, route.days, route.nights) },
+                { icon: <Users size={13}/>,    label: t.routeDetails.groupSize, val: t.routeDetails.groupSizeValue },
+                { icon: <Star size={13}/>,     label: t.routeDetails.serviceLevel, val: t.routeDetails.serviceLevelValue },
+                { icon: <ShieldCheck size={13}/>, label: t.routeDetails.netFrom, val: `€${route.netFrom} / PAX` },
+              ].map((s,i)=>(
+                <div key={i} className="flex items-center gap-3 px-5 py-3 rounded-xl"
+                  style={{ background:'rgba(5,8,15,0.55)', backdropFilter:'blur(16px)', border:'1px solid rgba(255,255,255,0.1)' }}>
+                  <span style={{ color:'#C4923A' }}>{s.icon}</span>
+                  <div>
+                    <p style={{ fontSize:8, fontWeight:700, letterSpacing:'0.22em', textTransform:'uppercase', color:'rgba(255,255,255,0.35)' }}>{s.label}</p>
+                    <p style={{ fontSize:12, fontWeight:700, color:'white' }}>{s.val}</p>
                   </div>
                 </div>
-                <div className="w-full md:w-2/3 flex flex-col justify-center">
-                  <div className="flex items-center gap-2 text-accent mb-3">
-                    <MapPin size={16} />
-                    <h3 className="text-xl font-bold">{step.location}</h3>
+              ))}
+            </div>
+          </motion.div>
+        </motion.div>
+      </div>
+
+      {/* ── Body ── */}
+      <div className="container py-24">
+        <div className="grid lg:grid-cols-12 gap-16">
+
+          {/* Main: Itinerary */}
+          <div className="lg:col-span-7">
+            <div className="flex items-center gap-4 mb-14">
+              <div style={{ width:32, height:1, background:'#B31C2E' }} />
+              <p className="label">{t.routeDetails.theJourney}</p>
+            </div>
+
+            <div className="relative">
+              {/* Vertical line */}
+              <div className="timeline-line" />
+
+              <div className="space-y-0">
+                {route.itinerary.map((step, i) => (
+                  <ItineraryStep key={i} step={step} index={i} total={route.itinerary.length} />
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Sidebar */}
+          <div className="lg:col-span-5 space-y-6">
+
+            {/* Included */}
+            <IncludedCard t={t} />
+
+            {/* Quote form */}
+            <div id="rd-quote" className="rounded-3xl overflow-hidden" style={{ background:'#0B1628' }}>
+              <div className="p-8">
+                <ShieldCheck size={20} style={{ color:'#C4923A', marginBottom:14 }} />
+                <h3 className="heading text-white mb-2" style={{ fontSize:20 }}>
+                  {t.routeDetails.requestQuote.replace(' →','')}
+                </h3>
+                <p style={{ fontSize:13, color:'rgba(255,255,255,0.4)', marginBottom:24, lineHeight:1.6 }}>
+                  Net rates within 48h. White-label itinerary included. No commitment.
+                </p>
+                <form className="space-y-3" onSubmit={e=>e.preventDefault()}>
+                  <input type="text" placeholder="Company name"
+                    className="w-full rounded-xl px-4 py-3 text-sm outline-none transition-all"
+                    style={{ background:'rgba(255,255,255,0.07)', border:'1px solid rgba(255,255,255,0.1)', color:'white' }}
+                    onFocus={e=>(e.currentTarget.style.borderColor='#C4923A')}
+                    onBlur={e=>(e.currentTarget.style.borderColor='rgba(255,255,255,0.1)')} />
+                  <input type="email" placeholder="Work email"
+                    className="w-full rounded-xl px-4 py-3 text-sm outline-none transition-all"
+                    style={{ background:'rgba(255,255,255,0.07)', border:'1px solid rgba(255,255,255,0.1)', color:'white' }}
+                    onFocus={e=>(e.currentTarget.style.borderColor='#C4923A')}
+                    onBlur={e=>(e.currentTarget.style.borderColor='rgba(255,255,255,0.1)')} />
+                  <select className="w-full rounded-xl px-4 py-3 text-sm outline-none"
+                    style={{ background:'rgba(255,255,255,0.07)', border:'1px solid rgba(255,255,255,0.1)', color:'rgba(255,255,255,0.6)' }}>
+                    <option value="">Annual PAX volume</option>
+                    <option>Under 100 PAX</option>
+                    <option>100–500 PAX</option>
+                    <option>500–2,000 PAX</option>
+                    <option>2,000+ PAX</option>
+                  </select>
+                  <button className="btn btn-primary w-full justify-center" style={{ width:'100%', fontSize:10 }}>
+                    {t.routeDetails.requestQuote}
+                  </button>
+                </form>
+                <p style={{ fontSize:9, textAlign:'center', color:'rgba(255,255,255,0.22)', marginTop:14 }}>
+                  Response within 48h · No commitment
+                </p>
+              </div>
+
+              {/* Contact strip */}
+              <div style={{ borderTop:'1px solid rgba(255,255,255,0.07)', padding:'20px 32px' }} className="space-y-3">
+                {[
+                  { icon:<Mail size={13}/>, text:'partnerships@wanlitravel.com' },
+                  { icon:<Phone size={13}/>, text:'+34 91 000 0000 · +86 10 0000 0000' },
+                  { icon:<Clock size={13}/>, text:'48h SLA · Mon–Fri 9:00–18:00 CET' },
+                ].map((c,i)=>(
+                  <div key={i} className="flex items-center gap-3"
+                    style={{ fontSize:12, color:'rgba(255,255,255,0.35)' }}>
+                    <span style={{ color:'#C4923A', flexShrink:0 }}>{c.icon}</span>{c.text}
                   </div>
-                  <p className="text-ink/70 leading-relaxed text-lg">{step.activity}</p>
-                  
-                  <div className="mt-6 flex flex-wrap gap-3">
-                    <span className="px-4 py-2 bg-ink/5 rounded-full text-[10px] font-bold uppercase tracking-widest text-ink/60">{t.routeDetails.guidedTour}</span>
-                    <span className="px-4 py-2 bg-ink/5 rounded-full text-[10px] font-bold uppercase tracking-widest text-ink/60">{t.routeDetails.premium}</span>
-                  </div>
-                </div>
-              </motion.div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* More routes */}
+        <MoreRoutes routes={siblings} t={t} />
+      </div>
+
+      {/* Footer strip */}
+      <div style={{ background:'#05080F', padding:'32px 0' }}>
+        <div className="container flex items-center justify-between">
+          <img src="/logo-dark-bg.jpeg" alt="Wanlitravel" style={{ height:40, objectFit:'contain', borderRadius:8, opacity:0.75 }} />
+          <span style={{ fontSize:9, fontWeight:700, letterSpacing:'0.25em', textTransform:'uppercase', color:'rgba(255,255,255,0.18)' }}>
+            © 2025 Wanlitravel
+          </span>
+          <Link to="/" className="flex items-center gap-2 transition-colors"
+            style={{ fontSize:9, fontWeight:700, letterSpacing:'0.18em', textTransform:'uppercase', color:'rgba(255,255,255,0.35)' }}
+            onMouseEnter={e=>(e.currentTarget.style.color='#C4923A')}
+            onMouseLeave={e=>(e.currentTarget.style.color='rgba(255,255,255,0.35)')}>
+            Back to Home <ArrowRight size={11}/>
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Itinerary Step ─────────────────────────────────────────── */
+function ItineraryStep({ step, index, total }: {
+  step: { location: string; activity: string; img: string };
+  index: number; total: number;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, margin: '-60px' });
+
+  return (
+    <motion.div ref={ref}
+      initial={{ opacity:0, x:-16 }}
+      animate={inView ? { opacity:1, x:0 } : {}}
+      transition={{ duration:0.55, ease:[0.22,1,0.36,1], delay: index * 0.06 }}
+      className="relative pl-12 pb-16">
+
+      {/* Step dot */}
+      <div className="absolute left-0 top-1 w-10 h-10 rounded-full flex items-center justify-center z-10"
+        style={{ background: '#0E1117', border: '2px solid rgba(14,17,23,0.08)' }}>
+        <span style={{ fontSize:11, fontWeight:900, color:'white' }}>{index + 1}</span>
+      </div>
+
+      <div className="grid sm:grid-cols-2 gap-6">
+        {/* Text */}
+        <div>
+          <div className="flex items-center gap-2 mb-3">
+            <MapPin size={11} style={{ color:'#B31C2E', flexShrink:0 }} />
+            <p style={{ fontSize:9, fontWeight:700, letterSpacing:'0.28em', textTransform:'uppercase', color:'#B31C2E' }}>
+              {step.location}
+            </p>
+          </div>
+          <p style={{ fontSize:14, color:'rgba(14,17,23,0.65)', lineHeight:1.65 }}>{step.activity}</p>
+
+          <div className="flex flex-wrap gap-2 mt-5">
+            {['Licensed Guide','Private Transfer','4★+ Hotel'].map((b,i)=>(
+              <span key={i} className="tag tag-light" style={{ fontSize:8 }}>{b}</span>
             ))}
           </div>
         </div>
 
-        {/* Right Column: Details & Booking */}
-        <div className="lg:col-span-4">
-          <div className="sticky top-32 bg-surface p-8 rounded-3xl border border-ink/5">
-            <h3 className="text-2xl font-black tracking-tighter mb-8">{t.routeDetails.routeOverview}</h3>
-            
-            <div className="space-y-6 mb-10">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center text-accent">
-                  <Calendar size={20} />
-                </div>
-                <div>
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-ink/40">{t.routeDetails.duration}</p>
-                  <p className="font-bold">{route.itinerary.length} {t.routeDetails.days} / {route.itinerary.length - 1} {t.routeDetails.nights}</p>
-                </div>
-              </div>
-              
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center text-accent">
-                  <Users size={20} />
-                </div>
-                <div>
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-ink/40">{t.routeDetails.groupSize}</p>
-                  <p className="font-bold">{t.routeDetails.groupSizeValue}</p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center text-accent">
-                  <Star size={20} />
-                </div>
-                <div>
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-ink/40">{t.routeDetails.serviceLevel}</p>
-                  <p className="font-bold">{t.routeDetails.serviceLevelValue}</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="border-t border-ink/10 pt-8 mb-8">
-              <h4 className="font-bold mb-4">{t.routeDetails.includedInThisRoute}</h4>
-              <ul className="space-y-3">
-                {t.routeDetails.includedItems.map((item, i) => (
-                  <li key={i} className="flex items-start gap-3 text-sm text-ink/70">
-                    <CheckCircle2 size={18} className="text-accent shrink-0 mt-0.5" />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <button className="w-full bg-ink text-white py-4 rounded-xl font-bold uppercase tracking-widest text-xs hover:bg-accent transition-colors">
-              {t.routeDetails.requestQuote}
-            </button>
-          </div>
+        {/* Image */}
+        <div className="img-zoom-wrap rounded-2xl overflow-hidden" style={{ aspectRatio:'4/3', background:'#F0EDE8' }}>
+          <img src={step.img} alt={step.location} className="img-cover" referrerPolicy="no-referrer" />
         </div>
+      </div>
+    </motion.div>
+  );
+}
 
+/* ── Included Card ──────────────────────────────────────────── */
+function IncludedCard({ t }: { t: typeof import('./translations').translations.en }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true });
+  return (
+    <motion.div ref={ref} initial={{ opacity:0, y:20 }} animate={inView?{opacity:1,y:0}:{}} transition={{ duration:0.5 }}
+      className="card" style={{ padding:28 }}>
+      <div className="flex items-center gap-3 mb-6">
+        <ShieldCheck size={16} style={{ color:'#B31C2E' }} />
+        <p style={{ fontSize:11, fontWeight:700, letterSpacing:'0.2em', textTransform:'uppercase', color:'#0E1117' }}>
+          {t.routeDetails.includedInThisRoute}
+        </p>
+      </div>
+      <ul className="space-y-3">
+        {t.routeDetails.includedItems.map((item, i) => (
+          <motion.li key={i}
+            initial={{ opacity:0, x:-10 }} animate={inView?{opacity:1,x:0}:{}} transition={{ delay:0.05 + i*0.05 }}
+            className="flex items-start gap-3">
+            <CheckCircle2 size={13} style={{ color:'#B31C2E', flexShrink:0, marginTop:2 }} />
+            <span style={{ fontSize:13, color:'rgba(14,17,23,0.65)', lineHeight:1.5 }}>{item}</span>
+          </motion.li>
+        ))}
+      </ul>
+    </motion.div>
+  );
+}
+
+/* ── More Routes ────────────────────────────────────────────── */
+function MoreRoutes({ routes, t }: { routes: typeof allRoutes; t: typeof import('./translations').translations.en }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, margin: '-80px' });
+
+  return (
+    <div ref={ref} className="mt-28 pt-20" style={{ borderTop:'1px solid rgba(14,17,23,0.08)' }}>
+      <div className="flex items-center gap-4 mb-12">
+        <div style={{ width:28, height:1, background:'#B31C2E' }} />
+        <p className="label">More Routes</p>
+      </div>
+      <div className="grid sm:grid-cols-3 gap-5">
+        {routes.map((r, i) => {
+          const tr = t.routes[r.id as keyof typeof t.routes];
+          return (
+            <motion.div key={r.id}
+              initial={{ opacity:0, y:28 }} animate={inView?{opacity:1,y:0}:{}} transition={{ delay:i*0.1, duration:0.6 }}>
+              <Link to={`/route/${r.id}`} className="route-card block" style={{ aspectRatio:'3/4' }}>
+                <img src={r.img} alt={tr?.title} className="img-cover w-full h-full" />
+                <div className="absolute inset-0 z-10 flex flex-col justify-end p-6">
+                  <p style={{ fontSize:9, fontWeight:700, letterSpacing:'0.28em', textTransform:'uppercase', color:'rgba(196,146,58,0.85)', marginBottom:6 }}>
+                    {tr?.region}
+                  </p>
+                  <h3 className="heading text-white" style={{ fontSize:20 }}>{tr?.title}</h3>
+                  <div className="flex items-center gap-2 mt-4" style={{ opacity:0, transform:'translateY(6px)', transition:'all 0.3s ease' }}
+                    onMouseEnter={e=>{
+                      const p = e.currentTarget; p.style.opacity='1'; p.style.transform='translateY(0)';
+                    }}>
+                    <span style={{ fontSize:9, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.18em', color:'rgba(255,255,255,0.5)' }}>View</span>
+                    <ArrowRight size={11} style={{ color:'#C4923A' }} />
+                  </div>
+                </div>
+              </Link>
+            </motion.div>
+          );
+        })}
       </div>
     </div>
   );
-};
-
-export default RouteDetails;
+}

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<CitiesResult>
+<result>
+<cod_result>M1</cod_result>
+<des_result>Operación correcta</des_result>
+<type_message>I</type_message>
+</result>
+<cities>
+<city>
+<code>10001</code>
+<description>Estepona</description>
+<countryCode>ES</countryCode>
+<provinceCode>Mlg</provinceCode>
+</city>
+<city>
+<code>10001</code>
+<description>Torremolinos</description>
+<countryCode>ES</countryCode>
+<provinceCode>Mlg</provinceCode>
+</city>
+<city>
+<code>10015</code>
+<description>Benalmádena</description>
+<countryCode>ES</countryCode>
+<provinceCode>Mlg</provinceCode>
+</city>
+<city>
+<code>10023</code>
+<description>Málaga</description>
+<countryCode>ES</countryCode>
+<provinceCode>Mlg</provinceCode>
+</city>
+<city>
+<code>10045</code>
+<description>Marbella</description>
+<countryCode>ES</countryCode>
+<provinceCode>Mlg</provinceCode>
+</city>
+</cities>
+ <timeStamp>2020-02-27T12:02:15.596+01:00</timeStamp>
+</CitiesResult>

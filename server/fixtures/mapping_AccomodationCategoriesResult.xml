@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<AccomodationCategoriesResult>
+<result>
+<cod_result>M1</cod_result>
+<des_result>Operación correcta</des_result>
+<type_message>I</type_message>
+</result>
+<categories>
+<category>
+<code>1</code>
+<description>1 Estrella</description>
+</category>
+<category>
+<code>2</code>
+<description>2 Estrellas</description>
+</category>
+<category>
+<code>3</code>
+<description>3 Estrellas</description>
+</category>
+<category>
+<code>4</code>
+<description>4 Estrellas</description>
+</category>
+<category>
+<code>5</code>
+<description>5 Estrellas</description>
+</category>
+</categories>
+  <timeStamp>2020-02-27T12:02:15.596+01:00</timeStamp>
+</AccomodationCategoriesResult>

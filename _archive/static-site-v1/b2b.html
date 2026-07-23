@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>B2B 合作伙伴 | 万里旅行 WANLITRAVEL</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@200;700&family=Noto+Sans+SC:wght@100;300;400&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <style>
+        :root { --iberia-red: #E31B23; --rich-black: #050505; --deep-gold: #c9a96e; }
+        body { background-color: var(--rich-black); color: #ffffff; font-family: 'Noto Sans SC', sans-serif; overflow-x: hidden; }
+        .serif { font-family: 'Noto Serif SC', serif; font-weight: 200; }
+        .tracking-ultra { letter-spacing: 0.5em; }
+        .tracking-luxury { letter-spacing: 0.2em; }
+        .luxury-border { border: 1px solid rgba(255,255,255,0.08); transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+        .glass-nav { background: rgba(5, 5, 5, 0.4); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.03); }
+    </style>
+</head>
+<body>
+    <nav class="fixed w-full z-[100] px-12 py-6 flex justify-between items-center glass-nav">
+        <a href="zh.html" class="text-xl font-light tracking-ultra iberia-red serif">WANLITRAVEL</a>
+        <div class="flex items-center space-x-12 text-[10px] uppercase tracking-ultra font-light">
+            <a href="zh.html#tours" class="hover:text-white transition">精品路线</a>
+            <a href="zh.html" class="hover:text-white transition">返回首页</a>
+            <button class="bg-white text-black px-6 py-2 hover:bg-red-600 hover:text-white transition">立即联系</button>
+        </div>
+    </nav>
+
+    <section class="pt-48 pb-32 px-12 max-w-7xl mx-auto">
+        <div class="mb-32" data-aos="fade-up">
+            <p class="text-[10px] tracking-ultra iberia-red mb-6 uppercase">DMC Partnership</p>
+            <h1 class="text-6xl md:text-8xl serif font-light tracking-luxury leading-tight mb-8">
+                赋能全球旅行商 <br> <span class="italic text-gray-500">直连伊比利亚</span>
+            </h1>
+            <div class="w-24 h-px bg-iberia-red mb-12"></div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-32">
+            <div class="space-y-16" data-aos="fade-right">
+                <div class="luxury-border p-12">
+                    <h3 class="text-2xl serif mb-6 tracking-luxury">实时资源直连</h3>
+                    <p class="text-gray-400 font-light leading-loose text-sm">
+                        接入我们的 NDC 实时库存系统，获取最前沿的机票、酒店及官方地接资源。支持多币种即时结算，无中间商。
+                    </p>
+                </div>
+                <div class="luxury-border p-12">
+                    <h3 class="text-2xl serif mb-6 tracking-luxury">全境内自营服务</h3>
+                    <p class="text-gray-400 font-light leading-loose text-sm">
+                        拥有西班牙、葡萄牙全境自营车队与持证华人导游库。提供 24/7 全中文紧急响应，确保每一个 PAX 的极致体验。
+                    </p>
+                </div>
+                <div class="luxury-border p-12">
+                    <h3 class="text-2xl serif mb-6 tracking-luxury">合作伙伴权益</h3>
+                    <p class="text-gray-400 font-light leading-loose text-sm">
+                        为注册代理商提供全套 Marketing Toolkit（海报、视频、PR文案）。定期举办伊比利亚踩线团。
+                    </p>
+                </div>
+            </div>
+
+            <div class="bg-zinc-950 p-12 luxury-border h-fit sticky top-48" data-aos="fade-left">
+                <h2 class="text-3xl serif mb-12 tracking-luxury">申请成为合作伙伴</h2>
+                <form class="space-y-8">
+                    <div><label class="text-[9px] tracking-ultra uppercase text-gray-600 mb-2 block">Company Name</label><input type="text" class="w-full bg-transparent border-b border-white/10 py-3 text-sm focus:border-red-600 outline-none transition"></div>
+                    <div><label class="text-[9px] tracking-ultra uppercase text-gray-600 mb-2 block">Business Email</label><input type="email" class="w-full bg-transparent border-b border-white/10 py-3 text-sm focus:border-red-600 outline-none transition"></div>
+                    <div class="grid grid-cols-2 gap-12">
+                        <div><label class="text-[9px] tracking-ultra uppercase text-gray-600 mb-2 block">Region</label><input type="text" class="w-full bg-transparent border-b border-white/10 py-3 text-sm focus:border-red-600 outline-none transition"></div>
+                        <div><label class="text-[9px] tracking-ultra uppercase text-gray-600 mb-2 block">Monthly PAX</label><input type="text" class="w-full bg-transparent border-b border-white/10 py-3 text-sm focus:border-red-600 outline-none transition"></div>
+                    </div>
+                    <button class="w-full py-5 bg-iberia-red text-white text-[10px] tracking-ultra uppercase font-bold hover:bg-red-700 transition">Submit Application</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <footer class="py-24 px-12 text-center text-[9px] tracking-ultra text-gray-600 border-t border-white/5 uppercase">
+        Wanlitravel DMC Business Unit · Spain Licensed B-XXXXXXXX
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>AOS.init({ once: true });</script>
+</body>
+</html>

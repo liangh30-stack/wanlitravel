@@ -1,736 +1,870 @@
-import React, { useRef, useState, createContext, useContext } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Link, useNavigate } from 'react-router-dom';
-import { motion, useScroll, useTransform, useSpring, AnimatePresence } from 'motion/react';
-import { spainRoutes, chinaRoutes } from './data';
+import {
+  motion, useScroll, useTransform, useSpring,
+  AnimatePresence, useInView, useMotionValue,
+} from 'motion/react';
+import { spainRoutes, chinaRoutes, formatDuration } from './data';
 import RouteDetails from './RouteDetails';
 import { translations, Language } from './translations';
-import { 
-  ArrowRight, 
-  ChevronDown,
-  Phone,
-  Mail,
-  Globe,
-  Compass,
-  Map,
-  Sparkles,
-  Coffee,
-  Camera,
-  Heart,
-  Star
+import { LanguageContext, useLanguage } from './context';
+import {
+  ArrowRight, ArrowUpRight, ChevronDown, Globe2, Sparkles,
+  Star, CheckCircle2, TrendingUp, Clock3, ShieldCheck, Zap,
+  Users2, Quote, Phone, Mail, ChevronLeft, ChevronRight,
+  MapPin, Building2, Wifi,
 } from 'lucide-react';
 
-// --- Context ---
-export const LanguageContext = createContext<{
-  language: Language;
-  setLanguage: (lang: Language) => void;
-  t: typeof translations.en;
-}>({
-  language: 'en',
-  setLanguage: () => {},
-  t: translations.en,
-});
-
-export const useLanguage = () => useContext(LanguageContext);
-
-// --- Components ---
-
-const Grain = () => <div className="grain" />;
-
-const Navbar = () => {
-  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
-  const navigate = useNavigate();
-  const dropdownTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const { language, setLanguage, t } = useLanguage();
-
-  const handleMouseEnter = (dropdownId: string) => {
-    if (dropdownTimeoutRef.current) {
-      clearTimeout(dropdownTimeoutRef.current);
-    }
-    setActiveDropdown(dropdownId);
-  };
-
-  const handleMouseLeave = () => {
-    dropdownTimeoutRef.current = setTimeout(() => {
-      setActiveDropdown(null);
-    }, 300); // 300ms delay before closing
-  };
-
-  const handleNavClick = (percent: number, dropdownId: string) => {
-    if (window.location.pathname !== '/') {
-      navigate('/');
-      setTimeout(() => scrollToPercent(percent), 100);
-    } else {
-      scrollToPercent(percent);
-    }
-    setActiveDropdown(activeDropdown === dropdownId ? null : dropdownId);
-  };
-
-  const scrollToPercent = (percent: number) => {
-    const height = document.documentElement.scrollHeight - window.innerHeight;
-    window.scrollTo({
-      top: height * percent,
-      behavior: 'smooth'
-    });
-  };
-
+/* ─────────────────────────────────────────────────────────────
+   CURSOR GLOW
+───────────────────────────────────────────────────────────── */
+const CursorGlow = () => {
+  const x = useMotionValue(-999);
+  const y = useMotionValue(-999);
+  useEffect(() => {
+    const move = (e: MouseEvent) => { x.set(e.clientX); y.set(e.clientY); };
+    window.addEventListener('mousemove', move);
+    return () => window.removeEventListener('mousemove', move);
+  }, []);
   return (
-    <nav className="fixed top-0 left-0 w-full z-[100] py-8 px-16 flex justify-between items-center bg-white/80 backdrop-blur-md border-b border-ink/5 text-ink">
-      <div className="flex items-center gap-12">
-        <Link to="/" className="cursor-pointer"><img src="/logo-light-bg.jpeg" alt="Wanli - Bridging China and Europe" className="h-12 object-contain" /></Link>
-        <div className="h-4 w-[1px] bg-ink/10"></div>
-        <div className="flex gap-10 text-[9px] font-bold uppercase tracking-[0.2em] relative">
-          
-          {/* Spain Dropdown */}
-          <div className="relative group" onMouseLeave={handleMouseLeave} onMouseEnter={() => handleMouseEnter('spain')}>
-            <button 
-              onClick={() => handleNavClick(0.6, 'spain')} 
-              className="hover:text-accent transition-colors uppercase flex items-center gap-1 py-4"
-            >
-              {t.nav.spainCollections} <ChevronDown size={10} />
-            </button>
-            <AnimatePresence>
-              {activeDropdown === 'spain' && (
-                <motion.div 
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 10 }}
-                  className="absolute top-full left-0 pt-2 w-64"
-                >
-                  <div className="bg-white border border-ink/5 shadow-2xl rounded-2xl overflow-hidden py-4">
-                    {spainRoutes.map(route => (
-                      <Link 
-                        key={route.id} 
-                        to={`/route/${route.id}`}
-                        className="block px-6 py-3 hover:bg-surface transition-colors"
-                        onClick={() => setActiveDropdown(null)}
-                      >
-                        <p className="text-xs font-black text-ink normal-case tracking-normal mb-1">{t.routes[route.id as keyof typeof t.routes].title}</p>
-                        <p className="text-[8px] text-ink/50">{t.routes[route.id as keyof typeof t.routes].region}</p>
-                      </Link>
-                    ))}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-
-          {/* China Dropdown */}
-          <div className="relative group" onMouseLeave={handleMouseLeave} onMouseEnter={() => handleMouseEnter('china')}>
-            <button 
-              onClick={() => handleNavClick(0.8, 'china')} 
-              className="hover:text-accent transition-colors uppercase flex items-center gap-1 py-4"
-            >
-              {t.nav.chinaRoutes} <ChevronDown size={10} />
-            </button>
-            <AnimatePresence>
-              {activeDropdown === 'china' && (
-                <motion.div 
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 10 }}
-                  className="absolute top-full left-0 pt-2 w-64"
-                >
-                  <div className="bg-white border border-ink/5 shadow-2xl rounded-2xl overflow-hidden py-4">
-                    {chinaRoutes.map(route => (
-                      <Link 
-                        key={route.id} 
-                        to={`/route/${route.id}`}
-                        className="block px-6 py-3 hover:bg-surface transition-colors"
-                        onClick={() => setActiveDropdown(null)}
-                      >
-                        <p className="text-xs font-black text-ink normal-case tracking-normal mb-1">{t.routes[route.id as keyof typeof t.routes].title}</p>
-                        <p className="text-[8px] text-ink/50">{t.routes[route.id as keyof typeof t.routes].region}</p>
-                      </Link>
-                    ))}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-
-          <button onClick={() => handleNavClick(0.4, 'b2b')} className="hover:text-accent transition-colors uppercase">{t.nav.b2bSolutions}</button>
-        </div>
-      </div>
-      
-      <div className="flex items-center gap-10 text-[9px] font-bold tracking-[0.2em]">
-        <div className="flex items-center gap-2">
-          <Globe size={12} className="text-accent" />
-          <div className="flex gap-2">
-            <button onClick={() => setLanguage('en')} className={`hover:text-accent transition-colors ${language === 'en' ? 'text-accent' : ''}`}>EN</button>
-            <span className="opacity-30">/</span>
-            <button onClick={() => setLanguage('zh')} className={`hover:text-accent transition-colors ${language === 'zh' ? 'text-accent' : ''}`}>中文</button>
-            <span className="opacity-30">/</span>
-            <button onClick={() => setLanguage('es')} className={`hover:text-accent transition-colors ${language === 'es' ? 'text-accent' : ''}`}>ES</button>
-          </div>
-        </div>
-        <button 
-          onClick={() => handleNavClick(0.95, 'partner')}
-          className="bg-ink text-white px-6 py-2 rounded-full hover:bg-accent transition-colors uppercase tracking-widest text-[8px]"
-        >
-          {t.nav.partnerPortal}
-        </button>
-      </div>
-    </nav>
+    <motion.div className="cursor-glow"
+      style={{ left: x, top: y, position: 'fixed', pointerEvents: 'none', zIndex: 9000 }} />
   );
 };
 
-const ScrollytellingExperience = () => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const { t } = useLanguage();
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end end"]
-  });
-
-  const smoothProgress = useSpring(scrollYProgress, { damping: 20, stiffness: 100 });
-
-  // --- HERO PORTAL ANIMATIONS (0% - 15%) ---
-  const portalScale = useTransform(smoothProgress, [0, 0.15], [1, 20]);
-  const portalOpacity = useTransform(smoothProgress, [0.13, 0.15], [1, 0]);
-  const heroTextOpacity = useTransform(smoothProgress, [0, 0.08], [1, 0]);
-  const heroTextY = useTransform(smoothProgress, [0, 0.08], [0, -50]);
-  const bgParallax = useTransform(smoothProgress, [0, 0.15], [0, -100]);
-  
-  // --- THE EXCHANGE (15% - 35%) ---
-  const exchangeSectionOpacity = useTransform(smoothProgress, [0.15, 0.2, 0.3, 0.35], [0, 1, 1, 0]);
-  const exchangeRotate = useTransform(smoothProgress, [0.2, 0.3], [0, 180]);
-  const exchangeScale = useTransform(smoothProgress, [0.2, 0.3], [0.8, 1]);
-  const specsOpacity = useTransform(smoothProgress, [0.22, 0.28], [0, 1]);
-
-  // --- FEMALE CURATION (35% - 55%) ---
-  const curationOpacity = useTransform(smoothProgress, [0.35, 0.4, 0.5, 0.55], [0, 1, 1, 0]);
-  const curationY = useTransform(smoothProgress, [0.35, 0.4], [100, 0]);
-
-  // --- DESTINATION CONTRAST (55% - 75%) ---
-  const destinationOpacity = useTransform(smoothProgress, [0.55, 0.6, 0.7, 0.75], [0, 1, 1, 0]);
-  const destinationScale = useTransform(smoothProgress, [0.6, 0.7], [0.9, 1.1]);
-
-  // --- GLOBAL MAP (75% - 90%) ---
-  const globalOpacity = useTransform(smoothProgress, [0.75, 0.8, 0.85, 0.9], [0, 1, 1, 0]);
-  const mapScale = useTransform(smoothProgress, [0.8, 0.9], [0.8, 1.2]);
-
-  // --- COMMUNITY (90% - 100%) ---
-  const communityOpacity = useTransform(smoothProgress, [0.9, 0.95], [0, 1]);
-  const communityY = useTransform(smoothProgress, [0.9, 0.95], [50, 0]);
-
+/* ─────────────────────────────────────────────────────────────
+   DUAL CLOCK — Madrid / Beijing (carried over from static site v1)
+───────────────────────────────────────────────────────────── */
+const DualClock = ({ solid }: { solid: boolean }) => {
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 30_000);
+    return () => clearInterval(id);
+  }, []);
+  const fmt = (tz: string) =>
+    now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: tz });
   return (
-    <div ref={containerRef} className="h-[1200vh] relative bg-bg">
-      
-      {/* 1. THE CULTURAL GATEWAY (Sticky) */}
-      <div className="sticky top-0 h-screen w-full flex items-center justify-center overflow-hidden">
-        
-        {/* Background (Spanish Architecture - Iconic Gateway) */}
-        <motion.div style={{ y: bgParallax }} className="absolute inset-0 z-0">
-          <img 
-            src="https://images.unsplash.com/photo-1558642084-fd07fae5282e?auto=format&fit=crop&q=80&w=2000" 
-            alt="Spanish Architecture" 
-            className="w-full h-[120%] object-cover brightness-75"
-            referrerPolicy="no-referrer"
-          />
-        </motion.div>
-
-        {/* The Gateway Portal */}
-        <motion.div 
-          style={{ scale: portalScale, opacity: portalOpacity }}
-          className="relative z-20 w-[350px] h-[500px] md:w-[550px] md:h-[750px] bg-bg flex items-center justify-center"
-        >
-          <div className="w-[85%] h-[85%] bg-transparent plane-window-shape shadow-[0_0_0_100vw_#F9F7F2] relative overflow-hidden">
-             <div className="absolute inset-0 border-[15px] border-accent/20 rounded-[160px] pointer-events-none z-10"></div>
-             <img 
-               src="https://images.unsplash.com/photo-1547981609-4b6bfe67ca0b?auto=format&fit=crop&q=80&w=1200" 
-               alt="China Landscape" 
-               className="w-full h-full object-cover"
-               referrerPolicy="no-referrer"
-             />
-             <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-                <img src="/logo-dark-bg.jpeg" alt="Wanli" className="w-72 opacity-50 rounded-2xl" />
-             </div>
-          </div>
-        </motion.div>
-
-        {/* Hero Text Overlay */}
-        <div className="absolute inset-0 z-30 flex items-center justify-between px-24 pointer-events-none">
-          <motion.div style={{ opacity: heroTextOpacity, y: heroTextY }} className="max-w-xl">
-            <h1 className="text-[11vw] leading-[0.82] mb-12 text-ink">
-              {t.hero.b2b}<br /><span className="italic font-serif normal-case tracking-normal text-accent">{t.hero.excellence}</span>
-            </h1>
-            <div className="flex gap-10 items-start">
-              <div className="w-16 h-[2px] bg-accent mt-3"></div>
-              <div className="space-y-4">
-                <p className="text-xs font-bold uppercase tracking-[0.4em] text-ink">{t.hero.subtitle}</p>
-                <p className="text-sm font-medium text-ink/60 max-w-xs leading-relaxed">
-                  {t.hero.description}
-                </p>
-              </div>
-            </div>
-          </motion.div>
-
-          <motion.div style={{ opacity: heroTextOpacity, y: heroTextY }} className="text-right">
-            <h1 className="text-[11vw] leading-[0.82] text-ink">
-              {t.hero.scale}<br /><span className="italic font-serif normal-case tracking-normal text-sun">{t.hero.trust}</span>
-            </h1>
-          </motion.div>
-        </div>
-
-        {/* Fixed Bottom Button */}
-        <div className="absolute bottom-12 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-6">
-          <motion.button 
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => scrollToPercent(0.95)}
-            className="bg-accent text-bg px-12 py-5 rounded-full text-[10px] font-bold uppercase tracking-[0.3em] shadow-2xl relative overflow-hidden group"
-          >
-            <span className="relative z-10">{t.nav.partnerPortal}</span>
-            <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-500"></div>
-          </motion.button>
-          <motion.div 
-            style={{ opacity: heroTextOpacity }}
-            animate={{ y: [0, 8, 0] }} 
-            transition={{ repeat: Infinity, duration: 2 }}
-            className="flex flex-col items-center gap-2 opacity-30"
-          >
-            <span className="text-[8px] font-bold uppercase tracking-[0.5em] text-ink">{t.hero.scroll}</span>
-            <ChevronDown size={14} className="text-ink" />
-          </motion.div>
-        </div>
-      </div>
-
-      {/* 2. THE EXCHANGE (Sticky) */}
-      <motion.div 
-        style={{ opacity: exchangeSectionOpacity }}
-        className="sticky top-0 h-screen w-full bg-white z-40 flex items-center justify-center overflow-hidden"
-      >
-        <div className="max-w-7xl mx-auto w-full px-12 grid grid-cols-12 items-center relative h-full">
-          
-          {/* Left: Outbound China */}
-          <motion.div style={{ opacity: specsOpacity }} className="col-span-3 space-y-20">
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.5em] mb-4 text-sun">{t.exchange.outbound}</p>
-              <h2 className="text-7xl leading-none" dangerouslySetInnerHTML={{ __html: t.exchange.chinaToEurope.replace(' to ', '<br />to ') }}></h2>
-            </div>
-            <div className="space-y-8">
-              <div>
-                <p className="text-[10px] font-bold uppercase tracking-widest opacity-30 mb-2">{t.exchange.targetGroup}</p>
-                <p className="text-3xl font-bold tracking-tighter">{t.exchange.chineseConsumers}</p>
-              </div>
-              <div>
-                <p className="text-[10px] font-bold uppercase tracking-widest opacity-30 mb-2">{t.exchange.solutions}</p>
-                <p className="text-3xl font-bold tracking-tighter">{t.exchange.wholesaleRoutes}</p>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Rotating Cultural Icons */}
-          <div className="col-span-6 flex items-center justify-center relative">
-            <motion.div 
-              style={{ rotate: exchangeRotate, scale: exchangeScale }}
-              className="w-full max-w-md relative z-10 aspect-square flex items-center justify-center"
-            >
-              {/* Orbital Track */}
-              <div className="absolute inset-0 border-[2px] border-dashed border-ink/10 rounded-full"></div>
-              
-              {/* Europe Node */}
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white p-3 rounded-full shadow-2xl border border-ink/5">
-                <div className="relative w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden">
-                  <img 
-                    src="https://images.unsplash.com/photo-1499856871958-5b9627545d1a?auto=format&fit=crop&q=100&w=1600" 
-                    alt="Europe" 
-                    className="w-full h-full object-cover" 
-                    referrerPolicy="no-referrer" 
-                  />
-                  <div className="absolute inset-0 shadow-inner rounded-full pointer-events-none"></div>
-                </div>
-              </div>
-
-              {/* China Node */}
-              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 bg-white p-3 rounded-full shadow-2xl border border-ink/5">
-                <div className="relative w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden">
-                  <img 
-                    src="https://images.unsplash.com/photo-1547981609-4b6bfe67ca0b?auto=format&fit=crop&q=100&w=1600" 
-                    alt="China" 
-                    className="w-full h-full object-cover" 
-                    referrerPolicy="no-referrer" 
-                  />
-                  <div className="absolute inset-0 shadow-inner rounded-full pointer-events-none"></div>
-                </div>
-              </div>
-              
-              {/* Center Anchor */}
-              <div className="bg-white p-6 rounded-full shadow-xl border border-ink/5 z-20 relative">
-                <Globe size={48} className="text-accent" strokeWidth={1.5} />
-              </div>
-            </motion.div>
-          </div>
-
-          {/* Right: Inbound China */}
-          <motion.div style={{ opacity: specsOpacity }} className="col-span-3 text-right space-y-20">
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.5em] mb-4 text-accent">{t.exchange.inbound}</p>
-              <h2 className="text-7xl leading-none" dangerouslySetInnerHTML={{ __html: t.exchange.europeToChina.replace(' to ', '<br />to ') }}></h2>
-            </div>
-            <div className="space-y-8">
-              <div>
-                <p className="text-[10px] font-bold uppercase tracking-widest opacity-30 mb-2">{t.exchange.targetGroup}</p>
-                <p className="text-3xl font-bold tracking-tighter">{t.exchange.europeanTravelers}</p>
-              </div>
-              <div>
-                <p className="text-[10px] font-bold uppercase tracking-widest opacity-30 mb-2">{t.exchange.solutions}</p>
-                <p className="text-3xl font-bold tracking-tighter">{t.exchange.groundHandling}</p>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Background Watermark */}
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <h2 className="text-[20vw] font-black text-outline opacity-5 select-none">{t.exchange.title.replace('.', '').toUpperCase()}</h2>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* 3. B2B SOLUTIONS & DASHBOARD (Sticky) */}
-      <motion.div 
-        style={{ opacity: curationOpacity, y: curationY }}
-        className="sticky top-0 h-screen w-full bg-ink text-white z-42 flex items-center justify-center overflow-hidden"
-      >
-        {/* Atmospheric Background */}
-        <div className="absolute inset-0 z-0 opacity-40">
-          <img 
-            src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=2000" 
-            alt="Global Network" 
-            className="w-full h-full object-cover mix-blend-luminosity scale-105"
-            referrerPolicy="no-referrer"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-ink via-ink/90 to-ink/40"></div>
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(242,125,38,0.15),transparent_50%)]"></div>
-        </div>
-
-        <div className="max-w-7xl mx-auto w-full px-12 relative z-10">
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-20 items-center">
-            <div className="col-span-1 md:col-span-5 space-y-16">
-              <div className="relative">
-                <div className="absolute -left-10 top-0 w-1 h-full bg-accent"></div>
-                <p className="text-[11px] font-bold uppercase tracking-[0.6em] mb-6 text-accent">{t.b2b.subtitle}</p>
-                <h2 className="text-7xl md:text-[90px] leading-[0.85] font-black tracking-tighter" dangerouslySetInnerHTML={{ __html: t.b2b.title.replace('.', '.<br />') }}></h2>
-              </div>
-              <div className="space-y-10">
-                <div className="flex gap-8 items-start group">
-                  <div className="w-16 h-16 bg-white/5 backdrop-blur-xl rounded-2xl flex items-center justify-center shadow-2xl border border-white/10 shrink-0 group-hover:border-accent/50 transition-colors">
-                    <Globe size={28} className="text-accent" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-bold uppercase tracking-[0.2em] mb-3 text-white">{t.b2b.inventory}</p>
-                    <p className="text-sm text-white/50 leading-relaxed font-medium">{t.b2b.inventoryDesc}</p>
-                  </div>
-                </div>
-                <div className="flex gap-8 items-start group">
-                  <div className="w-16 h-16 bg-white/5 backdrop-blur-xl rounded-2xl flex items-center justify-center shadow-2xl border border-white/10 shrink-0 group-hover:border-accent/50 transition-colors">
-                    <Map size={28} className="text-accent" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-bold uppercase tracking-[0.2em] mb-3 text-white">{t.b2b.dynamic}</p>
-                    <p className="text-sm text-white/50 leading-relaxed font-medium">{t.b2b.dynamicDesc}</p>
-                  </div>
-                </div>
-              </div>
-              <button 
-                onClick={() => scrollToPercent(0.95)}
-                className="group relative inline-flex items-center justify-center px-12 py-6 text-[11px] font-bold text-white uppercase tracking-[0.3em] overflow-hidden rounded-full bg-ink border border-white/20 hover:border-accent transition-colors"
-              >
-                <span className="absolute inset-0 w-full h-full bg-accent opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-out"></span>
-                <span className="relative z-10 flex items-center gap-3">{t.b2b.requestDemo} <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" /></span>
-              </button>
-            </div>
-
-            <div className="col-span-1 md:col-span-7">
-              <div className="bg-white/5 backdrop-blur-3xl rounded-[40px] p-12 shadow-[0_30px_100px_rgba(0,0,0,0.5)] border border-white/10 relative overflow-hidden">
-                {/* Glow effect behind dashboard */}
-                <div className="absolute -top-40 -right-40 w-[500px] h-[500px] bg-accent/20 rounded-full blur-[120px] pointer-events-none"></div>
-                <div className="absolute -bottom-40 -left-40 w-[400px] h-[400px] bg-blue-500/10 rounded-full blur-[100px] pointer-events-none"></div>
-                
-                <div className="flex items-center justify-between mb-12 border-b border-white/10 pb-8 relative z-10">
-                  <div className="flex gap-4">
-                    <div className="w-3 h-3 rounded-full bg-white/20"></div>
-                    <div className="w-3 h-3 rounded-full bg-white/20"></div>
-                    <div className="w-3 h-3 rounded-full bg-white/20"></div>
-                  </div>
-                  <div className="text-[10px] font-bold opacity-50 uppercase tracking-[0.3em] font-mono">{t.b2b.dashboard.title}</div>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative z-10">
-                  <div className="col-span-1 md:col-span-2 space-y-8">
-                    <div className="h-48 bg-gradient-to-br from-white/10 to-transparent rounded-3xl p-8 flex flex-col justify-between border border-white/10 shadow-inner">
-                      <p className="text-[10px] font-bold opacity-60 uppercase tracking-widest">{t.b2b.dashboard.bookings}</p>
-                      <div className="flex items-end justify-between">
-                        <span className="text-7xl font-black tracking-tighter">1,284</span>
-                        <span className="text-sm text-accent font-bold tracking-widest bg-accent/10 px-4 py-2 rounded-full">{t.b2b.dashboard.yoy}</span>
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-8">
-                      <div className="h-40 bg-white/5 rounded-3xl p-8 flex flex-col justify-between border border-white/5 hover:bg-white/10 transition-colors">
-                        <p className="text-[10px] font-bold opacity-60 uppercase tracking-widest">{t.b2b.dashboard.revenue}</p>
-                        <span className="text-4xl font-black tracking-tight">€4.2M</span>
-                      </div>
-                      <div className="h-40 bg-white/5 rounded-3xl p-8 flex flex-col justify-between border border-white/5 hover:bg-white/10 transition-colors">
-                        <p className="text-[10px] font-bold opacity-60 uppercase tracking-widest">{t.b2b.dashboard.allotment}</p>
-                        <span className="text-4xl font-black tracking-tight">84%</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="bg-accent/10 rounded-3xl p-8 space-y-10 border border-accent/20 backdrop-blur-md">
-                    <p className="text-[10px] font-bold opacity-90 uppercase tracking-[0.2em] text-accent">{t.b2b.dashboard.topRoutes}</p>
-                    <div className="space-y-8">
-                      <div>
-                        <div className="flex justify-between items-center mb-3">
-                          <span className="text-xs font-bold tracking-widest font-mono">SHA — MAD</span>
-                          <span className="text-[10px] opacity-70 font-mono">92%</span>
-                        </div>
-                        <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
-                          <div className="w-[92%] h-full bg-accent rounded-full shadow-[0_0_10px_rgba(242,125,38,0.8)]"></div>
-                        </div>
-                      </div>
-                      <div>
-                        <div className="flex justify-between items-center mb-3">
-                          <span className="text-xs font-bold tracking-widest font-mono">PEK — BCN</span>
-                          <span className="text-[10px] opacity-70 font-mono">88%</span>
-                        </div>
-                        <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
-                          <div className="w-[88%] h-full bg-sun rounded-full shadow-[0_0_10px_rgba(242,193,38,0.8)]"></div>
-                        </div>
-                      </div>
-                      <div>
-                        <div className="flex justify-between items-center mb-3">
-                          <span className="text-xs font-bold tracking-widest font-mono">CAN — PAR</span>
-                          <span className="text-[10px] opacity-70 font-mono">76%</span>
-                        </div>
-                        <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
-                          <div className="w-[76%] h-full bg-white/60 rounded-full"></div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* 4. SPAIN COLLECTIONS (Sticky) */}
-      <motion.div 
-        id="spain"
-        style={{ opacity: destinationOpacity }}
-        className="sticky top-0 h-screen w-full bg-white z-45 flex items-center justify-center overflow-hidden"
-      >
-        {/* Subtle Spain Background Overlay */}
-        <div className="absolute inset-0 z-0 opacity-[0.03] pointer-events-none">
-          <img 
-            src="https://images.unsplash.com/photo-1543783232-af412b852fc3?auto=format&fit=crop&q=80&w=2000" 
-            alt="Spain Architecture" 
-            className="w-full h-full object-cover"
-            referrerPolicy="no-referrer"
-          />
-        </div>
-
-        <div className="max-w-7xl mx-auto w-full px-12 relative z-10">
-          <div className="flex justify-between items-end mb-16">
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-widest mb-4 text-accent">{t.spain.subtitle}</p>
-              <h2 className="text-7xl leading-none" dangerouslySetInnerHTML={{ __html: t.spain.title.replace('.', '.<br />').replace(' ', '<br />') }}></h2>
-            </div>
-            <p className="text-sm font-medium text-ink/40 max-w-xs text-right leading-relaxed">
-              {t.spain.description}
-            </p>
-          </div>
-
-          <div className="grid grid-cols-3 gap-8">
-            {spainRoutes.map((route) => (
-              <Link 
-                key={route.id} 
-                to={`/route/${route.id}`}
-                className="group cursor-pointer block"
-              >
-                <div className="relative h-80 rounded-3xl overflow-hidden mb-6">
-                  <img src={route.img} alt={t.routes[route.id as keyof typeof t.routes].title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" referrerPolicy="no-referrer" />
-                  <div className="absolute inset-0 bg-ink/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <div className="w-16 h-16 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center shadow-xl">
-                      <ArrowRight size={20} className="text-accent" />
-                    </div>
-                  </div>
-                </div>
-                <div>
-                  <h3 className="text-xl font-black mb-1">{t.routes[route.id as keyof typeof t.routes].title}</h3>
-                  <p className="text-[10px] font-bold opacity-40 uppercase tracking-widest">{t.routes[route.id as keyof typeof t.routes].region}</p>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </motion.div>
-
-      {/* 5. CHINA ROUTES (Sticky) */}
-      <motion.div 
-        id="china"
-        style={{ opacity: globalOpacity }}
-        className="sticky top-0 h-screen w-full bg-ink text-bg z-50 flex items-center justify-center overflow-hidden"
-      >
-        {/* Subtle China Background Overlay */}
-        <div className="absolute inset-0 z-0 opacity-20">
-          <img 
-            src="https://images.unsplash.com/photo-1547981609-4b6bfe67ca0b?auto=format&fit=crop&q=80&w=2000" 
-            alt="Great Wall of China" 
-            className="w-full h-full object-cover"
-            referrerPolicy="no-referrer"
-          />
-        </div>
-
-        <div className="max-w-7xl mx-auto w-full px-12 relative z-10">
-          <div className="flex justify-between items-end mb-16">
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-widest mb-4 text-sun">{t.china.subtitle}</p>
-              <h2 className="text-7xl leading-none text-white" dangerouslySetInnerHTML={{ __html: t.china.title.replace('.', '.<br />').replace(' ', '<br />') }}></h2>
-            </div>
-            <p className="text-sm font-medium text-white/40 max-w-xs text-right leading-relaxed">
-              {t.china.description}
-            </p>
-          </div>
-
-          <div className="grid grid-cols-3 gap-8">
-            {chinaRoutes.map((route) => (
-              <Link 
-                key={route.id} 
-                to={`/route/${route.id}`}
-                className="group cursor-pointer block"
-              >
-                <div className="relative h-80 rounded-3xl overflow-hidden mb-6 border border-white/10">
-                  <img src={route.img} alt={t.routes[route.id as keyof typeof t.routes].title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" referrerPolicy="no-referrer" />
-                  <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <div className="w-16 h-16 rounded-full bg-accent/90 backdrop-blur-md flex items-center justify-center shadow-xl">
-                      <Sparkles size={20} className="text-white" />
-                    </div>
-                  </div>
-                </div>
-                <div>
-                  <h3 className="text-xl font-black mb-1 text-white">{t.routes[route.id as keyof typeof t.routes].title}</h3>
-                  <p className="text-[10px] font-bold opacity-40 uppercase tracking-widest text-white">{t.routes[route.id as keyof typeof t.routes].region}</p>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </motion.div>
-
-      {/* 6. OUR PARTNERS & INQUIRY (Sticky) */}
-      <motion.div 
-        style={{ opacity: communityOpacity, y: communityY }}
-        className="sticky top-0 h-screen w-full bg-white z-[55] flex items-center justify-center overflow-hidden"
-      >
-        <div className="max-w-7xl mx-auto w-full px-12 grid grid-cols-2 gap-24 items-center">
-          <div className="space-y-12">
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.5em] mb-4 text-accent">{t.community.subtitle}</p>
-              <h2 className="text-7xl font-serif italic">{t.community.title}</h2>
-            </div>
-            
-            <div className="relative h-64 w-full rounded-3xl overflow-hidden shadow-2xl">
-              <img 
-                src="https://images.unsplash.com/photo-1556761175-5973dc0f32d7?auto=format&fit=crop&q=80&w=1200" 
-                alt="Business Partnership" 
-                className="w-full h-full object-cover"
-                referrerPolicy="no-referrer"
-              />
-              <div className="absolute inset-0 bg-ink/10"></div>
-            </div>
-
-            <div className="pt-12 border-t border-ink/5">
-              <p className="text-[9px] font-bold uppercase tracking-widest opacity-30 mb-8">{t.community.trustedBy}</p>
-              <div className="flex gap-12 opacity-20 grayscale">
-                <Globe size={32} />
-                <Compass size={32} />
-                <Map size={32} />
-                <Globe size={32} />
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-surface rounded-[40px] p-16 shadow-xl border border-ink/5">
-            <h3 className="text-3xl font-black mb-8">{t.community.inquiry}</h3>
-            <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
-              <div className="grid grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label className="text-[9px] font-bold uppercase tracking-widest opacity-40">{t.community.companyName}</label>
-                  <input type="text" className="w-full bg-white border border-ink/5 rounded-xl px-4 py-3 text-sm focus:border-accent outline-none transition-colors" placeholder={t.community.companyPlaceholder} />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-[9px] font-bold uppercase tracking-widest opacity-40">{t.community.businessType}</label>
-                  <select className="w-full bg-white border border-ink/5 rounded-xl px-4 py-3 text-sm focus:border-accent outline-none transition-colors">
-                    <option>{t.community.tourOperator}</option>
-                    <option>{t.community.travelAgency}</option>
-                    <option>{t.community.corporateTMC}</option>
-                    <option>{t.community.other}</option>
-                  </select>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <label className="text-[9px] font-bold uppercase tracking-widest opacity-40">{t.community.workEmail}</label>
-                <input type="email" className="w-full bg-white border border-ink/5 rounded-xl px-4 py-3 text-sm focus:border-accent outline-none transition-colors" placeholder={t.community.emailPlaceholder} />
-              </div>
-              <div className="space-y-2">
-                <label className="text-[9px] font-bold uppercase tracking-widest opacity-40">{t.community.primaryInterest}</label>
-                <textarea className="w-full bg-white border border-ink/5 rounded-xl px-4 py-3 text-sm focus:border-accent outline-none transition-colors h-32 resize-none" placeholder={t.community.interestPlaceholder}></textarea>
-              </div>
-              <button className="w-full bg-ink text-white py-5 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-accent transition-all shadow-lg">
-                {t.community.submit}
-              </button>
-            </form>
-          </div>
-        </div>
-      </motion.div>
+    <div className="hidden xl:flex items-center gap-4"
+      style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.22em', fontFamily: 'monospace',
+        color: solid ? 'rgba(14,17,23,0.35)' : 'rgba(255,255,255,0.45)' }}>
+      <span>MAD {fmt('Europe/Madrid')}</span>
+      <span style={{ opacity: 0.4 }}>·</span>
+      <span>BJS {fmt('Asia/Shanghai')}</span>
     </div>
   );
 };
 
+/* ─────────────────────────────────────────────────────────────
+   NAVBAR
+───────────────────────────────────────────────────────────── */
+const Navbar = () => {
+  const [dropdown, setDropdown] = useState<string | null>(null);
+  const [solid, setSolid] = useState(false);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { language, setLanguage, t } = useLanguage();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fn = () => setSolid(window.scrollY > 60);
+    window.addEventListener('scroll', fn, { passive: true });
+    return () => window.removeEventListener('scroll', fn);
+  }, []);
+
+  const open = (id: string) => { if (timer.current) clearTimeout(timer.current); setDropdown(id); };
+  const close = () => { timer.current = setTimeout(() => setDropdown(null), 220); };
+
+  const goTo = (id: string) => {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  return (
+    <motion.header
+      className="fixed top-0 inset-x-0 z-[999] transition-all duration-500"
+      style={{
+        background: solid ? 'rgba(248,246,242,0.97)' : 'transparent',
+        backdropFilter: solid ? 'blur(20px)' : 'none',
+        borderBottom: solid ? '1px solid rgba(14,17,23,0.07)' : '1px solid transparent',
+      }}>
+      <div className="container flex items-center justify-between" style={{ height: solid ? 64 : 80, transition: 'height 0.4s ease' }}>
+
+        {/* Logo */}
+        <Link to="/" className="shrink-0">
+          <img src={solid ? '/logo-light-bg.jpeg' : '/logo-dark-bg.jpeg'}
+            alt="Wanlitravel" className="h-9 object-contain rounded-lg" style={{ opacity: solid ? 1 : 0.92 }} />
+        </Link>
+
+        {/* Nav links */}
+        <nav className="hidden lg:flex items-center gap-1">
+          {[
+            { id: 'spain', label: t.nav.spainCollections, routes: spainRoutes, section: 'routes-spain' },
+            { id: 'china', label: t.nav.chinaRoutes, routes: chinaRoutes, section: 'routes-china' },
+          ].map(({ id, label, routes, section }) => (
+            <div key={id} className="relative" onMouseEnter={() => open(id)} onMouseLeave={close}>
+              <button onClick={() => goTo(section)}
+                className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-[10px] font-bold tracking-[0.18em] uppercase transition-colors ${
+                  solid ? 'text-ink/70 hover:text-ink' : 'text-white/80 hover:text-white'
+                }`}>
+                {label} <ChevronDown size={10} className={`transition-transform ${dropdown === id ? 'rotate-180' : ''}`} />
+              </button>
+              <AnimatePresence>
+                {dropdown === id && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8, scale: 0.97 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 8, scale: 0.97 }}
+                    transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+                    className="absolute top-full left-0 mt-2 w-72"
+                    onMouseEnter={() => open(id)} onMouseLeave={close}>
+                    <div className="card-glass overflow-hidden shadow-2xl">
+                      <div className="px-4 pt-4 pb-2">
+                        <p className="label text-ink/30">{id === 'spain' ? 'Spain Portfolio' : 'China Portfolio'}</p>
+                      </div>
+                      {routes.map(r => {
+                        const tr = t.routes[r.id as keyof typeof t.routes];
+                        return (
+                          <Link key={r.id} to={`/route/${r.id}`} onClick={() => setDropdown(null)}
+                            className="flex items-center gap-4 px-4 py-3 hover:bg-black/4 transition-colors group">
+                            <div className="w-10 h-10 rounded-xl overflow-hidden shrink-0 img-zoom-wrap">
+                              <img src={r.img} alt={tr?.title} className="img-cover" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-[13px] font-bold text-ink truncate">{tr?.title}</p>
+                              <p className="text-[10px] text-ink/40 mt-0.5">{tr?.region}</p>
+                            </div>
+                            <ArrowUpRight size={14} className="text-ink/20 group-hover:text-crimson group-hover:scale-110 transition-all shrink-0" />
+                          </Link>
+                        );
+                      })}
+                      <div className="px-4 py-3 border-t border-black/6">
+                        <button onClick={() => { goTo(section); setDropdown(null); }}
+                          className="text-[9px] font-bold uppercase tracking-widest text-crimson hover:text-crimson/70 transition-colors">
+                          View all {id === 'spain' ? 'Spain' : 'China'} routes →
+                        </button>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          ))}
+          <button onClick={() => goTo('b2b')}
+            className={`px-4 py-2 rounded-full text-[10px] font-bold tracking-[0.18em] uppercase transition-colors ${
+              solid ? 'text-ink/70 hover:text-ink' : 'text-white/80 hover:text-white'
+            }`}>{t.nav.b2bSolutions}</button>
+        </nav>
+
+        {/* Right */}
+        <div className="flex items-center gap-5">
+          <DualClock solid={solid} />
+          <div className="hidden sm:flex items-center gap-3">
+            {(['en','zh','es'] as Language[]).map((lang, i) => (
+              <React.Fragment key={lang}>
+                {i > 0 && <span className={`opacity-20 text-xs ${solid ? 'text-ink' : 'text-white'}`}>/</span>}
+                <button onClick={() => setLanguage(lang)}
+                  className={`text-[9px] font-bold tracking-widest uppercase transition-colors ${
+                    language === lang
+                      ? 'text-crimson'
+                      : solid ? 'text-ink/50 hover:text-ink' : 'text-white/50 hover:text-white'
+                  }`}>
+                  {lang === 'en' ? 'EN' : lang === 'zh' ? '中' : 'ES'}
+                </button>
+              </React.Fragment>
+            ))}
+          </div>
+          <button onClick={() => goTo('partner-form')} className="btn btn-primary" style={{ padding: '10px 20px', fontSize: 9 }}>
+            {t.nav.partnerPortal}
+          </button>
+        </div>
+      </div>
+    </motion.header>
+  );
+};
+
+/* ─────────────────────────────────────────────────────────────
+   HERO — Airplane → Window → Spain
+───────────────────────────────────────────────────────────── */
+const PlaneMask = ({ progress }: { progress: any }) => {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    return progress.on('change', (v: number) => {
+      if (!ref.current) return;
+      // v goes 0→1 over 300vh. Mask hole grows from 9vw to 300vw
+      const size = 9 + v * 291; // vw equivalent
+      const mask = `radial-gradient(ellipse ${size * 0.88}vw ${size}vw at 50% 50%, transparent 98%, black 100%)`;
+      ref.current.style.webkitMaskImage = mask;
+      (ref.current.style as any).maskImage = mask;
+    });
+  }, [progress]);
+
+  return (
+    <div ref={ref} className="absolute inset-0"
+      style={{
+        backgroundImage: 'url(/hero-plane-sky.jpg)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center 60%',
+        WebkitMaskImage: 'radial-gradient(ellipse 7.9vw 9vw at 50% 50%, transparent 98%, black 100%)',
+        maskImage: 'radial-gradient(ellipse 7.9vw 9vw at 50% 50%, transparent 98%, black 100%)',
+      }} />
+  );
+};
+
+const HeroSection = () => {
+  const { t } = useLanguage();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: containerRef, offset: ['start start', 'end start'] });
+  const smooth = useSpring(scrollYProgress, { damping: 28, stiffness: 100, restDelta: 0.001 });
+
+  const planeOpacity   = useTransform(smooth, [0, 0.05, 0.62, 0.78], [1, 1, 1, 0]);
+  const spainOpacity   = useTransform(smooth, [0.1, 0.35], [0, 1]);
+  const spainScale     = useTransform(smooth, [0.1, 0.78], [1.12, 1.0]);
+  const textOpacity    = useTransform(smooth, [0, 0.08], [1, 0]);
+  const textY          = useTransform(smooth, [0, 0.08], [0, -32]);
+  const scrollHint     = useTransform(smooth, [0, 0.06], [1, 0]);
+  const glareOpacity   = useTransform(smooth, [0, 0.05, 0.55, 0.7], [0, 1, 1, 0]);
+  const arrivedOpacity = useTransform(smooth, [0.65, 0.82], [0, 1]);
+  const arrivedY       = useTransform(smooth, [0.65, 0.82], [24, 0]);
+  const overlayOpacity = useTransform(smooth, [0, 0.06, 0.55, 0.75], [0.55, 0.55, 0.55, 0]);
+
+  return (
+    <div ref={containerRef} style={{ height: '320vh' }}>
+      <div className="sticky top-0 h-screen overflow-hidden bg-[#05080f]">
+
+        {/* Spain landscape — revealed through the growing window */}
+        <motion.div style={{ opacity: spainOpacity, scale: spainScale }}
+          className="absolute inset-0 z-0 origin-center">
+          <img src="/hero-spain-arrival.jpg" alt="Spain" className="img-cover" style={{ filter: 'brightness(0.9) saturate(1.1)' }} />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/15 via-transparent to-black/55" />
+        </motion.div>
+
+        {/* Plane layer — full bleed, fades out */}
+        <motion.div style={{ opacity: planeOpacity }} className="absolute inset-0 z-10">
+          <img src="/hero-plane-sky.jpg" alt="Airplane" className="img-cover"
+            style={{ objectPosition: 'center 60%', filter: 'brightness(0.82) saturate(1.05)' }} />
+          {/* Atmospheric vignette */}
+          <motion.div style={{ opacity: overlayOpacity }}
+            className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/10 to-black/60" />
+        </motion.div>
+
+        {/* Plane mask — punches growing hole to show Spain */}
+        <motion.div style={{ opacity: planeOpacity }} className="absolute inset-0 z-20">
+          <PlaneMask progress={smooth} />
+        </motion.div>
+
+        {/* Window ring — visible while plane is showing */}
+        <motion.div style={{ opacity: glareOpacity }}
+          className="absolute inset-0 z-25 flex items-center justify-center pointer-events-none">
+          <motion.div
+            style={{ width: useTransform(smooth, [0, 0.62], ['18vw', '310vw']), aspectRatio: '0.88 / 1' }}
+            className="relative shrink-0">
+            {/* Outer frame */}
+            <div className="absolute inset-0 rounded-[50%]"
+              style={{ border: '5px solid rgba(200,215,240,0.35)', boxShadow: 'inset 0 2px 8px rgba(255,255,255,0.35), 0 0 0 1px rgba(0,0,0,0.25)' }} />
+            {/* Glass glare */}
+            <div className="absolute inset-0 rounded-[50%] overflow-hidden">
+              <div className="absolute inset-0"
+                style={{ background: 'radial-gradient(ellipse at 30% 22%, rgba(255,255,255,0.38) 0%, rgba(255,255,255,0.1) 28%, transparent 58%)' }} />
+              <div className="absolute inset-0"
+                style={{ background: 'radial-gradient(ellipse at 68% 12%, rgba(255,255,255,0.2) 0%, transparent 35%)' }} />
+              {/* Sky tint */}
+              <div className="absolute inset-0"
+                style={{ background: 'linear-gradient(180deg, rgba(130,175,255,0.1) 0%, transparent 55%)', mixBlendMode: 'screen' }} />
+            </div>
+          </motion.div>
+        </motion.div>
+
+        {/* Hero headline */}
+        <motion.div style={{ opacity: textOpacity, y: textY }}
+          className="absolute inset-0 z-30 flex flex-col items-center justify-center text-center px-8 pointer-events-none">
+          <motion.p initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
+            className="label text-white/50 mb-8">{t.hero.subtitle}</motion.p>
+          <motion.h1 initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6, duration: 0.7, ease: [0.22,1,0.36,1] }}
+            className="text-white mb-6 leading-[0.88]"
+            style={{ fontFamily: '"Cormorant Garamond", serif', fontStyle: 'italic', fontWeight: 300, fontSize: 'clamp(64px, 10vw, 140px)' }}>
+            Wan<span style={{ color: '#C4923A' }}>li</span>travel.
+          </motion.h1>
+          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.9 }}
+            className="text-white/55 max-w-md leading-relaxed mb-10" style={{ fontSize: 15 }}>
+            {t.hero.description}
+          </motion.p>
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.1 }}
+            className="flex items-center gap-3 pointer-events-auto">
+            <button onClick={() => document.getElementById('partner-form')?.scrollIntoView({ behavior: 'smooth' })}
+              className="btn btn-primary">
+              {t.hero.cta} <ArrowRight size={13} />
+            </button>
+            <button onClick={() => document.getElementById('routes-spain')?.scrollIntoView({ behavior: 'smooth' })}
+              className="btn btn-ghost">
+              Explore Routes
+            </button>
+          </motion.div>
+        </motion.div>
+
+        {/* Scroll cue */}
+        <motion.div style={{ opacity: scrollHint }}
+          className="absolute bottom-10 left-1/2 -translate-x-1/2 z-40 flex flex-col items-center gap-2 pointer-events-none">
+          <p className="label text-white/35" style={{ letterSpacing: '0.38em' }}>{t.hero.scroll}</p>
+          <motion.div animate={{ y: [0, 9, 0] }} transition={{ repeat: Infinity, duration: 1.8, ease: 'easeInOut' }}>
+            <div className="w-[1px] h-10 bg-gradient-to-b from-white/45 to-transparent" />
+          </motion.div>
+        </motion.div>
+
+        {/* "Arrived" caption after zoom */}
+        <motion.div style={{ opacity: arrivedOpacity, y: arrivedY }}
+          className="absolute bottom-16 right-12 lg:right-20 z-40 text-right pointer-events-none">
+          <p className="label text-white/50 mb-2">Now Arriving</p>
+          <h2 className="text-white leading-[0.88]"
+            style={{ fontFamily: '"Cormorant Garamond",serif', fontStyle:'italic', fontWeight:300, fontSize:'clamp(42px,6vw,88px)' }}>
+            España.<br /><span style={{ color:'#C4923A' }}>Welcome.</span>
+          </h2>
+        </motion.div>
+      </div>
+    </div>
+  );
+};
+
+/* ─────────────────────────────────────────────────────────────
+   TRUST BAR
+───────────────────────────────────────────────────────────── */
+const TrustBar = () => {
+  const { t } = useLanguage();
+  const items = [t.trust.item1, t.trust.item2, t.trust.item3, t.trust.item4];
+  return (
+    <div className="bg-[#0B1628] text-white overflow-hidden relative" style={{ borderBottom: '1px solid rgba(196,146,58,0.15)' }}>
+      <div className="marquee-wrap py-4">
+        <div className="marquee-track items-center gap-16">
+          {[...items, ...items, ...items, ...items].map((item, i) => (
+            <span key={i} className="flex items-center gap-3 shrink-0"
+              style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.28em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)' }}>
+              <span style={{ width: 4, height: 4, borderRadius: '50%', background: '#C4923A', display: 'inline-block', flexShrink: 0 }} />
+              {item}
+            </span>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ─────────────────────────────────────────────────────────────
+   STATS — animated numbers
+───────────────────────────────────────────────────────────── */
+const Stats = () => {
+  const { t } = useLanguage();
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, margin: '-80px' });
+
+  const stats = [
+    { value: '8,400+', label: t.stats.s1desc, icon: <Globe2 size={20} /> },
+    { value: '98.7%',  label: t.stats.s2desc, icon: <CheckCircle2 size={20} /> },
+    { value: '120+',   label: t.stats.s3desc, icon: <Users2 size={20} /> },
+    { value: '48h',    label: t.stats.s4desc, icon: <Clock3 size={20} /> },
+  ];
+
+  return (
+    <section ref={ref} className="section-pad" style={{ background: '#0B1628' }}>
+      <div className="container">
+        <div className="flex items-end justify-between mb-16 flex-wrap gap-8">
+          <div>
+            <p className="label mb-3" style={{ color: 'rgba(196,146,58,0.7)' }}>{t.stats.label}</p>
+            <h2 className="heading text-white" style={{ fontSize: 'clamp(36px,4.5vw,56px)' }}>
+              Performance<br />that speaks.
+            </h2>
+          </div>
+          <p className="text-white/35 max-w-xs leading-relaxed" style={{ fontSize: 14 }}>
+            {t.trust.label}
+          </p>
+        </div>
+
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
+          {stats.map((s, i) => (
+            <motion.div key={i}
+              initial={{ opacity: 0, y: 32 }}
+              animate={inView ? { opacity: 1, y: 0 } : {}}
+              transition={{ delay: i * 0.1, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              className="card-dark p-8 group hover:border-gold/20 transition-colors"
+              style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
+              <div className="text-gold/50 mb-5 group-hover:text-gold transition-colors">{s.icon}</div>
+              <div className="stat-num text-white mb-2" style={{ fontSize: 'clamp(36px,4vw,52px)' }}>{s.value}</div>
+              <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.22em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)' }}>
+                {s.label}
+              </p>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+/* ─────────────────────────────────────────────────────────────
+   PARTNER LOGOS
+───────────────────────────────────────────────────────────── */
+const PartnerLogos = () => {
+  const { t } = useLanguage();
+  const logos = ['Viajes Barceló', 'Globalia', 'SinoTour UK', 'TUI Group', 'Carlson Wagonlit', 'FCM Travel', 'Hotelbeds', 'El Corte Inglés', 'Iberia Partners', 'CITS'];
+  return (
+    <section className="section-pad-sm bg-bg">
+      <div className="container">
+        <p className="label text-center mb-10" style={{ color: 'rgba(14,17,23,0.2)' }}>{t.trust.label}</p>
+      </div>
+      <div className="marquee-wrap relative">
+        <div className="absolute left-0 inset-y-0 w-24 z-10" style={{ background: 'linear-gradient(to right, #F8F6F2, transparent)' }} />
+        <div className="absolute right-0 inset-y-0 w-24 z-10" style={{ background: 'linear-gradient(to left, #F8F6F2, transparent)' }} />
+        <div className="marquee-track items-center gap-20">
+          {[...logos, ...logos].map((name, i) => (
+            <span key={i} className="shrink-0"
+              style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(14,17,23,0.18)', whiteSpace: 'nowrap' }}>
+              {name}
+            </span>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+/* ─────────────────────────────────────────────────────────────
+   B2B SECTION
+───────────────────────────────────────────────────────────── */
+const B2BSection = () => {
+  const { t } = useLanguage();
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, margin: '-80px' });
+
+  const features = [
+    { icon: <Zap size={18}/>,        title: t.b2b.inventory, desc: t.b2b.inventoryDesc,  tag: 'Real-time' },
+    { icon: <Sparkles size={18}/>,   title: t.b2b.dynamic,   desc: t.b2b.dynamicDesc,    tag: 'White-label' },
+    { icon: <ShieldCheck size={18}/>,title: t.b2b.api,       desc: t.b2b.apiDesc,         tag: 'API-first' },
+  ];
+
+  return (
+    <section id="b2b" ref={ref} className="section-pad relative overflow-hidden" style={{ background: '#0B1628' }}>
+      {/* Subtle background */}
+      <div className="absolute inset-0 z-0">
+        <img src="/b2b-tech.jpg" alt="" className="img-cover" style={{ opacity: 0.12, mixBlendMode: 'luminosity' }} />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(160deg, #0B1628 30%, rgba(22,34,64,0.9) 100%)' }} />
+      </div>
+
+      <div className="container relative z-10">
+        <div className="grid lg:grid-cols-2 gap-20 items-start">
+          {/* Left text */}
+          <div>
+            <motion.div initial={{ opacity:0, y:24 }} animate={inView?{opacity:1,y:0}:{}} transition={{ duration: 0.7, ease:[0.22,1,0.36,1] }}>
+              <p className="label mb-5" style={{ color: 'rgba(196,146,58,0.65)' }}>{t.b2b.subtitle}</p>
+              <h2 className="heading text-white mb-6" style={{ fontSize: 'clamp(40px,5vw,64px)' }}>
+                {t.b2b.title}
+              </h2>
+              <p className="text-white/40 leading-relaxed mb-10" style={{ fontSize: 15, maxWidth: 400 }}>
+                {t.curation.description}
+              </p>
+
+              {/* Features */}
+              <div className="space-y-4">
+                {features.map((f, i) => (
+                  <motion.div key={i}
+                    initial={{ opacity:0, x:-20 }} animate={inView?{opacity:1,x:0}:{}} transition={{ delay: 0.2 + i*0.1 }}
+                    className="card-dark flex items-start gap-5 p-5 group hover:border-gold/15 transition-colors cursor-default"
+                    style={{ border: '1px solid rgba(255,255,255,0.06)' }}>
+                    <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+                      style={{ background: 'rgba(196,146,58,0.1)', color: '#C4923A' }}>
+                      {f.icon}
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-1">
+                        <p style={{ fontSize: 13, fontWeight: 700, color: 'white' }}>{f.title}</p>
+                        <span className="tag tag-gold">{f.tag}</span>
+                      </div>
+                      <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', lineHeight: 1.6 }}>{f.desc}</p>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+
+              <motion.button
+                initial={{ opacity:0 }} animate={inView?{opacity:1}:{}} transition={{ delay: 0.6 }}
+                onClick={() => document.getElementById('partner-form')?.scrollIntoView({ behavior: 'smooth' })}
+                className="btn btn-primary mt-10">
+                {t.b2b.requestDemo}
+              </motion.button>
+            </motion.div>
+          </div>
+
+          {/* Right — Dashboard mockup */}
+          <motion.div
+            initial={{ opacity:0, y:40 }} animate={inView?{opacity:1,y:0}:{}} transition={{ delay: 0.25, duration: 0.8, ease:[0.22,1,0.36,1] }}>
+            <div className="card-glass-dark overflow-hidden"
+              style={{ border: '1px solid rgba(255,255,255,0.08)' }}>
+              {/* Titlebar */}
+              <div className="flex items-center gap-3 px-5 py-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)', background: 'rgba(255,255,255,0.03)' }}>
+                <div className="flex gap-1.5">
+                  {['#FF5F57','#FEBC2E','#28C840'].map(c => (
+                    <div key={c} style={{ width: 10, height: 10, borderRadius: '50%', background: c, opacity: 0.7 }} />
+                  ))}
+                </div>
+                <p style={{ fontSize: 10, fontFamily: 'monospace', color: 'rgba(255,255,255,0.2)' }}>{t.b2b.dashboard.title}</p>
+                <div className="ml-auto flex items-center gap-1.5">
+                  <span className="pulse-dot" style={{ width:6, height:6, borderRadius:'50%', background:'#22C55E', display:'inline-block' }} />
+                  <span style={{ fontSize: 8, fontWeight:700, color:'#22C55E', letterSpacing:'0.2em', textTransform:'uppercase' }}>LIVE</span>
+                </div>
+              </div>
+
+              {/* Metric cards */}
+              <div className="p-5 grid grid-cols-2 gap-3">
+                {[
+                  { l: t.b2b.dashboard.bookings,   v: '2,847', change: '+24%', c: '#22C55E' },
+                  { l: t.b2b.dashboard.revenue,     v: '€4.2M', change: '+18%', c: '#C4923A' },
+                  { l: t.b2b.dashboard.allotment,   v: '94%',   change: 'LIVE',  c: '#B31C2E' },
+                  { l: t.b2b.dashboard.topRoutes,   v: '12',    change: 'ACTIVE',c: '#60A5FA' },
+                ].map((d,i)=>(
+                  <div key={i} className="rounded-xl p-4" style={{ background:'rgba(255,255,255,0.04)', border:'1px solid rgba(255,255,255,0.05)' }}>
+                    <p style={{ fontSize:8, fontWeight:700, letterSpacing:'0.22em', textTransform:'uppercase', color:'rgba(255,255,255,0.25)', marginBottom:8 }}>{d.l}</p>
+                    <p className="stat-num" style={{ fontSize: 28, color: d.c, marginBottom:4 }}>{d.v}</p>
+                    <span style={{ fontSize:8, fontWeight:700, color:'rgba(255,255,255,0.3)', background:'rgba(255,255,255,0.07)', padding:'3px 8px', borderRadius:99 }}>{d.change}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Top routes list */}
+              <div className="px-5 pb-5">
+                <div className="rounded-xl p-4" style={{ background:'rgba(255,255,255,0.03)', border:'1px solid rgba(255,255,255,0.05)' }}>
+                  <p style={{ fontSize:8, fontWeight:700, letterSpacing:'0.22em', textTransform:'uppercase', color:'rgba(255,255,255,0.22)', marginBottom:12 }}>Top Revenue Routes</p>
+                  {[
+                    { name:'Costa del Sol Classic', net:'€850 net/pax', trend: '+12%' },
+                    { name:'Imperial Capitals',     net:'€720 net/pax', trend: '+8%' },
+                    { name:'Karst Landscapes',      net:'€680 net/pax', trend: '+21%' },
+                  ].map((r,i)=>(
+                    <div key={i} className="flex items-center gap-3 py-2.5" style={{ borderBottom: i<2 ? '1px solid rgba(255,255,255,0.05)' : 'none' }}>
+                      <div style={{ width:4, height:4, borderRadius:'50%', background:'#C4923A', flexShrink:0 }} />
+                      <span style={{ fontSize:12, color:'rgba(255,255,255,0.55)', flex:1 }}>{r.name}</span>
+                      <span style={{ fontSize:11, color:'rgba(255,255,255,0.3)' }}>{r.net}</span>
+                      <span style={{ fontSize:9, fontWeight:700, color:'#22C55E' }}>{r.trend}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+/* ─────────────────────────────────────────────────────────────
+   ROUTE GRID
+───────────────────────────────────────────────────────────── */
+const RouteGrid = ({ routes, title, subtitle, id, dark = false }: {
+  routes: typeof spainRoutes; title: string; subtitle: string; id: string; dark?: boolean;
+}) => {
+  const { t } = useLanguage();
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, margin: '-60px' });
+
+  return (
+    <section id={id} ref={ref} className="section-pad" style={{ background: dark ? '#0E1117' : '#F8F6F2' }}>
+      <div className="container">
+        {/* Section header */}
+        <motion.div initial={{ opacity:0, y:24 }} animate={inView?{opacity:1,y:0}:{}} transition={{ duration:0.6 }}
+          className="flex items-end justify-between mb-14 flex-wrap gap-6">
+          <div>
+            <p className="label mb-3" style={{ color: dark ? 'rgba(196,146,58,0.6)' : '#B31C2E' }}>{subtitle}</p>
+            <h2 className="heading" style={{ fontSize:'clamp(40px,5vw,64px)', color: dark ? 'white' : '#0E1117' }}>
+              {title}
+            </h2>
+          </div>
+          <p style={{ fontSize:14, color: dark ? 'rgba(255,255,255,0.4)' : 'rgba(14,17,23,0.5)', maxWidth:320, lineHeight:1.6 }}>
+            {dark ? t.china.description : t.spain.description}
+          </p>
+        </motion.div>
+
+        {/* Cards */}
+        <div className="grid sm:grid-cols-3 gap-5">
+          {routes.map((route, i) => {
+            const tr = t.routes[route.id as keyof typeof t.routes];
+            return (
+              <motion.div key={route.id}
+                initial={{ opacity:0, y:32 }} animate={inView?{opacity:1,y:0}:{}}
+                transition={{ delay: i*0.12, duration:0.65, ease:[0.22,1,0.36,1] }}>
+                <Link to={`/route/${route.id}`} className="route-card block" style={{ aspectRatio:'3/4' }}>
+                  <img src={route.img} alt={tr?.title} className="img-cover w-full h-full" />
+                  {/* Content overlay */}
+                  <div className="absolute inset-0 z-10 flex flex-col justify-end p-7">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <MapPin size={10} style={{ color: '#C4923A' }} />
+                        <p style={{ fontSize:9, fontWeight:700, letterSpacing:'0.28em', textTransform:'uppercase', color:'rgba(196,146,58,0.85)' }}>
+                          {tr?.region}
+                        </p>
+                      </div>
+                      <span style={{ fontSize:8, fontWeight:700, letterSpacing:'0.2em', fontFamily:'monospace', color:'rgba(255,255,255,0.4)' }}>
+                        {route.code}
+                      </span>
+                    </div>
+                    <h3 className="heading text-white mb-1" style={{ fontSize: 22 }}>{tr?.title}</h3>
+                    <p style={{ fontSize:10, fontWeight:700, letterSpacing:'0.12em', color:'#C4923A', marginBottom:10 }}>
+                      {formatDuration(t.routeDetails.durationFormat, route.days, route.nights)} · {t.routeDetails.netFrom} €{route.netFrom}
+                    </p>
+                    <p style={{ fontSize:12, color:'rgba(255,255,255,0.55)', lineHeight:1.55, display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', overflow:'hidden' }}>
+                      {tr?.description}
+                    </p>
+                    <div className="flex items-center gap-2 mt-5 opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300"
+                      style={{ transition:'all 0.3s ease' }}>
+                      <span style={{ fontSize:9, fontWeight:700, letterSpacing:'0.2em', textTransform:'uppercase', color:'rgba(255,255,255,0.5)' }}>View Route</span>
+                      <ArrowRight size={12} style={{ color: '#C4923A' }} />
+                    </div>
+                  </div>
+                </Link>
+              </motion.div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+/* ─────────────────────────────────────────────────────────────
+   TESTIMONIALS
+───────────────────────────────────────────────────────────── */
+const Testimonials = () => {
+  const { t } = useLanguage();
+  const [active, setActive] = useState(0);
+  const items = t.testimonials.items;
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, margin: '-80px' });
+
+  return (
+    <section ref={ref} className="section-pad" style={{ background: '#F0EDE8' }}>
+      <div className="container">
+        <motion.div initial={{ opacity:0, y:24 }} animate={inView?{opacity:1,y:0}:{}} transition={{ duration:0.6 }}
+          className="flex items-end justify-between mb-16 flex-wrap gap-8">
+          <div>
+            <p className="label mb-3">{t.testimonials.label}</p>
+            <h2 style={{ fontFamily:'"Cormorant Garamond",serif', fontStyle:'italic', fontWeight:300, fontSize:'clamp(40px,5vw,64px)', color:'#0E1117', lineHeight:0.92 }}>
+              What our<br />partners say.
+            </h2>
+          </div>
+          <div className="flex items-center gap-3">
+            {[ChevronLeft, ChevronRight].map((Icon, i) => (
+              <button key={i}
+                onClick={() => setActive((active + (i===0?-1:1) + items.length) % items.length)}
+                className="w-11 h-11 rounded-full flex items-center justify-center transition-colors"
+                style={{ border:'1px solid rgba(14,17,23,0.12)', color:'rgba(14,17,23,0.5)' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = '#B31C2E'; (e.currentTarget as HTMLElement).style.color = '#B31C2E'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(14,17,23,0.12)'; (e.currentTarget as HTMLElement).style.color = 'rgba(14,17,23,0.5)'; }}>
+                <Icon size={16} />
+              </button>
+            ))}
+          </div>
+        </motion.div>
+
+        <div className="grid lg:grid-cols-3 gap-5">
+          {items.map((item, i) => (
+            <motion.div key={i}
+              initial={{ opacity:0, y:28 }} animate={inView?{opacity:1,y:0}:{}} transition={{ delay: i*0.1, duration:0.6 }}
+              onClick={() => setActive(i)}
+              className="card cursor-pointer"
+              style={{
+                padding: 32,
+                opacity: i === active ? 1 : 0.48,
+                transform: i === active ? 'scale(1)' : 'scale(0.985)',
+                transition: 'all 0.35s ease',
+                outline: i === active ? '1.5px solid rgba(196,146,58,0.3)' : '1.5px solid transparent',
+              }}>
+              <Quote size={22} style={{ color: 'rgba(179,28,46,0.18)', marginBottom: 20 }} />
+              <p style={{ fontFamily:'"Cormorant Garamond",serif', fontStyle:'italic', fontSize:17, color:'rgba(14,17,23,0.75)', lineHeight:1.65, marginBottom:24 }}>
+                "{item.quote}"
+              </p>
+              <div className="flex items-center gap-3" style={{ paddingTop:20, borderTop:'1px solid rgba(14,17,23,0.07)' }}>
+                <div className="w-9 h-9 rounded-full flex items-center justify-center text-white"
+                  style={{ background:'#B31C2E', fontSize:13, fontWeight:900 }}>{item.name[0]}</div>
+                <div className="flex-1">
+                  <p style={{ fontSize:13, fontWeight:700, color:'#0E1117' }}>{item.name}</p>
+                  <p style={{ fontSize:10, color:'rgba(14,17,23,0.4)', marginTop:1 }}>{item.title}</p>
+                </div>
+                <div className="flex gap-0.5">
+                  {[...Array(5)].map((_,j)=><Star key={j} size={9} style={{ fill:'#C4923A', color:'#C4923A' }} />)}
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+/* ─────────────────────────────────────────────────────────────
+   PARTNER INQUIRY FORM
+───────────────────────────────────────────────────────────── */
+const PartnerForm = () => {
+  const { t } = useLanguage();
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, margin: '-80px' });
+
+  return (
+    <section id="partner-form" ref={ref} className="section-pad relative overflow-hidden" style={{ background: '#F8F6F2' }}>
+      {/* Background image */}
+      <div className="absolute inset-0 z-0">
+        <img src="/about-team.jpg" alt="" className="img-cover" style={{ opacity: 0.18 }} />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(100deg, #F8F6F2 45%, rgba(248,246,242,0.5) 100%)' }} />
+      </div>
+
+      <div className="container relative z-10">
+        <div className="grid lg:grid-cols-2 gap-20 items-start">
+          {/* Left */}
+          <motion.div initial={{ opacity:0, x:-32 }} animate={inView?{opacity:1,x:0}:{}} transition={{ duration:0.7, ease:[0.22,1,0.36,1] }}>
+            <p className="label mb-5">{t.community.subtitle}</p>
+            <h2 style={{ fontFamily:'"Cormorant Garamond",serif', fontStyle:'italic', fontWeight:300, fontSize:'clamp(48px,6vw,80px)', color:'#0E1117', lineHeight:0.9, marginBottom:24 }}>
+              {t.community.title}
+            </h2>
+            <p style={{ fontSize:15, color:'rgba(14,17,23,0.55)', lineHeight:1.65, maxWidth:380, marginBottom:40 }}>
+              {t.community.description}
+            </p>
+
+            {/* Certifications */}
+            <div className="flex flex-wrap gap-2 mb-12">
+              {[t.trust.item1, t.trust.item2, t.trust.item3].map((item,i)=>(
+                <span key={i} className="tag tag-light">
+                  <CheckCircle2 size={10} style={{ color:'#B31C2E' }} />{item}
+                </span>
+              ))}
+            </div>
+
+            {/* Contact info */}
+            <div style={{ paddingTop:28, borderTop:'1px solid rgba(14,17,23,0.08)' }}>
+              <div className="flex items-center gap-3 mb-3">
+                <Mail size={14} style={{ color:'#B31C2E', flexShrink:0 }} />
+                <span style={{ fontSize:14, color:'rgba(14,17,23,0.55)' }}>partnerships@wanlitravel.com</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <Phone size={14} style={{ color:'#B31C2E', flexShrink:0 }} />
+                <span style={{ fontSize:14, color:'rgba(14,17,23,0.55)' }}>+34 91 000 0000 · +86 10 0000 0000</span>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Right — Form */}
+          <motion.div initial={{ opacity:0, x:32 }} animate={inView?{opacity:1,x:0}:{}} transition={{ delay:0.15, duration:0.7, ease:[0.22,1,0.36,1] }}>
+            <div className="card-glass" style={{ padding: '40px' }}>
+              <h3 className="heading mb-8" style={{ fontSize:22 }}>{t.community.inquiry}</h3>
+              <form className="space-y-5" onSubmit={e=>e.preventDefault()}>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="form-label">{t.community.companyName}</label>
+                    <input type="text" placeholder={t.community.companyPlaceholder} className="form-input" />
+                  </div>
+                  <div>
+                    <label className="form-label">{t.community.businessType}</label>
+                    <select className="form-input">
+                      <option>{t.community.tourOperator}</option>
+                      <option>{t.community.travelAgency}</option>
+                      <option>{t.community.corporateTMC}</option>
+                      <option>{t.community.other}</option>
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <label className="form-label">{t.community.workEmail}</label>
+                  <input type="email" placeholder={t.community.emailPlaceholder} className="form-input" />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="form-label">{t.community.region}</label>
+                    <input type="text" placeholder={t.community.regionPlaceholder} className="form-input" />
+                  </div>
+                  <div>
+                    <label className="form-label">{t.community.monthlyPax}</label>
+                    <select className="form-input">
+                      <option>&lt; 50</option>
+                      <option>50–200</option>
+                      <option>200–500</option>
+                      <option>500+</option>
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <label className="form-label">{t.community.primaryInterest}</label>
+                  <textarea placeholder={t.community.interestPlaceholder} className="form-input" rows={4} style={{ resize:'none' }} />
+                </div>
+                <button type="submit" className="btn btn-primary w-full justify-center" style={{ width:'100%', fontSize:10 }}>
+                  {t.community.submit}
+                </button>
+                <p style={{ fontSize:10, textAlign:'center', color:'rgba(14,17,23,0.3)', marginTop:12 }}>{t.community.privacy}</p>
+              </form>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+/* ─────────────────────────────────────────────────────────────
+   FOOTER
+───────────────────────────────────────────────────────────── */
 const Footer = () => {
   const { t } = useLanguage();
   return (
-    <footer className="bg-bg py-48 px-16 border-t border-ink/5 relative z-[60] overflow-hidden">
-      <div className="max-w-7xl mx-auto relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-24 mb-48">
-          <div className="md:col-span-6">
-            <img src="/logo-light-bg.jpeg" alt="Wanli - Bridging China and Europe" className="h-24 object-contain mb-10" />
-            <p className="text-ink/60 max-w-md leading-relaxed text-lg font-medium">
+    <footer style={{ background: '#05080F', color: 'white', paddingTop: 80, paddingBottom: 48 }}>
+      <div className="container">
+        <div className="grid lg:grid-cols-12 gap-12 mb-16">
+          <div className="lg:col-span-5">
+            <img src="/logo-dark-bg.jpeg" alt="Wanlitravel"
+              style={{ height: 52, objectFit:'contain', borderRadius:10, opacity:0.88, marginBottom:20 }} />
+            <p style={{ fontSize:14, color:'rgba(255,255,255,0.32)', lineHeight:1.7, maxWidth:320 }}>
               {t.footer.description}
             </p>
           </div>
-          <div className="md:col-span-3">
-            <p className="text-[9px] font-bold uppercase tracking-[0.3em] mb-12 opacity-30">{t.footer.solutions}</p>
-            <ul className="space-y-6 text-[11px] font-bold uppercase tracking-[0.2em]">
-              <li><a href="#" className="hover:text-accent transition-colors">{t.footer.wholesale}</a></li>
-              <li><a href="#" className="hover:text-accent transition-colors">{t.footer.groundHandling}</a></li>
-              <li><a href="#" className="hover:text-accent transition-colors">{t.footer.apiIntegration}</a></li>
-              <li><a href="#" className="hover:text-accent transition-colors">{t.footer.bespoke}</a></li>
-            </ul>
+          <div className="lg:col-span-3 lg:col-start-7">
+            <p style={{ fontSize:9, fontWeight:700, letterSpacing:'0.3em', textTransform:'uppercase', color:'rgba(255,255,255,0.2)', marginBottom:20 }}>
+              {t.footer.solutions}
+            </p>
+            <div className="space-y-3">
+              {[t.footer.wholesale, t.footer.groundHandling, t.footer.apiIntegration, t.footer.bespoke].map((item,i)=>(
+                <a key={i} href="#" style={{ display:'block', fontSize:12, fontWeight:700, letterSpacing:'0.15em', textTransform:'uppercase', color:'rgba(255,255,255,0.35)', transition:'color 0.2s' }}
+                  onMouseEnter={e=>(e.currentTarget.style.color='#C4923A')}
+                  onMouseLeave={e=>(e.currentTarget.style.color='rgba(255,255,255,0.35)')}>
+                  {item}
+                </a>
+              ))}
+            </div>
           </div>
-          <div className="md:col-span-3">
-            <p className="text-[9px] font-bold uppercase tracking-[0.3em] mb-12 opacity-30">{t.footer.connect}</p>
-            <ul className="space-y-6 text-[11px] font-bold uppercase tracking-[0.2em]">
-              <li><a href="#" className="hover:text-accent transition-colors">{t.footer.linkedin}</a></li>
-              <li><a href="#" className="hover:text-accent transition-colors">{t.footer.partnerPortal}</a></li>
-              <li><a href="#" className="hover:text-accent transition-colors">{t.footer.contactUs}</a></li>
-            </ul>
+          <div className="lg:col-span-2">
+            <p style={{ fontSize:9, fontWeight:700, letterSpacing:'0.3em', textTransform:'uppercase', color:'rgba(255,255,255,0.2)', marginBottom:20 }}>
+              {t.footer.connect}
+            </p>
+            <div className="space-y-3">
+              {[t.footer.linkedin, t.footer.partnerPortal, t.footer.contactUs].map((item,i)=>(
+                <a key={i} href="#" style={{ display:'block', fontSize:12, fontWeight:700, letterSpacing:'0.15em', textTransform:'uppercase', color:'rgba(255,255,255,0.35)', transition:'color 0.2s' }}
+                  onMouseEnter={e=>(e.currentTarget.style.color='#C4923A')}
+                  onMouseLeave={e=>(e.currentTarget.style.color='rgba(255,255,255,0.35)')}>
+                  {item}
+                </a>
+              ))}
+            </div>
           </div>
         </div>
-        <div className="pt-16 border-t border-ink/5 flex justify-between items-center text-[9px] font-bold uppercase tracking-[0.4em] opacity-30">
-          <p>{t.footer.rights}</p>
-          <p className="italic font-serif normal-case tracking-normal opacity-50">{t.footer.globalPartnerships}</p>
+
+        <div className="divider-gold mb-8" />
+
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+          <p style={{ fontSize:9, fontWeight:700, letterSpacing:'0.25em', textTransform:'uppercase', color:'rgba(255,255,255,0.15)' }}>
+            {t.footer.rights}
+          </p>
+          <p style={{ fontFamily:'"Cormorant Garamond",serif', fontStyle:'italic', fontSize:14, color:'rgba(255,255,255,0.1)' }}>
+            {t.footer.globalPartnerships}
+          </p>
         </div>
-      </div>
-      
-      <div className="absolute -bottom-20 -right-20 pointer-events-none opacity-[0.02]">
-        <h2 className="text-[40vw] font-black leading-none" style={{ letterSpacing: '0.1em' }}>WANLI</h2>
       </div>
     </footer>
   );
 };
 
+/* ─────────────────────────────────────────────────────────────
+   APP ROOT
+───────────────────────────────────────────────────────────── */
 export default function App() {
   const [language, setLanguage] = useState<Language>('en');
   const t = translations[language];
@@ -739,13 +873,32 @@ export default function App() {
     <LanguageContext.Provider value={{ language, setLanguage, t }}>
       <BrowserRouter>
         <div className="no-scrollbar">
-          <Grain />
+          <CursorGlow />
           <Routes>
             <Route path="/" element={
               <>
                 <Navbar />
                 <main>
-                  <ScrollytellingExperience />
+                  <HeroSection />
+                  <TrustBar />
+                  <Stats />
+                  <PartnerLogos />
+                  <B2BSection />
+                  <RouteGrid
+                    routes={spainRoutes}
+                    title={t.spain.title}
+                    subtitle={t.spain.subtitle}
+                    id="routes-spain"
+                  />
+                  <RouteGrid
+                    routes={chinaRoutes}
+                    title={t.china.title}
+                    subtitle={t.china.subtitle}
+                    id="routes-china"
+                    dark
+                  />
+                  <Testimonials />
+                  <PartnerForm />
                 </main>
                 <Footer />
               </>

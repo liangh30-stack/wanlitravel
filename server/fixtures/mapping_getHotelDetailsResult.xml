@@ -1,0 +1,70 @@
+<?xmlversion="1.0"encoding="ISO-8859-1"?>
+<getHotelDetailsResult>
+<result>
+<cod_result>M1</cod_result>
+<des_result>Operación correcta.</des_result>
+<type_message>I</type_message>
+</result>
+<HotelDetailsBean>
+<anioConstruccion>2005</anioConstruccion>
+<anioRenovacion/>
+<categoria>
+<claveCategoria>3</claveCategoria>
+<nombre>3 Estrellas</nombre>
+</categoria>
+<codPostal>10600</codPostal>
+<descripcion>Hotel de estilo marcadamente andaluz, dividido   en patios corredores abiertos, decorados con plantas y flores naturales, así como tinajas, platos y baúles  con 159 habitaciones, piscina, restaurante y salones.El Hotel se halla en el Centro comercial Las Rampas, el cual  dispone de parking público, cafeterías, Agencia de Viajes, peluquería, boutiques y galerías comerciales.</descripcion>
+<direccion>Calle Pintor Nogales s/n</direccion>
+<email>direccion@hotelciudaddeplasencia.es</email>
+<tfno>999999999</tfno>
+<fax>888888888</fax>
+<imagenes>
+	<nombreImagen>http://www.XXX.com/images/hoteles/15985_fotpe1_ROOMc1.JPG</nombreImagen>
+	<nombreImagen>http://www.XXX.com/images/hoteles/15985_fotpe1_ROOMc1.JPG</nombreImagen>
+</imagenes>
+<nhabitaciones>159</nhabitaciones>
+<nombre>Villa Rosario</nombre>
+<numPlantas>4</numPlantas>
+<codPais>ES</codPais>
+<pais>España</pais>
+<codProvincia>Málaga</codProvincia>
+<provincia>ESMlg</provincia>
+<codCiudad>Fuengirola</codCiudad>
+<ciudad>ES00231</ciudad>
+<restaurantes>
+	<restaurante>
+		<nombre/>
+		<imagen/>
+		<descripcion>El salón principal, en dónde se encuentra el buffet y los otros tres salones están decorados en distintos tonos cálidos y con plantas, dónde es posible desayunar, almorzar y cenar.</descripcion>
+	</restaurante>
+</restaurantes>
+<salones>
+		<salon>
+			<nombre>Verde</nombre>
+			<metros2>80</metros2>
+			<imagen/>
+			<descripcion>Maravilloso salón con vistas exteriores al jardín ideal para reuniones empresariales y para celebración de eventos.</descripcion>
+			<capacidadMinima/>
+			<capacidadMaxima>150 personas</capacidadMaxima>
+		</salon>
+	</salones>
+	<servicios>
+		<servicio>
+			<codigo>5</codigo>
+			<nombre>Fax público</nombre>
+			<descripcion/>
+		</servicio>
+		<servicio>
+			<codigo>25</codigo>
+			<nombre>Caja Fuerte</nombre>
+			<descripcion>Caja fuerte en todas las habitaciones</descripcion>
+		</servicio>
+		<servicio>
+			<codigo>26</codigo>
+			<nombre>Piscina</nombre>
+			<descripcion>Piscina no cubierta abierta en periodos de verano</descripcion>
+		</servicio>
+	</servicios>
+</HotelDetailsBean>
+  <timeStamp>2020-02-27T12:02:15.596+01:00</timeStamp>
+</getHotelDetailsResult>

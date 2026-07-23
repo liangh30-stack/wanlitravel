@@ -1,0 +1,71 @@
+<ReservationValueResult>
+  <result>
+    <cod_result>M1</cod_result>
+    <des_result>Operación correcta</des_result>
+    <type_message>I</type_message>
+  </result>
+  <reservation>
+      <IdOperation>Drej3434sd8s7df9sl=</IdOperation>
+      <accomodation>
+        <code>12563</code>
+        <mealPlan>SA</mealPlan>
+        <pvp>1207.36</pvp>
+        <neto>1122.85</neto>
+	  <comision>84.51</comision>
+        <currencyCode>EUR</currencyCode>
+        <status>SALE</status> 
+        <rooms>
+          <room>            
+             <code>CPM2</code>
+             <name>CUADRUPLE (2adlts+2ninos)</name>
+             <units>1</units>
+             <adults>2</adults>
+             <children>2</children>
+<pvp>586.88</pvp>
+             <neto>545.8</neto>
+             <mandatory_pvp>590</mandatory_pvp>
+             <observations/>
+             <restrictions/>
+             <supplements/>
+             <discounts/>
+<optionalSupplAndDisc/>
+	      </room>
+          <room>            
+            <code>DB</code>
+            <name>DOBLE</name>
+            <units>2</units>
+            <adults>2</adults>
+            <children>0</children>                            
+            <pvp>620.48</pvp>
+     	      <neto>577.05</neto>
+            <mandatory_pvp/>
+            <observations/>
+            <restrictions/>
+            <supplements/>
+            <discounts/>
+<optionalSupplAndDisc/>
+          </room>
+        </rooms>
+<cancelPolicies>
+          <cancelPolicie>Si la reserva es cancelada después del 22/05/2012 a las 00:00 tendrá un coste del 50% del importe</cancelPolicie>
+          <cancelPolicie>Si la reserva es cancelada después del 01/06/2010 a las 00:00 tendrá un coste del 100% del importe</cancelPolicie>
+        </cancelPolicies>
+  <checkinTime>01/06/2012 00:00</checkinTime>
+        <structuredCancelPolicies>
+		<structuredCancelPolicie>
+                   <hoursFrom>240</hoursFrom>
+                   <amount>50</amount>
+                   <amountType>PJ</amountType>
+                   <calculationType>TR</calculationType>
+       </structuredCancelPolicie>
+		<structuredCancelPolicie>
+                   <hoursFrom>0</hoursFrom>
+                   <amount>100</amount>
+                   <amountType>PJ</amountType>
+                   <calculationType>TR</calculationType>
+       </structuredCancelPolicie>
+        </structuredCancelPolicies>
+      </accomodation>
+  </reservation>
+ <timeStamp>2020-02-27T12:02:15.596+01:00</timeStamp>
+</ReservationValueResult>

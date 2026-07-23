@@ -1,0 +1,60 @@
+<?xmlversion="1.0"encoding="ISO-8859-1"?>
+<hotelDescriptionsResult>
+	<result>
+		<cod_result>M1</cod_result>
+		<des_result>Operación correcta.</des_result>
+		<type_message>I</type_message>
+	</result>
+	<totalHotels>62263</totalHotels>
+	<totalHotelsRetrieved>600</totalHotelsRetrieved>
+	<operationCode>UMNXASU7EQTGCOT5ZU</operationCode>
+	<hotelDescriptions>
+		<hotelDescriptionsBean>
+			<hotelName>HOVIMA SANTA MARIA</hotelName>
+			<hotelID>TrF7767</hotelID>
+			<address>Avda. de España, Urb. San Eugenio,</address>
+			<country>España</country>
+			<codeCountry>ES</codeCountry>
+			<city>Adeje (Tenerife)</city>
+			<codeCity>ES00699</codeCity>
+			<district>TENERIFE</district>
+			<codeDistrict>ESTrF</codeDistrict>
+			<category>
+				<claveCategoria>3</claveCategoria>
+				<nombre>3 Estrellas</nombre>
+			</category>
+			<postalCode/>
+			<telephoneNumber>0</telephoneNumber>
+			<faxNumber/>
+			<url xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"/>
+			<emailAddress xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"/>
+			<latitude/>
+			<longitude/>
+			<description xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"/>
+				</hotelDescriptionsBean>
+			.
+			.
+			.
+			.
+		<hotelDescriptionsBean>
+			<hotelName>Neelkanth Inn Paldi</hotelName>
+			<hotelID>IN0T0687</hotelID>
+			<address>Paldi Cross Road</address>
+			<country>India</country>
+			<codeCountry>IN</codeCountry>
+			<city>Ahmedabad</city>
+			<codeCity>IN00002</codeCity>
+			<district>Generica India</district>
+			<codeDistrict>ININ0</codeDistrict>
+			<postalCode>380 006</postalCode>
+			<telephoneNumber>917932911227</telephoneNumber>
+			<faxNumber>917926574384</faxNumber>
+<url xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"/>
+			<emailAddress xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"/>
+			<latitude>23.014868</latitude>
+			<longitude>72.564224</longitude>
+			<description xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"/>
+		</hotelDescriptionsBean>
+	</hotelDescriptions>
+<timeStamp>2020-02-27T12:02:15.596+01:00</timeStamp>
+</hotelDescriptionsResult>

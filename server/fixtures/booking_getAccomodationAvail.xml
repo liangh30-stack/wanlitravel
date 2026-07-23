@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+  <getAccomodationAvail>
+    <sessionID>58ace5e3-d0b6-4b0f-8c11-018cdd3440fc</sessionID>
+    <availabilitySearchData>
+      <initialDate>22062012</initialDate>
+      <finalDate>26062012</finalDate>
+      <onlyConfirmed>false</onlyConfirmed>
+
+  <retrieveCancelPolicies>true</retrieveCancelPolicies>
+
+      <room1>
+        <adult>2</adult>
+        <children>2</children>
+        <firstChildAge>6</firstChildAge>
+        <secondChildAge>11</secondChildAge>
+        <units>1</units>
+      </room1>
+<room2>
+        <adult>2</adult>
+        <children>0</children>
+        <firstChildAge/>
+        <secondChildAge/>
+        <units>2</units>
+      </room2>
+      <room3/>
+      <accomodationsCode/>
+<countryCode>ES</countryCode>
+      <category/>
+      <mealPlan/>
+      <city>29054</city>
+      <province/>
+      <zone/>
+    </availabilitySearchData>
+  </getAccomodationAvail>

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>万里旅行 WANLITRAVEL | 奢华西班牙私人订制</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@200;400;700&family=Noto+Sans+SC:wght@100;300;400&display=swap" rel="stylesheet">
+    <!-- 引入滚动动画库 -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <style>
+        :root {
+            --iberia-red: #E31B23;
+            --rich-black: #050505;
+            --deep-gold: #c9a96e;
+        }
+        body { background-color: var(--rich-black); color: #ffffff; font-family: 'Noto Sans SC', sans-serif; overflow-x: hidden; }
+        .serif { font-family: 'Noto Serif SC', serif; font-weight: 200; }
+        
+        /* 极致字间距营造高级感 */
+        .tracking-ultra { letter-spacing: 0.5em; }
+        .tracking-luxury { letter-spacing: 0.2em; }
+
+        /* 沉浸式背景渐变 */
+        .vignette-overlay { background: radial-gradient(circle, rgba(5,5,5,0) 0%, rgba(5,5,5,0.8) 100%); }
+        .hero-mask { background: linear-gradient(to bottom, rgba(5,5,5,0.4) 0%, var(--rich-black) 95%); }
+
+        /* 非对称网格与边框 */
+        .luxury-border { border: 1px solid rgba(255,255,255,0.08); transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+        .luxury-border:hover { border-color: var(--iberia-red); background: rgba(227, 27, 35, 0.03); }
+
+        /* 优雅的线条装饰 */
+        .gold-line { height: 1px; background: linear-gradient(to right, transparent, var(--deep-gold), transparent); width: 100px; }
+
+        /* 毛玻璃导航 */
+        .glass-nav { background: rgba(5, 5, 5, 0.4); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.03); }
+
+        /* 定制化按钮 */
+        .cta-button { position: relative; overflow: hidden; }
+        .cta-button::after { content: ''; position: absolute; bottom: 0; left: 0; width: 0; height: 1px; background: var(--iberia-red); transition: width 0.4s ease; }
+        .cta-button:hover::after { width: 100%; }
+
+        /* 视差图片容器 */
+        .parallax-container { overflow: hidden; position: relative; }
+        .parallax-img { transition: transform 0.8s ease-out; }
+        .parallax-container:hover .parallax-img { transform: scale(1.08); }
+
+        /* 时刻组件 */
+        .time-badge { font-family: monospace; font-size: 10px; color: var(--deep-gold); opacity: 0.7; }
+    </style>
+</head>
+<body>
+    <!-- 极简高端导航 -->
+    <nav class="fixed w-full z-[100] px-12 py-6 flex justify-between items-center glass-nav">
+        <div class="flex items-center space-x-12">
+            <div class="text-xl font-light tracking-ultra iberia-red serif">WANLITRAVEL</div>
+            <div class="hidden lg:flex space-x-8 text-[9px] uppercase tracking-[0.3em] text-gray-400">
+                <span id="madrid-time">MAD 00:00</span>
+                <span id="beijing-time">BJS 00:00</span>
+            </div>
+        </div>
+        <div class="flex items-center space-x-12 text-[10px] uppercase tracking-ultra font-light">
+            <a href="#tours" class="hover:text-white transition cta-button">Experiences</a>
+            <a href="#b2b" class="hover:text-white transition cta-button">Partnerships</a>
+            <a href="index.html" class="text-gray-500 hover:text-white">EN</a>
+            <div class="w-8 h-px bg-white/20"></div>
+            <button class="bg-white text-black px-6 py-2 hover:bg-red-600 hover:text-white transition">Reserve</button>
+        </div>
+    </nav>
+
+    <!-- 电影感 Hero 区域 -->
+    <section class="relative h-screen flex items-end px-12 pb-24 overflow-hidden">
+        <video autoplay muted loop class="absolute inset-0 w-full h-full object-cover opacity-60">
+            <!-- 假设这里是高质量的西班牙美景剪辑，暂时用静态图代替 -->
+            <source src="" type="video/mp4">
+        </video>
+        <img src="https://sc02.alicdn.com/kf/A7b37404cfdb544d2b5f9027df01f434aP.png" class="absolute inset-0 w-full h-full object-cover" alt="Spain">
+        <div class="absolute inset-0 vignette-overlay"></div>
+        <div class="absolute inset-0 hero-mask"></div>
+
+        <div class="relative z-10 w-full max-w-5xl" data-aos="fade-up" data-aos-duration="1500">
+            <div class="gold-line mb-8"></div>
+            <h1 class="text-7xl md:text-9xl serif mb-6 leading-tight font-extralight tracking-luxury">
+                纵横万里 <br> <span class="iberia-red italic">阅尽绝色</span>
+            </h1>
+            <div class="flex flex-col md:flex-row md:items-center space-y-6 md:space-y-0 md:space-x-12">
+                <p class="text-sm md:text-base text-gray-400 max-w-sm font-light tracking-widest leading-relaxed">
+                    我们不只是地接社，我们是您在伊比利亚半岛的奢华向导。为您开启封存已久的文明印记。
+                </p>
+                <div class="flex items-center space-x-4">
+                    <span class="text-[10px] tracking-ultra text-white/50">DMC & BESPOKE TRAVEL</span>
+                    <div class="w-12 h-px bg-white/30"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 叙事布局：精品路线 -->
+    <section id="tours" class="py-32 px-12 bg-black">
+        <div class="text-center mb-32" data-aos="fade-up">
+            <p class="text-[10px] tracking-ultra text-red-600 mb-4 uppercase">Private Collections</p>
+            <h2 class="text-5xl serif font-light tracking-luxury">匠心甄选路线</h2>
+        </div>
+
+        <div class="space-y-48 max-w-7xl mx-auto">
+            <!-- 路线 1：大图排版 -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center" data-aos="fade-right">
+                <div class="lg:col-span-7 parallax-container">
+                    <img src="https://sc02.alicdn.com/kf/S70c8d17a3a804a189f7831d459037c76T.jpg" class="w-full h-[60vh] object-cover parallax-img shadow-2xl" alt="Barcelona">
+                </div>
+                <div class="lg:col-span-5 px-8">
+                    <span class="text-[10px] text-gray-500 tracking-luxury mb-4 block">CODE: ES-BM01</span>
+                    <h3 class="text-4xl serif mb-6 tracking-luxury">西班牙双城记 <br> <span class="text-xl text-gray-500 tracking-luxury">巴塞罗那 & 马德里</span></h3>
+                    <p class="text-gray-400 font-light leading-loose text-sm mb-8">
+                        从高迪奇幻的圣家族大教堂，到马德里皇室珍藏的艺术长廊。这是一场穿越艺术与皇权的双重洗礼。
+                    </p>
+                    <div class="flex items-center space-x-12 border-t border-white/10 pt-8">
+                        <div>
+                            <p class="text-[10px] text-gray-500 uppercase mb-2 tracking-luxury">Duration</p>
+                            <p class="text-sm tracking-luxury">8 Days / 7 Nights</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] text-gray-500 uppercase mb-2 tracking-luxury">From</p>
+                            <p class="text-lg serif iberia-red">€1,299</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 路线 2：反向排版 -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center" data-aos="fade-left">
+                <div class="lg:col-span-5 order-2 lg:order-1 px-8 lg:text-right">
+                    <span class="text-[10px] text-gray-500 tracking-luxury mb-4 block">CODE: ES-AD02</span>
+                    <h3 class="text-4xl serif mb-6 tracking-luxury">南境之魂 <br> <span class="text-xl text-gray-500 tracking-luxury">安达卢西亚秘境</span></h3>
+                    <p class="text-gray-400 font-light leading-loose text-sm mb-8">
+                        沉浸在摩尔人的旧梦中。塞维利亚的阳光，格拉纳达的晚霞，以及那永不停歇的弗拉门戈。
+                    </p>
+                    <div class="flex items-center lg:justify-end space-x-12 border-t border-white/10 pt-8">
+                        <div>
+                            <p class="text-[10px] text-gray-500 uppercase mb-2 tracking-luxury">Duration</p>
+                            <p class="text-sm tracking-luxury">7 Days / 6 Nights</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] text-gray-500 uppercase mb-2 tracking-luxury">From</p>
+                            <p class="text-lg serif iberia-red">€1,099</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="lg:col-span-7 order-1 lg:order-2 parallax-container">
+                    <img src="https://sc02.alicdn.com/kf/S98e8c1b48b7a4b8eb58514560737c76U.jpg" class="w-full h-[60vh] object-cover parallax-img shadow-2xl" alt="Andalusia">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- B2B 极简专区 -->
+    <section id="b2b" class="py-40 bg-zinc-950">
+        <div class="max-w-4xl mx-auto px-12 text-center" data-aos="zoom-in">
+            <h2 class="text-4xl serif mb-12 tracking-luxury">B2B 合作伙伴：万里生态</h2>
+            <p class="text-gray-400 font-light leading-relaxed mb-16 text-lg">
+                我们为全球精英旅行社提供伊比利亚半岛最专业的落地资源直连。
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-1px bg-white/10">
+                <div class="bg-zinc-950 p-12 luxury-border">
+                    <span class="text-[10px] iberia-red tracking-ultra block mb-6">01. DIRECT</span>
+                    <p class="text-sm font-light tracking-luxury text-gray-300">NDC 实时库存直连</p>
+                </div>
+                <div class="bg-zinc-950 p-12 luxury-border">
+                    <span class="text-[10px] iberia-red tracking-ultra block mb-6">02. NATIVE</span>
+                    <p class="text-sm font-light tracking-luxury text-gray-300">本地自营车队导游</p>
+                </div>
+                <div class="bg-zinc-950 p-12 luxury-border">
+                    <span class="text-[10px] iberia-red tracking-ultra block mb-6">03. GLOBAL</span>
+                    <p class="text-sm font-light tracking-luxury text-gray-300">跨境结算与多币种</p>
+                </div>
+            </div>
+            <div class="mt-20">
+                <button class="px-16 py-5 border border-white/20 text-[10px] tracking-ultra uppercase hover:bg-white hover:text-black transition duration-500">Apply for Partnership</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- 联系我们：沉浸式卡片 -->
+    <section class="py-32 px-12">
+        <div class="max-w-6xl mx-auto flex flex-col items-center">
+            <h2 class="text-5xl serif mb-16 tracking-luxury italic">Connection</h2>
+            <div class="flex space-x-12 items-center">
+                <a href="#" class="text-[11px] tracking-ultra text-white/40 hover:text-white transition group flex items-center">
+                    WHATSAPP <span class="ml-2 iberia-red opacity-0 group-hover:opacity-100 transition">→</span>
+                </a>
+                <div class="w-px h-4 bg-white/20"></div>
+                <a href="#" class="text-[11px] tracking-ultra text-white/40 hover:text-white transition group flex items-center">
+                    WECHAT <span class="ml-2 iberia-red opacity-0 group-hover:opacity-100 transition">→</span>
+                </a>
+                <div class="w-px h-4 bg-white/20"></div>
+                <a href="#" class="text-[11px] tracking-ultra text-white/40 hover:text-white transition group flex items-center">
+                    EMAIL <span class="ml-2 iberia-red opacity-0 group-hover:opacity-100 transition">→</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="py-24 px-12 text-center">
+        <div class="text-[9px] tracking-ultra text-gray-600 uppercase border-t border-white/5 pt-12">
+            WANLITRAVEL SPAIN · PRIVACY POLICY · TERMS OF SERVICE · &copy; 2026
+        </div>
+    </footer>
+
+    <!-- 脚本：动画加载 -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({ once: true });
+
+        function updateTime() {
+            const options = { hour: '2-digit', minute: '2-digit', hour12: false };
+            document.getElementById('madrid-time').innerText = 'MAD ' + new Date().toLocaleTimeString('en-GB', { ...options, timeZone: 'Europe/Madrid' });
+            document.getElementById('beijing-time').innerText = 'BJS ' + new Date().toLocaleTimeString('en-GB', { ...options, timeZone: 'Asia/Shanghai' });
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+    </script>
+</body>
+</html>

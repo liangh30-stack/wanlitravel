@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<ZonesResult>
+<result>
+<cod_result>M1</cod_result>
+<des_result>Operación correcta</des_result>
+<type_message>I</type_message>
+</result>
+<zones>
+<zone>
+<name>Costa del Sol</name>
+<zoneCode>Esg0001</zoneCode>
+ <cities>
+      <city>
+        <name>10001</name>
+        <cityCode>Estepona</cityCode>        
+      </city>
+      <city>
+        <name>10001</name>
+        <cityCode>Torremolinos</cityCode>        
+       </city>
+    </cities>
+</zone>
+<zone>
+<name>Costa Blanca</name>
+<zoneCode>Esg0007</zoneCode>
+</zone>
+<zone>
+<name>Costa de Almería</name>
+<zoneCode>ESg0023</zoneCode>
+</zone>
+<zone>
+<name>Costa de Valencia</name>
+<zoneCode>ESg0045</zoneCode>
+</zone>
+<zone>
+<name>Costa del Mareme</name>
+<zoneCode>ESg0053</zoneCode>
+</zone>
+</zones>
+  <timeStamp>2020-02-27T12:02:15.596+01:00</timeStamp>
+</ZonesResult>

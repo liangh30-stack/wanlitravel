@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<CancellationResult>
+  <result>
+    <cod_result>M1</cod_result>
+    <des_result>Operación correcta</des_result>
+    <type_message>I</type_message>
+  </result>
+  <cancellation>
+	<cancelLoc>C_159413</cancelLoc>
+<cancelCost>50</cancelCost>
+<currencyCode>EUR</currencyCode>
+  </cancellation>
+  <timeStamp>2020-02-27T12:02:15.596+01:00</timeStamp>
+</CancellationResult>

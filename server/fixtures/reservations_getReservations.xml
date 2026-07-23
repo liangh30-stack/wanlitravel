@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<getReservations>
+
+  <user>USUARIO000</user>
+  <password>PWD0000</password>
+
+        <searchParams>
+         	 <initialBookingDate>01/01/2012</initialBookingDate>            
+         	 <finalBookingDate>15/01/2012</finalBookingDate>            
+        </searchParams>
+</getReservations>

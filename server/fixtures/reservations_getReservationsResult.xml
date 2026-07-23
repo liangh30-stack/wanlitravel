@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<getReservationsResult>
+    <result>
+        <cod_result>M1</cod_result>
+        <des_result>Operación correcta.</des_result>
+        <type_message>I</type_message>
+    </result>
+    <reservations>
+
+    <reservation>
+		<initialDate>15/06/2012</initialDate>
+		<finalDate>19/06/2012</finalDate>
+		<reservationDate>02/03/2012</reservationDate>
+		<localizer>343jsoisdf=</localizer>
+		<clientLocalizer>65B287</clientLocalizer>
+		<pvp>1207.36</pvp>
+<currencyCode>EUR</currencyCode>
+		<client>
+<name>Alejandra</name>
+<firstSurname>Alonso</firstSurname>
+<secondSurname>Sánchez</secondSurname>
+</client>
+<buyer>
+	<name>Agencia 456</name>
+	<identification>B-24598672</identification><eMail/>
+</buyer>
+<status>SALE</status>
+<cancelLoc/>
+<dateCancel/>
+    </reservation>
+    <reservation>
+		<initialDate>17/08/2102</initialDate>
+		<finalDate>24/08/2012</finalDate><reservationDate>13/05/2012</reservationDate>
+		<localizer>547abcF405=</localizer>
+		<clientLocalizer>25B/32F</clientLocalizer>
+		<pvp>2025.8</pvp>
+		<client>
+<name>Beatriz</name>
+<firstSurname>Suárez</firstSurname>
+<secondSurname></secondSurname>
+</client>
+<buyer>
+	<name>Agencia 5320</name>
+	<identification>A-09199277</identification><eMail/>
+</buyer>
+<status>CANCELLED</status>
+<modifiedDate>01/06/2012</modifiedDate>
+<cancelLoc>C58289652</cancelLoc>
+<dateCancel>01/06/2012</dateCancel>
+    </reservation>
+</reservations>
+</getReservationsResult>

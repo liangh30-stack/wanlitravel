@@ -1,0 +1,853 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<getReservationDetailsResult>
+    <result>
+        <cod_result>M1</cod_result>
+        <des_result>Operación correcta.</des_result>
+        <type_message>I</type_message>
+    </result>
+    <reservationDetail>
+	<initialDate>15/06/2012</initialDate>
+	<finalDate>19/06/2012</finalDate>
+	<reservationDate>02/03/2012</reservationDate>
+	<localizer>343jsoisdf=</localizer>
+	<clientLocalizer>65B287</clientLocalizer>
+	<pvp>1207.36</pvp>
+<neto/>
+	<comision>96.57</comision>
+<ivaComision>14.73</ivaComision>
+<currencyCode>EUR</currencyCode>
+<typeOfPayment>T</typeOfPayment>
+<amountPaid>0</amountPaid>
+	<client>
+		<name>Alejandra</name>
+		<firstSurname>Alonso</firstSurname>
+		<secondSurname>Sánchez</secondSurname>
+<age>30</age> 
+<nif>123456789O</nif> 
+<email>alejandra.alonso.sanchez@gmail.com</email> 
+<phone>987999999</phone>
+	</client>
+	<buyer>
+		<name>Agencia 456</name>
+		<identification>B-24598672</identification><eMail/>
+	</buyer>
+<billData>
+<name>Alejandra</name> 
+<firstSurname>Alonso</firstSurname> 
+<secondSurname>Sanchez</secondSurname> 
+<documentType>0000001</documentType> 
+<document>25632563T</document> 
+<contactPhone>919999999</contactPhone> 
+<mobilePhone>6669999999</mobilePhone> 
+<email>alejandra.alonso.sanchez@gmail.com</email> 
+<address>Calle Toledo 33 4C</address> 
+<postcode>28021</postcode> 
+<city>Madrid</city> 
+<province>Madrid</province> 
+<country>España</country> 
+</billData>
+	<status>SALE</status>
+	<modifiedDate>08/07/2012</modifiedDate>
+	<voucherAllowed>S</voucherAllowed>
+	<cancelLoc/>
+	<dateCancel/>
+	<accomodations>
+<code>12563</code>
+<name>GRAN HOTEL DEL SELLA</name>
+		<mealPlan>MP</mealPlan>
+		<initialDate>15/06/2012</initialDate>
+		<finalDate>19/06/2012</finalDate>
+<comision>96.57</comision> 
+<ivaComision>14.73</ivaComision>
+		<price>1127.36</price>
+		<remarks>OFERTA ESPECIAL. No se admite bebé</remarks>
+		<remarksVoucher>OFERTA ESPECIAL. No se admite bebé</remarksVoucher>
+		<cancelPolicies>
+			<cancelPolicie> Para la habitación DOBLE ENAMORADOS (SIN BEBÉ) se aplican las siguientes politicas de cancelación: Si la reserva es cancelada después del 01/06/2012 a las 00:00 tendra un coste de 100.0 % del importe de 2 noches 
+			</cancelPolicie>
+		</cancelPolicies>
+		<roomLines>
+			<code>DBEN02</code>
+			<name>DOBLE VISTA MAR</name>
+			<units>1<units>
+			<price>1127.36</price>
+			<numAdults>2</numAdults>
+			</ageAdults>
+			<numChild>1</numChild>
+			<ageChild>4</ageChild>
+			<client>
+				<name>Alejandra</name>
+				<firstSurname>Alonso</firstSurname>
+				<secondSurname>Sánchez</secondSurname>
+			</client>
+			<status>SALE</status>
+			<supplements>
+				<supplement>
+					<name>SUPL V/MAR LATERAL PAX/DÍA</name>
+					<value>73.956</value>
+					<description>Esta es la descripción detallada del suplemento</description>
+					<rooms>0</rooms>
+					<days>7</days>
+					<pax>2</pax>
+					<typePax>N</typePax>
+					<commissionable>N</commissionable>
+				</supplement>
+			<supplements>
+			<discounts>	
+				<name>Oferta Venta Anticipada para reservas hechas antes del 31/03/2012</name>
+				<value>82.60</value>		
+			</discounts>
+		</roomLines>
+	</accomodations>
+<structuredCancelPolicies>
+    <structuredCancelPolicie>
+<hoursFrom>48</hoursFrom>
+<calculationType>1N</calculationType>
+<amountType>PJ</amountType>
+<amount>100</amount>
+    </structuredCancelPolicie>
+    <structuredCancelPolicie>
+<hoursFrom>24</hoursFrom>
+<calculationType>2N</calculationType>
+<amountType>PJ</amountType>
+<amount>100</amount>
+     </structuredCancelPolicie>
+   </structuredCancelPolicies>
+	<generalRegime>S</generalRegime>
+  <reservationDetail>
+  <timeStamp>2020-02-27T12:02:15.596+01:00</timeStamp> 
+</getReservationDetailsResult>
+
+Nota.- Ejemplo de detalle de Reserva en la que existen dos líneas, una correspondiente a un Alojamiento y otra correspondiente a un Servicio
+
+Descripción de datos de respuesta getreservationDetailsResult
+
+
+getReservationDetailsResult: Estructura de datos con la siguiente información:
+result: Estructura de datos que informa de si el resultado de la petición ha sido satisfactorio o por el contrario ha ocurrido algún error  [Ver detalle]
+timeStamp: Fecha y hora a la que se ha realizado la respuesta [Ver detalle]
+reservationDetail: Estructura de información que contiene el detalle de la Reserva consultada en el sistema. Los ítems que contendrá esta estructura serán los siguientes:
+initialDate: Fecha de inicio de la Reserva.
+Tipo de dato: String. 
+Obligatorio: SI
+
+Formato: DD/MM/YYYY
+Posibles valores: [no aplica]
+finalDate: Fecha de fin de la Reserva.
+Tipo dato: String
+Obligatorio: SI
+Formato: DD/MM/YYYY
+Posibles valores: [no aplica]
+reservationDate: Fecha de realización de la Reserva:
+Tipo de dato: String. 
+Obligatorio: SI
+Formato: DD/MM/YYYY
+Posibles valores: [no aplica]
+localizer.-  Localizador de la reserva en el sistema Proveedor.
+Tipo de dato: String. 
+Obligatorio: SI
+Formato: máx. 40 caracteres de longitud
+Posibles valores: [no aplica]
+clientLocalizer: Localizador de la reserva en el sistema invocador. En el caso de haber sido informado en la invocación, contendrá el mismo valor que se haya informado.
+Tipo de dato: String. 
+Obligatorio: NO, sólo se informará en el caso de que haya sido suministrado en el proceso de realización de la Reserva.
+Formato: máx. 40 caracteres de longitud
+Posibles valores: [no aplica]
+pvp: pvp de la Reserva.
+Tipo de dato: String
+Obligatorio: NO 
+Formato: Será un número donde de existir decimales, estarán separados de la parte entera por un punto. 
+Posibles valores: [no aplica]
+neto: Precio neto de la Reserva.
+Tipo de dato: String
+Obligatorio: NO 
+Formato: Será un número donde de existir decimales, estarán separados de la parte entera por un punto. 
+Posibles valores: [no aplica]
+IMPORTANTE: Ambos ítems (neto y pvp) estarán informados, pudiendo coincidir el valor de los mismos en el caso de que la venta esté siendo hecha en Neto. 
+comision: Importe de la comisión de la Reserva.
+Tipo de dato: String
+Obligatorio: SI, en el caso de que el precio devuelto sea en PVP.
+Formato: Será un número donde de existir decimales, estarán separados de la parte entera por un punto. 
+Posibles valores: [no aplica]
+ivaComision: Importe del IVA de la comisión de la Reserva.
+Tipo de dato: String
+Obligatorio: SI, en el caso de que el precio devuelto sea en PVP.
+Formato: Será un número donde de existir decimales, estarán separados de la parte entera por un punto. 
+Posibles valores: [no aplica]
+IMPORTANTE: El ítem correspondiente a la comisión, será informado en el caso de que la venta esté siendo hecha en pvp, indicando de esta forma el valor de neto, pvp y comision correspondientes
+currencyCode.-  Código de la moneda en la que se han devuelto precio, neto y comisión.
+Tipo de dato: String. 
+Obligatorio: SI 
+Formato: Cadena de tres caracteres
+Posibles valores: Códigos de moneda contemplados en el ISO-4217 
+typeOfPayment.-  Forma de pago elegida por el cliente. 
+Tipo de dato: String. 
+Obligatorio: NO 
+Formato: Cadena de tres caracteres
+Posibles valores: 
+T: Pago mediante (T)ransferencia
+P: Pago mediante (P)asarela de pago.
+C: Pago mediante (C)uotas.
+amountPaid.-  Importe de la reserva que ya ha sido pagado.
+Tipo de dato: String. 
+Obligatorio: SI 
+Formato: Será un número donde de existir decimales, estarán separados de la parte entera por un punto. 
+Posibles valores: [no aplica]
+client: Estructura que contendrá los datos del titular de la Reserva. Los datos de la estructura client se detallan a continuación:
+name: Nombre del cliente.
+Tipo de dato: String. 
+Obligatorio: SI
+Formato: [no aplica]
+Posibles valores: [no aplica]
+firstSurname: Primer apellido del cliente.
+Tipo de dato: String. 
+Obligatorio: SI
+Formato: [no aplica]
+Posibles valores: [no aplica]
+secondSurname: Segundo apellido del cliente.
+Tipo de dato: String. 
+Obligatorio: NO
+Formato: [no aplica]
+Posibles valores: [no aplica]
+age: Edad del cliente.
+Tipo de dato: String. 
+Obligatorio: NO
+Formato: [no aplica]
+Posibles valores: [no aplica]
+nif: Nif del cliente.
+Tipo de dato: String. 
+Obligatorio: NO
+Formato: [no aplica]
+Posibles valores: [no aplica]
+email: Email del cliente.
+Tipo de dato: String. 
+Obligatorio: NO
+Formato: [no aplica]
+Posibles valores: [no aplica]
+phone: Teléfono del cliente.
+Tipo de dato: String. 
+Obligatorio: NO
+Formato: [no aplica]
+Posibles valores: [no aplica]
+buyer: Estructura que contendrá los datos del comprador de la Reserva. Los datos de la estructura se detallan a continuación:
+name: Nombre del comprador
+Tipo de dato: String. 
+Obligatorio: SI
+Formato: [no aplica]
+Posibles valores: [no aplica]
+identification: Contendrá el NIF/CIF del comprador de la Reserva.
+Tipo de dato: String. 
+Obligatorio: SI
+Formato: [no aplica]
+Posibles valores: [no aplica]
+eMail: Contendrá la dirección de mail del comprador de la Reserva.
+Tipo de dato: String. 
+Obligatorio: NO
+Formato: [no aplica]
+Posibles valores: [no aplica]
+billData: Estructura que contendrá los datos para la factura. Los datos de la estructura billData se detallan a continuación:
+name: Nombre del titular de la factura.
+Tipo de dato: String. 
+Obligatorio: SI
+Formato: [no aplica]
+Posibles valores: [no aplica]
+firstSurname: Primer apellido del titular de la factura.
+Tipo de dato: String. 
+Obligatorio: SI
+Formato: [no aplica]
+Posibles valores: [no aplica]
+secondSurname: Segundo apellido del titular de la factura.
+Tipo de dato: String. 
+Obligatorio: NO
+Formato: [no aplica]
+Posibles valores: [no aplica]
+documentType: Tipo de documento que idenfica al titular de la factura.
+Tipo de dato: String. 
+Obligatorio: SI
+Formato: [no aplica]
+Posibles valores: 
+0000000               Número Identificación Extranjeros  
+0000001               Documento Nacional Identidad       
+0000002               Código Identificación Fiscal       
+0000003               Pasaporte                          
+document: documento que idenfica al titular de la factura.
+Tipo de dato: String. 
+Obligatorio: SI
+Formato: [no aplica]
+Posibles valores: [no aplica]
+contactPhone: teléfono del titular de la factura.
+Tipo de dato: String. 
+Obligatorio: SI
+Formato: [no aplica]
+Posibles valores: [no aplica]
+mobilePhone: Teléfono móvil del titular de la factura.
+Tipo de dato: String. 
+Obligatorio: NO
+Formato: [no aplica]
+Posibles valores: [no aplica]
+email: email del titular de la factura.
+Tipo de dato: String. 
+Obligatorio: SI
+Formato: [no aplica]
+Posibles valores: [no aplica]
+address: dirección del titular de la factura.
+Tipo de dato: String. 
+Obligatorio: SI
+Formato: [no aplica]
+Posibles valores: [no aplica]
+postcode: código postal del titular de la factura.
+Tipo de dato: String. 
+Obligatorio: SI
+Formato: [no aplica]
+Posibles valores: [no aplica]
+city: ciudad del titular de la factura.
+Tipo de dato: String. 
+Obligatorio: SI
+Formato: [no aplica]
+Posibles valores: [no aplica]
+province: provincia del titular de la factura.
+Tipo de dato: String. 
+Obligatorio: SI
+Formato: [no aplica]
+Posibles valores: [no aplica]
+country: país del titular de la factura.
+Tipo de dato: String. 
+Obligatorio: SI
+Formato: [no aplica]
+Posibles valores: [no aplica]
+
+
+status: Estado de la reserva.
+Tipo de dato: String. 
+Obligatorio: SI 
+Formato: Cadena de caracteres
+Posibles valores: Los posibles valores son los siguientes:
+“SALE”: Conforme. En el caso de que todas las líneas de la Reserva estén conformes o algunas estén conformes y otras canceladas.
+“ON_REQUEST” : En petición. En el caso de que alguna de las líneas de la Reserva esté en estado “En petición”
+“CANCELLED”: Cancelada. En el caso de que todas las líneas de la Reserva estén en estado “cancelada”
+voucherAllowed: Indica si es posible la emisión de Bonos de la Reserva, o por el contrario para la reserva no está permitida esta emisión.Estado de la reserva.
+Tipo de dato: String. 
+Obligatorio: NO. En el caso de que el tag no esté informado o no existe tag, se considerará por defecto el valor “S”  ( es decir, la emisión de Bonos se considerará permitida).
+Formato: Cadena de caracteres
+Posibles valores: Los posibles valores son los siguientes:
+“S”: La emisión de Bonos está permitida
+“N”: La emisión de Bonos NO está permitida
+cancelLoc.- En el caso de que el estado de la reserva sea Cancelado, el dato contendrá el localizador de cancelación. 
+Tipo dato: String
+Obligatorio: NO.
+Formato: Max. 40 caracteres
+Posibles valores: [no aplica]
+dateCancel.- En el caso de que el estado de la reserva sea Cancelado, el dato contendrá la fecha de cancelación en el sistema proveedor de la Reserva. 
+Tipo dato: String
+Obligatorio: NO.
+Formato: DD/MM/YYYY
+Posibles valores: [no aplica]
+modifiedDate.- En el caso de que la reserva se haya modificado, el dato contendrá la última fecha de la modificacion en el sistema proveedor de la Reserva. 
+Tipo dato: String
+Obligatorio: NO.
+Formato: DD/MM/YYYY
+Posibles valores: [no aplica]
+accomodations [ ]: Lista de estructuras de tipo accomodation que contiene los datos de un alojamiento de la Reserva. La estructura accomodation contendrá los siguientes ítems de información:
+code: Código del alojamiento en el sistema proveedor
+Tipo de dato: String. 
+Obligatorio: SI 
+Formato: [no aplica]
+Posibles valores: [no aplica]
+name: Nombre del alojamiento en el sistema proveedor
+Tipo de dato: String. 
+Obligatorio: SI 
+Formato: [no aplica]
+Posibles valores: [no aplica]
+mealPlan: Código del régimen del alojamiento reservado.
+Tipo de dato: String. 
+Obligatorio: SI
+Formato: [no aplica]
+Posibles valores: [no aplica]
+initialDate: Fecha de inicio de la reserva del alojamiento.
+Tipo de dato: String
+Obligatorio: SI
+Formato: [no aplica]
+Posibles valores: [no aplica] 
+finalDate: Fecha de fin de la reserva del alojamiento.
+Tipo de dato: String
+Obligatorio: SI
+Formato: [no aplica]
+Posibles valores: [no aplica] 
+comision: Importe de la comisión aplicada a el alojamiento.
+Tipo de dato: String
+Obligatorio: SI
+Formato: Será un número donde de existir decimales, estarán separados de la parte entera por un punto. 
+Posibles valores: [no aplica]
+ivaComision: Importe del iva de la comisión aplicada a el alojamiento
+Tipo de dato: String
+Obligatorio: SI
+Formato: Será un número donde de existir decimales, estarán separados de la parte entera por un punto. 
+Posibles valores: [no aplica]
+price: precio de la línea de Alojamiento a la que corresponden los datos, corresponderá a la suma de los precios de las habitaciones contratadas en el alojamiento al que se refieren los datos
+Tipo de dato: String
+Obligatorio: SI
+Formato: Será un número donde de existir decimales, estarán separados de la parte entera por un punto. 
+Posibles valores: [no aplica]
+remarks: Observaciones para la Reserva.
+Tipo de dato: String. 
+Obligatorio: NO
+Formato: 
+Posibles valores: [no aplica]
+remarksVoucher: Observaciones para los Bonos de la Reserva.
+Tipo de dato: String. 
+Obligatorio: NO
+Formato: 
+Posibles valores: [no aplica]
+cancelPolicies [ ]: Lista que contempla las políticas de cancelación del Alojamiento. No es obligatorio que venga informada. La estructura contendrá una o varios ítems cancelPolicie. En cada uno de estos ítems se informará de una política de cancelación. 
+  cancelPolicie: Descripción con la política de cancelación.
+Tipo de dato: String. 
+Obligatorio: NO
+Formato: [no aplica]
+Posibles valores: [no aplica] 
+roomLines [ ]: Lista de estructuturas de tipo room que contemplan los datos de las habitaciones contratadas. Cada uno de los ítems de esta estructura contendrá la siguiente información: 
+   code: Código identidicador del tipo de habitación.
+Tipo de dato: String. 
+Obligatorio: NO 
+Formato: [no aplica]
+Posibles valores: [no aplica]
+   name: Nombre de la habitación contratada.
+Tipo de dato: String. 
+Obligatorio: SI 
+Formato: [no aplica]
+Posibles valores
+   units: Número de unidades de la habitación contratadas.
+Tipo de dato: String. 
+Obligatorio: SI 
+Formato: [no aplica]
+Posibles: [no aplica]
+  price:Precio
+Tipo de dato: String. 
+Obligatorio: SI
+Formato: Número
+Posibles valores: Deberá ser un número donde de existir decimales, deberán estar separados de la parte entera por un punto 
+   numAdults: Número de adultos de la habitación.
+Tipo de dato: String. 
+Obligatorio: SI
+Formato: Número
+Posibles valores: [no aplica] 
+   ageAdults: Edades de los adultos de la habitación
+Tipo de dato: String. 
+Obligatorio: NO
+Formato: Será una cadena en la que se especificarán como máximo tantos ítems separados por el carácter coma ‘,’ como número de adultos se haya especificado en el ítem numAdults.
+   numChild: Número de niños de la habitación.
+Tipo de dato: String. 
+Obligatorio: NO
+Formato: Número
+Posibles valores: [no aplica] 
+   ageChild: Edades de los niños de la habitación
+Tipo de dato: String. 
+Obligatorio: NO
+Formato: Será una cadena en la que se especificarán tantos ítems separados por el carácter coma ‘,’ como número de niños se haya especificado en el ítem numChild
+client: (Opcional). Estructura que contendrá los datos del titular de la habitación. Los datos de la estructura client se detallan a continuación:
+name: Nombre del cliente.
+Tipo de dato: String. 
+Obligatorio: SI
+Formato: [no aplica]
+Posibles valores: [no aplica]
+firstSurname: Primer apellido del cliente.
+Tipo de dato: String. 
+Obligatorio: SI
+Formato: [no aplica]
+Posibles valores: [no aplica]
+secondSurname: Segundo apellido del cliente.
+Tipo de dato: String. 
+Obligatorio: NO
+Formato: [no aplica]
+Posibles valores: [no aplica]
+
+   status: Estado de la línea de Alojamiento.
+Tipo de dato: String. 
+Obligatorio: SI 
+Formato: Cadena de caracteres
+Posibles valores: Los posibles valores son los siguientes:
+“SALE”: Conforme. En el caso de que el estado de la/s habitación/es a las que se refieren los datos sea Conforme.
+“ON_REQUEST”: En petición. En el caso de que el estado de la/s habitación/es a las que se refieren los datos sea En Petición
+“CANCELLED”: Cancelada. En el caso de que el estado de la/s habitación/es a las que se refieren los datos sea Cancelada.
+    supplements [ ]: Lista de suplementos correspondientes al precio de la habitación. La estructura de datos contendrá la siguiente información: 
+supplement: Estructura de datos con los siguientes ítems:
+name: Nombre/descripción del suplemento
+Tipo de dato: String. 
+Obligatorio: NO
+Formato: [no aplica]
+Posibles valores: [no aplica] 
+value: Valor/importe del suplemento
+Tipo de dato: String. 
+Obligatorio: NO
+Formato: [no aplica]
+Posibles valores: [no aplica]
+description: Descripción detalla del suplemento
+Tipo de dato: String. 
+Obligatorio: NO
+Formato: [no aplica]
+Posibles valores: [no aplica]
+rooms: Número de habitaciones de la reserva sobre los que se ha aplicado el suplemento.
+Tipo de dato: String. 
+Obligatorio: NO
+Formato: [no aplica]
+Posibles valores: [no aplica] 
+days: Número de dias de la reserva sobre los que se ha aplicado el suplemento.
+Tipo de dato: String. 
+Obligatorio: NO
+Formato: [no aplica]
+Posibles valores: [no aplica] 
+pax: Número de pasajeros de la reserva sobre los que se ha aplicado el suplemento.
+Tipo de dato: String. 
+Obligatorio: NO
+Formato: [no aplica]
+Posibles valores: [no aplica] 
+typePax: : Tipo de pasajeros sobre los que se ha aplicado el suplemento.
+Tipo de dato: String. 
+Obligatorio: NO
+Formato: [no aplica]
+Posibles valores: [T: Todos, A: Adultos, N: Niños] 
+commissionable: Indica si el suplemento es comisionable.
+Tipo de dato: String. 
+Obligatorio: NO
+Formato: [no aplica]
+Posibles valores: [S: SI, N: No] 
+
+     discounts [ ]: Lista de descuentos correspondientes al precio de la habitación. La estructura de datos contendrá la siguiente información: 
+discount: Estructura de datos con los siguientes ítems:
+name: Nombre/descripción del descuento
+Tipo de dato: String. 
+Obligatorio: NO
+Formato: [no aplica]
+Posibles valores: [no aplica] 
+value: Valor/importe del descuento
+Tipo de dato: String. 
+Obligatorio: NO
+Formato: [no aplica]
+Posibles valores: [no aplica]
+description: Descripción detalla del descuento
+Tipo de dato: String. 
+Obligatorio: NO
+Formato: [no aplica]
+Posibles valores: [no aplica]
+rooms: Número de habitaciones de la reserva sobre los que se ha aplicado el descuento.
+Tipo de dato: String. 
+Obligatorio: NO
+Formato: [no aplica]
+Posibles valores: [no aplica] 
+days: Número de dias de la reserva sobre los que se ha aplicado el descuento.
+Tipo de dato: String. 
+Obligatorio: NO
+Formato: [no aplica]
+Posibles valores: [no aplica] 
+pax: Número de pasajeros de la reserva sobre los que se ha aplicado el descuento.
+Tipo de dato: String. 
+Obligatorio: NO
+Formato: [no aplica]
+Posibles valores: [no aplica] 
+typePax: Tipo de pasajeros sobre los que se ha aplicado el descuento.
+Tipo de dato: String. 
+Obligatorio: NO
+Formato: [no aplica]
+Posibles valores: [T: Todos, A: Adultos, N: Niños] 
+commissionable: Indica si el descuento es comisionable.
+Tipo de dato: String. 
+Obligatorio: NO
+Formato: [no aplica]
+Posibles valores: [S: SI, N: No]
+
+structuredCancelPolicies: Lista que contempla las políticas de cancelación de forma estructuradas. Es obligatorio que vengan informados, si no hay gastos de cancelación no contendrá ningún ítem structuredcancelPolicie, en el caso de existir gastos de cancelación la estructura contendrá uno o varios ítems structuredcancelPolicie. En cada uno de estos ítems se informará de una política de cancelación. 
+¡¡NOTA IMPORTANTE!! En el caso de que en las structuredCancelPolicies aparezca una structuredCancelPolicie en la que el valor del calculationType sea ‘NA’ la reserva puede llevar o no llevar gastos de cancelación pero no se ha conseguido recuperar las políticas de cancelación por algún problema técnico. En éste caso se deberá contactar con el departamento de booking para poder saber los gastos de cancelación de dicha reserva. El structuredCancelPolicie ‘NA’ es:
+<structuredCancelPolicie>
+<hoursFrom>9999</hoursFrom>
+<calculationType>NA</calculationType>
+</structuredCancelPolicie>
+
+structuredCancelPolicie: Estructura con cada una la las políticas de cancelación. Cada uno de estos elementos contendrá:
+hoursFrom: Número de horas anteriores a la hora de chekin a partir de las cuales se aplicará esta política de cancelación:
+Tipo de dato: String. 
+Obligatorio: SI
+Formato: [no aplica]
+Posibles valores: [no aplica]. 
+NOTA: Si hay más de una política de cancelación que cumpla los requisitos de aplicación de la política de cancelación se tendrá en cuenta la que el número de horas anteriores a la hora de checkin sea menor. La hora de check-in vendrá informada en el tag checkinTime, si esta no viene informada la hora de check-in por defecto será la fecha de inificio de la estancia a las 0 horas, hora local del establecimiento.
+calculationType: El tipo de calculo es la cantidad sobre la que se aplicara el gasto de cancelación cuando este indicado en porcentaje:
+Tipo de dato: String. 
+Obligatorio: NO
+Formato: [no aplica]
+Posibles valores: Los posibles tipos de cálculo serán:
+NA: No se han podido recuperar las políticas de cancelación (Ver detalle). 
+NR: La reserva es no reembolsable 
+TR: Total de la reserva.
+1N: Primera noche de la reserva.
+2N: Primera y segunda noche de la reserva.
+3N: Primera, segunda y tercera noche de la reserva.
+4N: Primera, seg… y cuarta noche de la reserva.
+5N: Primera, seg… y quinta noche de la reserva.
+6N: Primera, seg… y sexta noche de la reserva.
+7N: Primera, seg… y séptima noche de la reserva.
+8N: Primera, seg… y octaba noche de la reserva.
+9N: Primera, seg… y novena noche de la reserva.
+10N: Primera, seg… y decima noche de la reserva.
+Etcétera
+amountType: El tipo de cantidad Indica si el gasto de cancelación es una cantidad o un porcentaje a aplicar en funcion del valor indicado en calculationType:
+Tipo de dato: String. 
+Obligatorio: SI
+Formato: [no aplica]
+Posibles valores: Los posibles tipos de cálculo serán:
+PJ: El gasto de cancelación vienen idicado en porcentaje.
+MD: El gasto de cancelación vienen idicado con una cantidad.
+amount: Cantidad o porcentate del gasto de cancelación a aplicar:
+Tipo de dato: String. 
+Obligatorio: SI Salvo que sea un calculationType ‘NA’
+Formato: [no aplica]
+Posibles valores: [no aplica]. 
+
+
+
+serviceLine [ ]: Lista de estructuras de tipo service que contiene los datos de un Servicio contratado en la Reserva. La estructura service contendrá los siguientes ítems de información:
+codeService: Código en el sistema proveedor del Servicio reservado.
+Tipo de dato: String. 
+Obligatorio: SI
+Formato: [no aplica]
+Posibles valores: [no aplica]
+nameService: Nombre en el sistema proveedor del Servicio reservado.
+Tipo de dato: String. 
+Obligatorio: SI
+Formato: [no aplica]
+Posibles valores: [no aplica]
+units: Número de unidades del Servicio reservado.
+Tipo de dato: String. 
+Obligatorio: SI 
+Formato: [no aplica]
+Posibles: [no aplica]
+initialDate: Fecha de inicio de prestación del Servicio.
+Tipo de dato: String. 
+Obligatorio: SI
+Formato: DD/MM/YYYY
+Posibles valores: [no aplica]
+finalDate: Fecha de fin de prestación del Servicio.
+Tipo de dato: String. 
+Obligatorio: SI
+Formato: DD/MM/YYYY
+Posibles valores: [no aplica]
+comision: Importe de la comisión aplicada a el servicio.
+Tipo de dato: String
+Obligatorio: SI
+Formato: Será un número donde de existir decimales, estarán separados de la parte entera por un punto. 
+Posibles valores: [no aplica]
+ivaComision: Importe del iva de la comisión aplicada a el servicio
+Tipo de dato: String
+Obligatorio: SI
+Formato: Será un número donde de existir decimales, estarán separados de la parte entera por un punto. 
+price: precio de la líneas de Servicio
+Tipo de dato: String. 
+Obligatorio: SI
+Formato: Número
+Posibles valores: Deberá ser un número donde de existir decimales, deberán estar separados de la parte entera por un punto 
+numAdults: Número de adultos para los que ha sido contrado el Servicio.
+Tipo de dato: String. 
+Obligatorio: SI
+Formato: Número
+Posibles valores: [no aplica] 
+numChild: Número de niños para los que ha sido contratado el Servicio.
+Tipo de dato: String. 
+Obligatorio: NO
+Formato: Número
+Posibles valores: [no aplica] 
+clients[ ]: (Opcional). Lista de datos que contendrá los nombres de los pasajeros para los que el Servicio ha sido contratado. Cada uno de los ítems contendrá una estructura de tipo client con la siguiente información:
+name: Nombre del cliente.
+Tipo de dato: String. 
+Obligatorio: SI
+Formato: [no aplica]
+Posibles valores: [no aplica]
+firstSurname: Primer apellido del cliente.
+Tipo de dato: String. 
+Obligatorio: SI
+Formato: [no aplica]
+Posibles valores: [no aplica]
+secondSurname: Segundo apellido del cliente.
+Tipo de dato: String. 
+Obligatorio: NO
+Formato: [no aplica]
+Posibles valores: [no aplica]
+age: Edad del pasajero.
+Tipo de dato: String. 
+Obligatorio: NO
+Formato: [no aplica]
+Posibles valores: [no aplica]
+status: Estado de la línea del Servicio.
+Tipo de dato: String. 
+Obligatorio: SI 
+Formato: Cadena de caracteres
+Posibles valores: Los posibles valores son los siguientes:
+“SALE”: Conforme. En el caso de que el estado de la línea de la Reserva sea conforme.
+“ON_REQUEST”: En petición.  En el caso de la línea de la Reserva sea En Petición
+“CANCELLED”: Cancelada. En el caso de que el estado de la línea de la Reserva sea Cancelada.
+remarks: Observaciones para la Reserva.
+Tipo de dato: String. 
+Obligatorio: NO
+Formato: 
+Posibles valores: [no aplica]
+
+remarksVoucher: Observaciones para los Bonos de la Reserva.
+Tipo de dato: String. 
+Obligatorio: NO
+Formato: 
+Posibles valores: [no aplica]
+cancelPolicies[]: Lista que contempla las políticas de cancelación del Servicio. No es obligatorio que venga informada. La estructura contendrá una o varios ítems cancelPolicie. En cada uno de estos ítems se informará de una política de cancelación. 
+  cancelPolicie: Descripción con la política de cancelación.
+Tipo de dato: String. 
+Obligatorio: NO
+Formato: [no aplica]
+Posibles valores: [no aplica] 
+supplements[ ]: Lista de suplementos correspondientes al precio del Servicio. La estructura de datos contendrá la siguiente información: 
+       supplement: Estructura de datos con los siguientes ítems:
+name: Nombre/descripción del suplemento
+Tipo de dato: String. 
+Obligatorio: NO
+Formato: [no aplica]
+Posibles valores: [no aplica] 
+value: Valor/importe del suplemento
+Tipo de dato: String. 
+Obligatorio: NO
+Formato: [no aplica]
+Posibles valores: [no aplica]
+discounts [ ]: Lista de descuentos correspondientes al precio del Servicio. La estructura de datos contendrá la siguiente información: 
+       discount: Estructura de datos con los siguientes ítems:
+name: Nombre/descripción del suplemento
+Tipo de dato: String. 
+Obligatorio: NO
+Formato: [no aplica]
+Posibles valores: [no aplica] 
+value: Valor/importe del suplemento
+Tipo de dato: String. 
+Obligatorio: NO
+Formato: [no aplica]
+Posibles valores: [no aplica]
+
+otherLine [ ]: Lista de estructuras de tipo other que contiene los datos de reserva de cualquier producto que no encaje en los anteriormente definidos. La estructura other contendrá los siguientes ítems de información:
+initialDate: Fecha de inicio de reserva del producto al que se refieren los datos
+Tipo de dato: String. 
+Obligatorio: SI
+Formato: DD/MM/YYYY
+Posibles valores: [no aplica]
+finalDate: Fecha de fin de reserva del producto al que se refieren los datos
+Tipo de dato: String. 
+Obligatorio: SI
+Formato: DD/MM/YYYY
+Posibles valores: [no aplica]
+name: Nombre en el sistema proveedor del producto reservado
+Tipo de dato: String. 
+Obligatorio: SI
+Formato: [no aplica]
+Posibles valores: [no aplica]
+units: Número de unidades del producto reservado.
+Tipo de dato: String. 
+Obligatorio: SI 
+Formato: [no aplica]
+Posibles: [no aplica]
+comision: Importe de la comisión aplicada a el producto.
+Tipo de dato: String
+Obligatorio: SI
+Formato: Será un número donde de existir decimales, estarán separados de la parte entera por un punto. 
+Posibles valores: [no aplica]
+ivaComision: Importe del iva de la comisión aplicada a el producto.
+Tipo de dato: String
+Obligatorio: SI
+Formato: Será un número donde de existir decimales, estarán separados de la parte entera por un punto. 
+Price: Precio 
+Tipo de dato: String. 
+Obligatorio: SI
+Formato: Número
+Posibles valores: Deberá ser un número donde de existir decimales, deberán estar separados de la parte entera por un punto 
+numAdults: Número de adultos para los que ha realizado la Reserva del producto
+Tipo de dato: String. 
+Obligatorio: SI
+Formato: Número
+Posibles valores: [no aplica] 
+numChild: Número de niños para los que se ha realizado la Reserva del producto
+Tipo de dato: String. 
+Obligatorio: NO
+Formato: Número
+Posibles valores: [no aplica] 
+clients[ ]: (Opcional). Lista de datos que contendrá los nombres de los pasajeros para los que el producto ha sido contratado. Cada uno de los ítems contendrá una estructura de tipo client con la siguiente información:
+name: Nombre del cliente.
+Tipo de dato: String. 
+Obligatorio: SI
+Formato: [no aplica]
+Posibles valores: [no aplica]
+firstSurname: Primer apellido del cliente.
+Tipo de dato: String. 
+Obligatorio: SI
+Formato: [no aplica]
+Posibles valores: [no aplica]
+secondSurname: Segundo apellido del cliente.
+Tipo de dato: String. 
+Obligatorio: NO
+Formato: [no aplica]
+Posibles valores: [no aplica]
+age: Edad del pasajero.
+Tipo de dato: String. 
+Obligatorio: NO
+Formato: [no aplica]
+Posibles valores: [no aplica]
+status: Estado de la línea del Producto.
+Tipo de dato: String. 
+Obligatorio: SI 
+Formato: Cadena de caracteres
+Posibles valores: Los posibles valores son los siguientes:
+“SALE”: Conforme. En el caso de que el estado de la línea de la Reserva sea conforme.
+“ON_REQUEST”: En petición.  En el caso de la línea de la Reserva sea En Petición
+“CANCELLED”: Cancelada. En el caso de que el estado de la línea de la Reserva sea Cancelada.
+remarks: Observaciones para la Reserva.
+Tipo de dato: String. 
+Obligatorio: NO
+Formato: 
+Posibles valores: [no aplica]
+remarksVoucher: Observaciones para los Bonos de la Reserva.
+Tipo de dato: String. 
+Obligatorio: NO
+Formato: [no aplica]
+Posibles valores: [no aplica]
+generalRegime: Indicador de si la factura de la reserva es en regimen general de agencia de viajes.
+Tipo de dato: String. 
+Obligatorio: SI 
+Formato: Cadena de caracteres
+Posibles valores: Los posibles valores son los siguientes:
+“S”: La factura es en regimen general de agencia de viajes.
+“N”: La factura es en regimen especial de agencia de viajes.
+
+
+Estructura result
+Tipo complejo que contiene el resultado de la petición informando si el resultado ha sido satisfactorio o erróneo.
+cod_result: Código identificador del resultado de la Petición. Deberá ser uno los contemplados en el apartado “Lista de códigos de resultado de peticiones” de la presente documentación. (Ver lista de  códigos de resultado de peticiones).
+des_result: Texto descriptivo del resultado de la petición.
+type_message: Tipo de mensaje resultado de la petición. Deberá tener de manrea obligatoria uno de los siguientes valores:
+I: Determinará que es un mensaje informativo. (Ejemplo: Operación correcta).
+E: mensaje informando que se ha producido un error. (Ejemplo: error de comunicación).
+
+Fecha y hora de respuesta
+Cadena de caracteres que contiene la fecha y hora en la que se ha respondido a la petición.
+
+timeStamp: Fecha y hora a la que se crea ésta respuesta
+Tipo de dato: String. 
+Obligatorio: SI
+Formato: Un date-time con un offset del UTC/Greenwich en ISO-8601 (ejemplo: 2020-02-26T17:36:17.038+01:00)
+Posibles valores: [no aplica]
+
+
+Lista de códigos de resultado de peticiones
+M1=Operación correcta.
+M2=Acceso denegado, el usuario y/o el  password no son correctos.
+M3=Se ha producido un error en el Sistema, Reintente la operación y si el error persiste contacte con el proveedor.
+M4=Se ha perdido la conexión con el servidor, reinténtelo más tarde.
+M8=La fecha de fin debe ser mayor que la fecha de inicio.
+M9=La fecha informada debe ser mayor a la fecha actual.
+M10=Es obligatorio dar algún valor a: [lista de campos para los que falta valor]
+M11=Formato de entrada incorrecto en: [lista de campos para los que el valor suministrado tiene un formato incorrecto]
+M13=La reserva no es válida.
+M16=XML de entrada Incorrecto, no existe o no puede ser procesado.
+M17=La operación solicitada no es reconocida por el servicio.
+M19=No se ha encontrado una reserva con ese localizador en el proveedor especificado.
+M23= Número de parámetros incorrectos para realizar la operación.
+M30=La Operación solicitada no puede realizarse en este momento. Reintente la operación más tarde y si el error persiste contacte con el proveedor.
+M72=Falta el tag user o el tag password en la petición.
+
