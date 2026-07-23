@@ -1,10 +1,11 @@
+import { Link } from 'react-router-dom';
 import { useLanguage } from '../context';
 
 /* ─────────────────────────────────────────────────────────────
    FOOTER
 ───────────────────────────────────────────────────────────── */
 const Footer = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   return (
     <footer style={{ background: '#05080F', color: 'white', paddingTop: 80, paddingBottom: 48 }}>
       <div className="container">
@@ -49,9 +50,15 @@ const Footer = () => {
         <div className="divider-gold mb-8" />
 
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-          <p style={{ fontSize:9, fontWeight:700, letterSpacing:'0.25em', textTransform:'uppercase', color:'rgba(255,255,255,0.15)' }}>
-            {t.footer.rights}
-          </p>
+          <div className="flex items-center gap-6">
+            <p style={{ fontSize:9, fontWeight:700, letterSpacing:'0.25em', textTransform:'uppercase', color:'rgba(255,255,255,0.15)' }}>
+              {t.footer.rights}
+            </p>
+            <Link to={`/${language}/privacy`}
+              style={{ fontSize:9, fontWeight:700, letterSpacing:'0.25em', textTransform:'uppercase', color:'rgba(255,255,255,0.3)' }}>
+              {t.footer.privacy}
+            </Link>
+          </div>
           <p style={{ fontFamily:'"Cormorant Garamond",serif', fontStyle:'italic', fontSize:14, color:'rgba(255,255,255,0.1)' }}>
             {t.footer.globalPartnerships}
           </p>

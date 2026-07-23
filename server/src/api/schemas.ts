@@ -52,3 +52,20 @@ export const confirmSchema = z.object({
 export const cancelSchema = z.object({
   locator: z.string().min(1).max(60),
 });
+
+/** 公开询盘表单（合作伙伴申请 / 路线报价请求） */
+export const inquirySchema = z.object({
+  type: z.enum(['partner', 'quote']),
+  companyName: z.string().trim().min(1).max(120),
+  businessType: z.string().max(60).optional(),
+  workEmail: z.string().trim().email().max(160),
+  region: z.string().max(80).optional(),
+  monthlyPax: z.string().max(20).optional(),
+  message: z.string().max(2000).optional(),
+  routeCode: z.string().max(20).optional(),
+  language: z.enum(['en', 'zh', 'es']).optional(),
+  /** GDPR：必须显式同意隐私政策 */
+  consent: z.literal(true),
+});
+// 注：蜜罐字段 website 不进 schema —— 在路由层检测到非空时静默丢弃并返回“成功”，
+// 避免给机器人任何反馈信号。

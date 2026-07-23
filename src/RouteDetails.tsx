@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion, useScroll, useTransform, useInView } from 'motion/react';
 import {
@@ -7,12 +7,21 @@ import {
 } from 'lucide-react';
 import { allRoutes, formatDuration } from './data';
 import { useLanguage } from './context';
+import { submitInquiry, type InquiryStatus } from './lib/inquiries';
 
 export default function RouteDetails() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { t, language } = useLanguage();
   const heroRef = useRef<HTMLDivElement>(null);
+
+  // 报价请求表单状态
+  const [qCompany, setQCompany] = useState('');
+  const [qEmail, setQEmail] = useState('');
+  const [qPax, setQPax] = useState('');
+  const [qConsent, setQConsent] = useState(false);
+  const [qHoneypot, setQHoneypot] = useState('');
+  const [quoteStatus, setQuoteStatus] = useState<InquiryStatus>('idle');
 
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] });
   const heroImgY   = useTransform(scrollYProgress, [0, 1], ['0%', '28%']);
@@ -31,6 +40,18 @@ export default function RouteDetails() {
       </div>
     );
   }
+
+  const onQuoteSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!qConsent) { setQuoteStatus('needConsent'); return; }
+    setQuoteStatus('sending');
+    const ok = await submitInquiry({
+      type: 'quote', companyName: qCompany, workEmail: qEmail,
+      message: qPax ? `Annual PAX volume: ${qPax}` : undefined,
+      routeCode: route.code, language, consent: true, website: qHoneypot,
+    });
+    setQuoteStatus(ok ? 'success' : 'error');
+  };
 
   const isSpain   = id?.startsWith('spain');
   const siblings  = allRoutes.filter(r => r.id !== id).slice(0, 3);
@@ -150,18 +171,24 @@ export default function RouteDetails() {
                 <p style={{ fontSize:13, color:'rgba(255,255,255,0.4)', marginBottom:24, lineHeight:1.6 }}>
                   Net rates within 48h. White-label itinerary included. No commitment.
                 </p>
-                <form className="space-y-3" onSubmit={e=>e.preventDefault()}>
-                  <input type="text" placeholder="Company name"
+                {quoteStatus === 'success' ? (
+                  <div className="text-center py-8">
+                    <p style={{ fontSize:16, fontWeight:700, color:'white', marginBottom:8 }}>{t.form.successTitle}</p>
+                    <p style={{ fontSize:13, color:'rgba(255,255,255,0.5)' }}>{t.form.successDesc}</p>
+                  </div>
+                ) : (
+                <form className="space-y-3" onSubmit={onQuoteSubmit}>
+                  <input type="text" required placeholder="Company name" value={qCompany} onChange={e=>setQCompany(e.target.value)}
                     className="w-full rounded-xl px-4 py-3 text-sm outline-none transition-all"
                     style={{ background:'rgba(255,255,255,0.07)', border:'1px solid rgba(255,255,255,0.1)', color:'white' }}
                     onFocus={e=>(e.currentTarget.style.borderColor='#C4923A')}
                     onBlur={e=>(e.currentTarget.style.borderColor='rgba(255,255,255,0.1)')} />
-                  <input type="email" placeholder="Work email"
+                  <input type="email" required placeholder="Work email" value={qEmail} onChange={e=>setQEmail(e.target.value)}
                     className="w-full rounded-xl px-4 py-3 text-sm outline-none transition-all"
                     style={{ background:'rgba(255,255,255,0.07)', border:'1px solid rgba(255,255,255,0.1)', color:'white' }}
                     onFocus={e=>(e.currentTarget.style.borderColor='#C4923A')}
                     onBlur={e=>(e.currentTarget.style.borderColor='rgba(255,255,255,0.1)')} />
-                  <select className="w-full rounded-xl px-4 py-3 text-sm outline-none"
+                  <select className="w-full rounded-xl px-4 py-3 text-sm outline-none" value={qPax} onChange={e=>setQPax(e.target.value)}
                     style={{ background:'rgba(255,255,255,0.07)', border:'1px solid rgba(255,255,255,0.1)', color:'rgba(255,255,255,0.6)' }}>
                     <option value="">Annual PAX volume</option>
                     <option>Under 100 PAX</option>
@@ -169,10 +196,27 @@ export default function RouteDetails() {
                     <option>500–2,000 PAX</option>
                     <option>2,000+ PAX</option>
                   </select>
-                  <button className="btn btn-primary w-full justify-center" style={{ width:'100%', fontSize:10 }}>
-                    {t.routeDetails.requestQuote}
+                  <input type="text" value={qHoneypot} onChange={e=>setQHoneypot(e.target.value)}
+                    name="website" tabIndex={-1} autoComplete="off" aria-hidden="true"
+                    style={{ position:'absolute', left:-9999, width:1, height:1, opacity:0 }} />
+                  <label className="flex items-start gap-2 cursor-pointer" style={{ fontSize:11, color:'rgba(255,255,255,0.5)' }}>
+                    <input type="checkbox" checked={qConsent} onChange={e=>setQConsent(e.target.checked)}
+                      style={{ marginTop:2, accentColor:'#C4923A' }} />
+                    <span>
+                      {t.form.consentPrefix}{' '}
+                      <Link to={`/${language}/privacy`} target="_blank" style={{ color:'#C4923A', textDecoration:'underline' }}>
+                        {t.form.privacyPolicy}
+                      </Link>
+                    </span>
+                  </label>
+                  {quoteStatus === 'needConsent' && <p style={{ fontSize:11, color:'#E5484D' }}>{t.form.consentRequired}</p>}
+                  {quoteStatus === 'error' && <p style={{ fontSize:11, color:'#E5484D' }}>{t.form.error}</p>}
+                  <button type="submit" disabled={quoteStatus==='sending'}
+                    className="btn btn-primary w-full justify-center" style={{ width:'100%', fontSize:10, opacity: quoteStatus==='sending' ? 0.6 : 1 }}>
+                    {quoteStatus === 'sending' ? t.form.sending : t.routeDetails.requestQuote}
                   </button>
                 </form>
+                )}
                 <p style={{ fontSize:9, textAlign:'center', color:'rgba(255,255,255,0.22)', marginTop:14 }}>
                   Response within 48h · No commitment
                 </p>

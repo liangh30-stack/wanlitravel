@@ -18,6 +18,7 @@ import RouteGrid from './components/RouteGrid';
 import Testimonials from './components/Testimonials';
 import PartnerForm from './components/PartnerForm';
 import Footer from './components/Footer';
+import PrivacyPolicy from './components/PrivacyPolicy';
 
 const SUPPORTED: Language[] = ['en', 'zh', 'es'];
 const LANG_KEY = 'wanli.lang';
@@ -136,6 +137,7 @@ export default function App() {
           <Route path="/:lang" element={<LanguageLayout />}>
             <Route index element={<HomePage />} />
             <Route path="route/:id" element={<RouteDetails />} />
+            <Route path="privacy" element={<PrivacyPolicy />} />
           </Route>
           <Route path="*" element={<Navigate to={`/${storedLang()}`} replace />} />
         </Routes>

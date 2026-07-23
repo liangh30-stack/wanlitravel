@@ -46,3 +46,11 @@ export const bookingLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
 });
+
+/** 公开询盘表单限流：每 IP 每分钟 5 次 */
+export const inquiryLimiter = rateLimit({
+  windowMs: 60_000,
+  limit: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+});

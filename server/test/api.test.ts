@@ -59,3 +59,26 @@ test('cancelSchema: locator 必填且限长', () => {
   assert.throws(() => cancelSchema.parse({ locator: 'x'.repeat(61) }));
   assert.doesNotThrow(() => cancelSchema.parse({ locator: 'LOC1' }));
 });
+
+/* ── 询盘 ─────────────────────────────────────── */
+
+test('InquiryStore: 创建/列表/标记已处理/删除', async () => {
+  const { InquiryStore } = await import('../src/store/inquiries.js');
+  const dir = mkdtempSync(path.join(tmpdir(), 'inq-'));
+  const store = new InquiryStore(dir);
+  const r = store.create({ type: 'partner', companyName: 'ACME', workEmail: 'a@b.com', consentAt: new Date().toISOString() });
+  assert.equal(store.list().length, 1);
+  assert.equal(store.markHandled(r.id), true);
+  assert.equal(store.list()[0].handled, true);
+  assert.equal(store.delete(r.id), true);
+  assert.equal(store.list().length, 0);
+});
+
+test('inquirySchema: 必须同意隐私政策、邮箱合法', async () => {
+  const { inquirySchema } = await import('../src/api/schemas.js');
+  const valid = { type: 'partner', companyName: 'ACME', workEmail: 'a@b.com', consent: true };
+  assert.doesNotThrow(() => inquirySchema.parse(valid));
+  assert.throws(() => inquirySchema.parse({ ...valid, consent: false }));
+  assert.throws(() => inquirySchema.parse({ ...valid, workEmail: 'not-an-email' }));
+  assert.throws(() => inquirySchema.parse({ ...valid, type: 'spam' }));
+});
