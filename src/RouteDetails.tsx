@@ -11,7 +11,7 @@ import { useLanguage } from './context';
 export default function RouteDetails() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const heroRef = useRef<HTMLDivElement>(null);
 
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] });
@@ -27,7 +27,7 @@ export default function RouteDetails() {
     return (
       <div className="min-h-screen flex items-center justify-center flex-col gap-6 bg-bg">
         <h1 className="heading" style={{ fontSize: 40 }}>{t.routeDetails.routeNotFound}</h1>
-        <Link to="/" className="btn btn-primary">{t.routeDetails.returnHome}</Link>
+        <Link to={`/${language}`} className="btn btn-primary">{t.routeDetails.returnHome}</Link>
       </div>
     );
   }
@@ -50,7 +50,7 @@ export default function RouteDetails() {
           {t.routeDetails.backToHome}
         </button>
 
-        <Link to="/"><img src="/logo-light-bg.jpeg" alt="Wanlitravel" style={{ height: 36, objectFit:'contain', borderRadius:8 }} /></Link>
+        <Link to={`/${language}`}><img src="/logo-light-bg.jpeg" alt="Wanlitravel" style={{ height: 36, objectFit:'contain', borderRadius:8 }} /></Link>
 
         <button onClick={() => document.getElementById('rd-quote')?.scrollIntoView({ behavior:'smooth' })}
           className="btn btn-primary" style={{ padding:'10px 20px', fontSize:9 }}>
@@ -206,7 +206,7 @@ export default function RouteDetails() {
           <span style={{ fontSize:9, fontWeight:700, letterSpacing:'0.25em', textTransform:'uppercase', color:'rgba(255,255,255,0.18)' }}>
             © 2025 Wanlitravel
           </span>
-          <Link to="/" className="flex items-center gap-2 transition-colors"
+          <Link to={`/${language}`} className="flex items-center gap-2 transition-colors"
             style={{ fontSize:9, fontWeight:700, letterSpacing:'0.18em', textTransform:'uppercase', color:'rgba(255,255,255,0.35)' }}
             onMouseEnter={e=>(e.currentTarget.style.color='#C4923A')}
             onMouseLeave={e=>(e.currentTarget.style.color='rgba(255,255,255,0.35)')}>
@@ -259,7 +259,7 @@ function ItineraryStep({ step, index, total }: {
 
         {/* Image */}
         <div className="img-zoom-wrap rounded-2xl overflow-hidden" style={{ aspectRatio:'4/3', background:'#F0EDE8' }}>
-          <img src={step.img} alt={step.location} className="img-cover" referrerPolicy="no-referrer" />
+          <img src={step.img} alt={step.location} loading="lazy" decoding="async" className="img-cover" referrerPolicy="no-referrer" />
         </div>
       </div>
     </motion.div>
@@ -295,6 +295,7 @@ function IncludedCard({ t }: { t: typeof import('./translations').translations.e
 
 /* ── More Routes ────────────────────────────────────────────── */
 function MoreRoutes({ routes, t }: { routes: typeof allRoutes; t: typeof import('./translations').translations.en }) {
+  const { language } = useLanguage();
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: '-80px' });
 
@@ -310,8 +311,8 @@ function MoreRoutes({ routes, t }: { routes: typeof allRoutes; t: typeof import(
           return (
             <motion.div key={r.id}
               initial={{ opacity:0, y:28 }} animate={inView?{opacity:1,y:0}:{}} transition={{ delay:i*0.1, duration:0.6 }}>
-              <Link to={`/route/${r.id}`} className="route-card block" style={{ aspectRatio:'3/4' }}>
-                <img src={r.img} alt={tr?.title} className="img-cover w-full h-full" />
+              <Link to={`/${language}/route/${r.id}`} className="route-card block" style={{ aspectRatio:'3/4' }}>
+                <img src={r.img} alt={tr?.title} loading="lazy" decoding="async" className="img-cover w-full h-full" />
                 <div className="absolute inset-0 z-10 flex flex-col justify-end p-6">
                   <p style={{ fontSize:9, fontWeight:700, letterSpacing:'0.28em', textTransform:'uppercase', color:'rgba(196,146,58,0.85)', marginBottom:6 }}>
                     {tr?.region}

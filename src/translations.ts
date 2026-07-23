@@ -1,7 +1,10 @@
 export type Language = 'en' | 'zh' | 'es';
 
-export const translations = {
-  en: {
+const en = {
+    meta: {
+      title: "Wanlitravel — B2B Travel Gateway · Europe & China",
+      description: "The leading B2B wholesale travel operator bridging Europe and China. Exclusive allotments, 48h quote SLA, white-label itineraries for agency partners.",
+    },
     nav: {
       spainCollections: "Spain Collections",
       chinaRoutes: "China Routes",
@@ -19,6 +22,8 @@ export const translations = {
       cta: "Request Partner Access",
       ctaSub: "Free. No commitment.",
     },
+    // TODO(上线前): 以下资质声明与统计数字（IATA/UNWTO/120+ agencies/8,400+ groups 等）
+    // 必须逐条核实为真实持有的资质与可佐证的数据，否则删除 —— 虚假资质声明有法律风险。
     trust: {
       label: "Trusted by 120+ agencies across 18 countries",
       item1: "Certified IATA Member",
@@ -103,25 +108,27 @@ export const translations = {
       partners: "Verified Local Partners",
       travelers: "Travelers Operated (2024)",
     },
+    // 注意：以下评价为匿名化的占位内容（不得使用真实公司名捏造背书）。
+    // 上线前请替换为已获得书面授权的真实客户评价。
     testimonials: {
       label: "What Partners Say",
       items: [
         {
           quote: "We switched from three separate DMCs to Wanlitravel for our China program. Net rate improved 18% and our clients stopped complaining about the guides.",
-          name: "María González",
-          title: "Director, Viajes Barceló",
+          name: "M. G.",
+          title: "Director, Spanish tour operator",
           country: "Spain",
         },
         {
           quote: "The white-label itinerary tool alone saved my team 6 hours per week. Our Spain packages now have a 34% higher close rate.",
-          name: "James Wu",
-          title: "Founder, SinoTour UK",
+          name: "J. W.",
+          title: "Founder, UK-based China specialist",
           country: "United Kingdom",
         },
         {
           quote: "48h quote SLA is real. I've tested it 40 times. They've never missed it. That reliability is what my corporate clients pay a premium for.",
-          name: "Sofía Martínez",
-          title: "Head of Groups, Globalia",
+          name: "S. M.",
+          title: "Head of Groups, European travel group",
           country: "Spain",
         },
       ],
@@ -273,9 +280,16 @@ export const translations = {
         ],
       },
     },
-  },
+};
 
-  zh: {
+/** 以 en 为基准的翻译结构：zh/es 缺 key 或结构不一致会在编译期报错 */
+export type TranslationSchema = typeof en;
+
+const zh: TranslationSchema = {
+    meta: {
+      title: "万里旅行 — 欧洲·中国 B2B 旅游批发平台",
+      description: "连接欧洲与中国的 B2B 批发旅游运营商。独家配额、48小时报价承诺、白标行程，服务全球旅行社伙伴。",
+    },
     nav: {
       spainCollections: "西班牙线路",
       chinaRoutes: "中国线路",
@@ -382,20 +396,20 @@ export const translations = {
       items: [
         {
           quote: "我们将中国项目从三家DMC整合到万里旅行。净价提升18%，客户对导游的投诉归零。",
-          name: "María González",
-          title: "总监，Viajes Barceló",
+          name: "M. G.",
+          title: "总监，西班牙旅游运营商",
           country: "西班牙",
         },
         {
           quote: "白标行程工具让我团队每周节省6小时。我们的西班牙套餐成交率提高了34%。",
           name: "吴先生",
-          title: "创始人，SinoTour UK",
+          title: "创始人，英国中国游专营社",
           country: "英国",
         },
         {
           quote: "48小时报价承诺是真实的。我测试了40次，从未失约。这种可靠性正是我企业客户愿意为之溢价的理由。",
-          name: "Sofía Martínez",
-          title: "团队总监，Globalia",
+          name: "S. M.",
+          title: "团队总监，欧洲旅游集团",
           country: "西班牙",
         },
       ],
@@ -547,9 +561,13 @@ export const translations = {
         ],
       },
     },
-  },
+};
 
-  es: {
+const es: TranslationSchema = {
+    meta: {
+      title: "Wanlitravel — Pasarela B2B de Viajes · Europa y China",
+      description: "Operador mayorista B2B que une Europa y China. Cupos exclusivos, SLA de cotización de 48h e itinerarios white-label para agencias.",
+    },
     nav: {
       spainCollections: "Colecciones España",
       chinaRoutes: "Rutas China",
@@ -656,20 +674,20 @@ export const translations = {
       items: [
         {
           quote: "Pasamos de tres DMC distintos a Wanlitravel para nuestro programa China. La tarifa neta mejoró un 18% y las quejas sobre guías desaparecieron.",
-          name: "María González",
-          title: "Directora, Viajes Barceló",
+          name: "M. G.",
+          title: "Directora, turoperador español",
           country: "España",
         },
         {
           quote: "La herramienta de itinerarios white-label ahorró a mi equipo 6 horas semanales. Nuestra tasa de cierre en paquetes España subió un 34%.",
-          name: "James Wu",
-          title: "Fundador, SinoTour UK",
+          name: "J. W.",
+          title: "Fundador, especialista en China (Reino Unido)",
           country: "Reino Unido",
         },
         {
           quote: "El SLA de 48h es real. Lo he testado 40 veces. Nunca han fallado. Esa fiabilidad es por la que mis clientes corporativos pagan una prima.",
-          name: "Sofía Martínez",
-          title: "Jefa de Grupos, Globalia",
+          name: "S. M.",
+          title: "Jefa de Grupos, grupo turístico europeo",
           country: "España",
         },
       ],
@@ -821,5 +839,6 @@ export const translations = {
         ],
       },
     },
-  },
 };
+
+export const translations = { en, zh, es };

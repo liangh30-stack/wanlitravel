@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: 前端类型检查
+        run: npm run lint
+      - name: 服务端类型检查
+        run: npm run server:lint
+      - name: 服务端单元测试
+        run: npm run server:test
+      - name: 生产构建
+        run: npm run build

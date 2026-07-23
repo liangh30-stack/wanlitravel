@@ -1,0 +1,137 @@
+import React, { useRef, useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'motion/react';
+import { ChevronDown, ArrowUpRight } from 'lucide-react';
+import { spainRoutes, chinaRoutes } from '../data';
+import type { Language } from '../translations';
+import { useLanguage } from '../context';
+import DualClock from './DualClock';
+
+/* ─────────────────────────────────────────────────────────────
+   NAVBAR
+───────────────────────────────────────────────────────────── */
+const Navbar = () => {
+  const [dropdown, setDropdown] = useState<string | null>(null);
+  const [solid, setSolid] = useState(false);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { language, setLanguage, t } = useLanguage();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fn = () => setSolid(window.scrollY > 60);
+    window.addEventListener('scroll', fn, { passive: true });
+    return () => window.removeEventListener('scroll', fn);
+  }, []);
+
+  const open = (id: string) => { if (timer.current) clearTimeout(timer.current); setDropdown(id); };
+  const close = () => { timer.current = setTimeout(() => setDropdown(null), 220); };
+
+  const goTo = (id: string) => {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  return (
+    <motion.header
+      className="fixed top-0 inset-x-0 z-[999] transition-all duration-500"
+      style={{
+        background: solid ? 'rgba(248,246,242,0.97)' : 'transparent',
+        backdropFilter: solid ? 'blur(20px)' : 'none',
+        borderBottom: solid ? '1px solid rgba(14,17,23,0.07)' : '1px solid transparent',
+      }}>
+      <div className="container flex items-center justify-between" style={{ height: solid ? 64 : 80, transition: 'height 0.4s ease' }}>
+
+        {/* Logo */}
+        <Link to={`/${language}`} className="shrink-0">
+          <img src={solid ? '/logo-light-bg.jpeg' : '/logo-dark-bg.jpeg'}
+            alt="Wanlitravel" className="h-9 object-contain rounded-lg" style={{ opacity: solid ? 1 : 0.92 }} />
+        </Link>
+
+        {/* Nav links */}
+        <nav className="hidden lg:flex items-center gap-1">
+          {[
+            { id: 'spain', label: t.nav.spainCollections, routes: spainRoutes, section: 'routes-spain' },
+            { id: 'china', label: t.nav.chinaRoutes, routes: chinaRoutes, section: 'routes-china' },
+          ].map(({ id, label, routes, section }) => (
+            <div key={id} className="relative" onMouseEnter={() => open(id)} onMouseLeave={close}>
+              <button onClick={() => goTo(section)}
+                className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-[10px] font-bold tracking-[0.18em] uppercase transition-colors ${
+                  solid ? 'text-ink/70 hover:text-ink' : 'text-white/80 hover:text-white'
+                }`}>
+                {label} <ChevronDown size={10} className={`transition-transform ${dropdown === id ? 'rotate-180' : ''}`} />
+              </button>
+              <AnimatePresence>
+                {dropdown === id && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8, scale: 0.97 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 8, scale: 0.97 }}
+                    transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+                    className="absolute top-full left-0 mt-2 w-72"
+                    onMouseEnter={() => open(id)} onMouseLeave={close}>
+                    <div className="card-glass overflow-hidden shadow-2xl">
+                      <div className="px-4 pt-4 pb-2">
+                        <p className="label text-ink/30">{id === 'spain' ? 'Spain Portfolio' : 'China Portfolio'}</p>
+                      </div>
+                      {routes.map(r => {
+                        const tr = t.routes[r.id as keyof typeof t.routes];
+                        return (
+                          <Link key={r.id} to={`/${language}/route/${r.id}`} onClick={() => setDropdown(null)}
+                            className="flex items-center gap-4 px-4 py-3 hover:bg-black/4 transition-colors group">
+                            <div className="w-10 h-10 rounded-xl overflow-hidden shrink-0 img-zoom-wrap">
+                              <img src={r.img} alt={tr?.title} className="img-cover" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-[13px] font-bold text-ink truncate">{tr?.title}</p>
+                              <p className="text-[10px] text-ink/40 mt-0.5">{tr?.region}</p>
+                            </div>
+                            <ArrowUpRight size={14} className="text-ink/20 group-hover:text-crimson group-hover:scale-110 transition-all shrink-0" />
+                          </Link>
+                        );
+                      })}
+                      <div className="px-4 py-3 border-t border-black/6">
+                        <button onClick={() => { goTo(section); setDropdown(null); }}
+                          className="text-[9px] font-bold uppercase tracking-widest text-crimson hover:text-crimson/70 transition-colors">
+                          View all {id === 'spain' ? 'Spain' : 'China'} routes →
+                        </button>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          ))}
+          <button onClick={() => goTo('b2b')}
+            className={`px-4 py-2 rounded-full text-[10px] font-bold tracking-[0.18em] uppercase transition-colors ${
+              solid ? 'text-ink/70 hover:text-ink' : 'text-white/80 hover:text-white'
+            }`}>{t.nav.b2bSolutions}</button>
+        </nav>
+
+        {/* Right */}
+        <div className="flex items-center gap-5">
+          <DualClock solid={solid} />
+          <div className="hidden sm:flex items-center gap-3">
+            {(['en','zh','es'] as Language[]).map((lang, i) => (
+              <React.Fragment key={lang}>
+                {i > 0 && <span className={`opacity-20 text-xs ${solid ? 'text-ink' : 'text-white'}`}>/</span>}
+                <button onClick={() => setLanguage(lang)}
+                  className={`text-[9px] font-bold tracking-widest uppercase transition-colors ${
+                    language === lang
+                      ? 'text-crimson'
+                      : solid ? 'text-ink/50 hover:text-ink' : 'text-white/50 hover:text-white'
+                  }`}>
+                  {lang === 'en' ? 'EN' : lang === 'zh' ? '中' : 'ES'}
+                </button>
+              </React.Fragment>
+            ))}
+          </div>
+          <button onClick={() => goTo('partner-form')} className="btn btn-primary" style={{ padding: '10px 20px', fontSize: 9 }}>
+            {t.nav.partnerPortal}
+          </button>
+        </div>
+      </div>
+    </motion.header>
+  );
+};
+
+export default Navbar;

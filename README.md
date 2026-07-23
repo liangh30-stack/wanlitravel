@@ -22,14 +22,23 @@ npm run dev        # http://localhost:3000
 
 ```
 src/
-  App.tsx           # 首页全部板块（导航、Hero、数据统计、B2B、路线、表单、页脚）
-  RouteDetails.tsx  # 路线详情页（/route/:id）
+  App.tsx           # 路由（/:lang 语言前缀、SEO 标签、旧链接重定向）
+  components/       # 首页各板块组件（Navbar、Hero、Stats、B2B、RouteGrid…）
+  RouteDetails.tsx  # 路线详情页（/:lang/route/:id）
   data.ts           # 路线数据：编号、天数、净价、行程（语言无关）
-  translations.ts   # 三语文案（en / zh / es），所有 UI 文本集中在此
+  translations.ts   # 三语文案（en 为 schema，zh/es 结构由编译期强制一致）
   context.ts        # 语言 Context
   index.css         # 全局样式与设计变量
+server/             # TourDiez (T10) 对接层 + JSON API（见 server/README.md）
 public/             # 本地化图片资源（logo、hero、路线图）
+.github/workflows/  # CI：push/PR 自动跑类型检查 + 测试 + 构建
 ```
+
+## 上线前必读（安全与合规）
+
+- 密钥只放服务端 `.env.local`（`T10_*`、`API_SHARED_KEY`），vite 配置禁止用 define 注入任何 key
+- 页面上的资质声明、统计数字、客户评价均为占位内容，上线前逐条核实/替换（见 translations.ts 中的 TODO 注释）
+- 语言已在 URL 中（/en /zh /es），hreflang 与按语言 title/description 由前端注入；如需更强 SEO 可再加预渲染
 
 ## 内容维护
 
