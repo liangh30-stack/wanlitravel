@@ -27,6 +27,51 @@ function encodeFormLatin1(params: Record<string, string>): string {
   return Object.entries(params).map(([k, v]) => `${k}=${encodeValue(v)}`).join('&');
 }
 
+/** 操作名 → 所属模块。T10 测试/生产环境按模块提供不同的 Servlet URL。 */
+const OPERATION_MODULE: Record<string, 'booking' | 'mapping' | 'reservations'> = {
+  login: 'booking',
+  getAccomodationAvail: 'booking',
+  value: 'booking',
+  confirm: 'booking',
+  cancel: 'booking',
+  getAllHotels: 'mapping',
+  getHotelDetails: 'mapping',
+  getMealPlans: 'mapping',
+  getCountries: 'mapping',
+  getAccomodationCategories: 'mapping',
+  getZones: 'mapping',
+  getProvinces: 'mapping',
+  getCities: 'mapping',
+  getReservations: 'reservations',
+  getReservationDetails: 'reservations',
+};
+
+export interface ModuleTransportOptions {
+  /** Booking 2.9（login/搜索/核价/确认/取消） */
+  bookingUrl: string;
+  /** Mapping 3.1（静态数据）；缺省回落到 bookingUrl */
+  mappingUrl?: string;
+  /** Reservations 3.1（对账）；缺省回落到 bookingUrl */
+  reservationsUrl?: string;
+  logDir?: string;
+}
+
+/** 按操作名把请求路由到对应模块的 URL（T10 的三个 API 各有独立入口）。 */
+export function createModuleTransport(opts: ModuleTransportOptions): Transport {
+  const urls = {
+    booking: opts.bookingUrl,
+    mapping: opts.mappingUrl || opts.bookingUrl,
+    reservations: opts.reservationsUrl || opts.bookingUrl,
+  };
+  const transports = Object.fromEntries(
+    Object.entries(urls).map(([mod, baseUrl]) => [mod, createHttpTransport({ baseUrl, logDir: opts.logDir })]),
+  ) as Record<'booking' | 'mapping' | 'reservations', Transport>;
+  return (operation, requestXml, timeoutMs) => {
+    const mod = OPERATION_MODULE[operation] ?? 'booking';
+    return transports[mod](operation, requestXml, timeoutMs);
+  };
+}
+
 export function createHttpTransport(opts: HttpTransportOptions): Transport {
   return async (operation, requestXml, timeoutMs) => {
     const body = encodeFormLatin1({ pOperacion: operation, pRequest: requestXml });

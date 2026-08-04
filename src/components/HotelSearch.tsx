@@ -19,6 +19,8 @@ interface Accommodation {
   code: string; name?: string; category?: string; mealPlan?: string; pvp?: string; neto?: string;
   currencyCode?: string; status?: string; rooms: RoomOffer[];
   cancelPolicies?: { from?: string; amount?: string }[];
+  /* T10: NS en disponibilidad — las condiciones de cancelación llegan en el paso de cotización */
+  cancelPoliciesPending?: boolean;
 }
 interface SearchResponse { demo: boolean; idOperation: string; accommodations: Accommodation[] }
 interface Destination { code: string; label: string }
@@ -209,9 +211,11 @@ const HotelSearch = () => {
                           {a.status === 'SALE'
                             ? <span className="flex items-center gap-1.5" style={{ color: '#1B8A4C' }}><CheckCircle2 size={11} />{t.hotels.instantConfirm}</span>
                             : <span className="flex items-center gap-1.5" style={{ color: '#8A6420' }}><Clock3 size={11} />{t.hotels.onRequest}</span>}
-                          {a.cancelPolicies?.[0]?.from && (
+                          {a.cancelPolicies?.[0]?.from ? (
                             <span className="flex items-center gap-1.5"><CalendarX2 size={11} />{t.hotels.freeCancelBefore} {a.cancelPolicies[0].from}</span>
-                          )}
+                          ) : a.cancelPoliciesPending ? (
+                            <span className="flex items-center gap-1.5"><CalendarX2 size={11} />{t.hotels.cancelAtQuote}</span>
+                          ) : null}
                         </div>
                       </div>
                       {/* Price */}

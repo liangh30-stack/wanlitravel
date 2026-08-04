@@ -12,7 +12,7 @@
  */
 import express from 'express';
 import { ZodError } from 'zod';
-import { T10Client, createHttpTransport, T10Error, ConfirmTimeoutError } from '../t10/index.js';
+import { T10Client, createModuleTransport, T10Error, ConfirmTimeoutError } from '../t10/index.js';
 import { OrderStore } from '../store/orders.js';
 import { InquiryStore } from '../store/inquiries.js';
 import { apiKeyAuth, generalLimiter, bookingLimiter, inquiryLimiter, searchLimiter } from './middleware.js';
@@ -20,7 +20,10 @@ import { searchSchema, valueSchema, confirmSchema, cancelSchema, inquirySchema }
 import { buildDemoAvailability, DEMO_DESTINATIONS } from '../t10/demo.js';
 
 const {
-  T10_BASE_URL = '',
+  // 三个模块各有独立入口（如缺省，Mapping/Reservations 回落到 Booking 的 URL）
+  T10_BOOKING_URL = process.env.T10_BASE_URL ?? '',
+  T10_MAPPING_URL = '',
+  T10_RESERVATIONS_URL = '',
   T10_USER = '',
   T10_PASSWORD = '',
   T10_LOG_DIR = './logs/t10',
@@ -29,8 +32,8 @@ const {
   PORT = '3001',
 } = process.env;
 
-if (!T10_BASE_URL || !T10_USER || !T10_PASSWORD) {
-  console.warn('[t10] 缺少 T10_BASE_URL / T10_USER / T10_PASSWORD 环境变量 — API 将以未配置状态启动');
+if (!T10_BOOKING_URL || !T10_USER || !T10_PASSWORD) {
+  console.warn('[t10] 缺少 T10_BOOKING_URL / T10_USER / T10_PASSWORD 环境变量 — API 将以未配置状态启动');
 }
 if (!API_SHARED_KEY) {
   console.warn('[auth] 未配置 API_SHARED_KEY — 仅接受本机请求（开发模式）');
@@ -39,7 +42,12 @@ if (!API_SHARED_KEY) {
 const client = new T10Client({
   user: T10_USER,
   password: T10_PASSWORD,
-  transport: createHttpTransport({ baseUrl: T10_BASE_URL, logDir: T10_LOG_DIR }),
+  transport: createModuleTransport({
+    bookingUrl: T10_BOOKING_URL,
+    mappingUrl: T10_MAPPING_URL,
+    reservationsUrl: T10_RESERVATIONS_URL,
+    logDir: T10_LOG_DIR,
+  }),
 });
 const orders = new OrderStore();
 const inquiries = new InquiryStore();
@@ -61,7 +69,7 @@ app.use(express.json({ limit: '100kb' }));
 
 // 健康检查不鉴权（供负载均衡探活）
 app.get('/api/health', (_req, res) => {
-  res.json({ ok: true, configured: Boolean(T10_BASE_URL && T10_USER && T10_PASSWORD) });
+  res.json({ ok: true, configured: Boolean(T10_BOOKING_URL && T10_USER && T10_PASSWORD) });
 });
 
 /**
@@ -89,12 +97,22 @@ app.post('/api/inquiries', inquiryLimiter, async (req, res) => {
  * 配置真实凭证后自动切换为 T10 实时库存，前端无需改动。
  * 注意：核价/下单/取消仍需鉴权 —— 公开的只有"看"，不开放"交易"。
  */
-const t10Configured = Boolean(T10_BASE_URL && T10_USER && T10_PASSWORD);
+const t10Configured = Boolean(T10_BOOKING_URL && T10_USER && T10_PASSWORD);
 const demoMode = !t10Configured || process.env.DEMO_MODE === 'true';
 
+/** 非演示模式的目的地列表：从 T10_DESTINATIONS（code:label,…）读取；将来改为 Mapping 同步库 */
+const configuredDestinations = (process.env.T10_DESTINATIONS ?? '')
+  .split(',')
+  .map(s => s.trim())
+  .filter(Boolean)
+  .map(s => {
+    const idx = s.indexOf(':');
+    return idx > 0 ? { code: s.slice(0, idx), label: s.slice(idx + 1) } : { code: s, label: s };
+  });
+
 app.get('/api/hotels/destinations', searchLimiter, (_req, res) => {
-  // 演示阶段返回静态目的地；接入真实数据后改为 Mapping 同步库
-  res.json({ demo: demoMode, destinations: DEMO_DESTINATIONS });
+  const destinations = demoMode || !configuredDestinations.length ? DEMO_DESTINATIONS : configuredDestinations;
+  res.json({ demo: demoMode, destinations });
 });
 
 app.post('/api/hotels/search', searchLimiter, async (req, res) => {

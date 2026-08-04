@@ -198,3 +198,61 @@ test('getCountries 解析文档示例静态数据', async () => {
   assert.ok(countries.length > 0, '应解析出至少一个国家');
   assert.ok(countries[0].code, '国家应有编码');
 });
+
+/* ── 可用性响应：distributions 展开与取消政策 ────── */
+
+test('可用性响应按 distribution 展开为报价，价格与 idDistributions 取自 distribution 层', async () => {
+  const { client } = makeClient([
+    fx('booking_LoginResult.xml'),
+    fx('booking_AccomodationInfoResult.xml'),
+  ]);
+  const res = await client.getAccommodationAvail({
+    checkIn: '2026-09-10', checkOut: '2026-09-14',
+    rooms: [{ adults: 2, children: 0, units: 1 }],
+    destinationCode: 'ES00634',
+  });
+  assert.equal(res.accommodations.length, 2); // 1 家酒店 × 2 个 distribution
+  const [d1, d2] = res.accommodations;
+  assert.equal(d1.code, '12563');
+  assert.equal(d1.name, 'Villa Rosario');
+  assert.equal(d1.category, '3');
+  assert.equal(d1.pvp, '1207.36');
+  assert.match(d1.idDistributions!, /^4,6,3,2,11,2/);
+  assert.equal(d1.rooms.length, 2);
+  assert.equal(d1.status, 'SALE'); // confirmed=Y
+  // 第一 distribution 有结构化政策（1N/2N），非 NS
+  assert.equal(d1.structuredCancelPolicies?.length, 2);
+  assert.equal(d1.structuredCancelPolicies?.[0].calculationType, '1N');
+  assert.notEqual(d1.cancelPoliciesPending, true);
+  // 第二 distribution 是 NS（测试环境下 100% 出现）→ 标记待核价
+  assert.equal(d2.cancelPoliciesPending, true);
+});
+
+test('搜索请求按文档使用 city 与 accomodationsCode 标签', async () => {
+  const { client, calls } = makeClient([
+    fx('booking_LoginResult.xml'),
+    fx('booking_AccomodationInfoResult_empty.xml'),
+  ]);
+  await client.getAccommodationAvail({
+    checkIn: '2026-09-10', checkOut: '2026-09-14',
+    rooms: [{ adults: 2, children: 0, units: 1 }],
+    destinationCode: 'ES00634',
+    hotelCodes: ['Mlg0846', 'Mlg1295'],
+  });
+  const xml = calls[1].xml;
+  assert.match(xml, /<city>ES00634<\/city>/);
+  assert.match(xml, /<accomodationsCode>Mlg0846,Mlg1295<\/accomodationsCode>/);
+  assert.doesNotMatch(xml, /destinationCode|hotelCodes/);
+});
+
+test('value 响应携带取消政策（NS 场景的权威来源）', async () => {
+  const { client } = makeClient([
+    fx('booking_LoginResult.xml'),
+    fx('booking_ReservationValueResult.xml'),
+  ]);
+  const valued = await client.value({
+    idOperation: 'op', code: '12563', idDistributions: 'd',
+  });
+  assert.ok(valued.structuredCancelPolicies?.length, 'value 应返回结构化取消政策');
+  assert.ok(valued.cancelPolicies?.length, 'value 应返回文本取消政策');
+});

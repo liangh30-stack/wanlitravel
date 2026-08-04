@@ -38,6 +38,21 @@ npm run server:test   # 跑单元测试（无需凭证，用文档示例报文�
 npm run server:lint   # 服务端类型检查
 ```
 
+## 测试环境（T10 提供，2026-07-31）
+
+| 模块 | URL |
+|---|---|
+| Booking 2.9 | `http://testapi.tourdiez.com/2.9/booking/ApiServlet.Srv` |
+| Reservations 3.1 | `http://testapi.tourdiez.com/3.1/reservations/ApiServlet.Srv` |
+| Mapping 3.1 | `http://testapi.tourdiez.com/3.1/mapping/ApiServlet.Srv` |
+
+三个模块共用同一组测试凭证（经一次性链接发放，只放 `.env.local`）。
+
+测试环境须知：
+
+- **可搜索数据只有**：城市 `ES00634`（马拉加）与 4 家酒店 `Mlg0846, Mlg1295, Mlg1141, Mlg0902`（含认证所需全部价目）。建议搜索多种天数（4/5/6 晚）并提前数月。
+- **NS 取消政策**：正式环境下少数可用性响应的取消政策为 `NS`（Next Step，须核价后才知道）；**测试环境下 100% 返回 NS**。因此取消政策的各种取值只能在 `value`（核价）响应中测试。代码已按此处理：可用性响应带 `cancelPoliciesPending: true` 标记，核价响应为取消政策的权威来源。
+
 ## 预订链路（必须按此顺序）
 
 1. `getAccommodationAvail` — 查房态报价（T10 侧默认 30s 超时），`retrieveCancelPolicies` 默认开启

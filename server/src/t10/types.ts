@@ -34,6 +34,22 @@ export interface CancelPolicy {
   raw?: unknown;
 }
 
+/**
+ * 结构化取消政策（Booking §structuredCancelPolicies）。
+ * calculationType === 'NS'（Next Step）表示本步骤未能取回政策，
+ * 必须在 value（核价）步骤重新获取 —— 测试环境下可用性响应几乎 100% 返回 NS。
+ */
+export interface StructuredCancelPolicy {
+  /** 入住前 N 小时起适用本政策；NS 时为 9999 */
+  hoursFrom?: string;
+  /** NS / 1N / 2N / …（按前 N 晚计算） */
+  calculationType?: string;
+  /** PJ = 百分比；MD = 金额 */
+  amountType?: string;
+  amount?: string;
+  raw?: unknown;
+}
+
 export interface RoomOffer {
   code: string;
   name?: string;
@@ -64,6 +80,11 @@ export interface AccommodationOffer {
   idDistributions?: string;
   rooms: RoomOffer[];
   cancelPolicies?: CancelPolicy[];
+  structuredCancelPolicies?: StructuredCancelPolicy[];
+  /** true = 本步骤未能取回取消政策（NS），需在 value 步骤获取后才能展示 */
+  cancelPoliciesPending?: boolean;
+  /** 城市名（可用性响应的 cityName） */
+  cityName?: string;
   raw?: unknown;
 }
 
@@ -94,6 +115,7 @@ export interface ValuedReservation {
   status?: string;
   rooms: RoomOffer[];
   cancelPolicies?: CancelPolicy[];
+  structuredCancelPolicies?: StructuredCancelPolicy[];
   raw?: unknown;
 }
 

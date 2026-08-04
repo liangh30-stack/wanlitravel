@@ -19,6 +19,7 @@ import type {
   AvailabilitySearch, AvailabilityResponse, AccommodationOffer, RoomOffer,
   ValueRequest, ValuedReservation, ConfirmRequest, ConfirmedReservation,
   CancelRequest, CancellationOutcome, T10Hotel, CodeName, ReservationSummary,
+  CancelPolicy, StructuredCancelPolicy,
 } from './types.js';
 
 export interface T10ClientOptions {
@@ -101,8 +102,9 @@ export class T10Client {
         onlyConfirmed: search.onlyConfirmed ?? false,
         retrieveCancelPolicies: search.retrieveCancelPolicies ?? true,
         ...roomsToT10(search.rooms),
-        ...(search.destinationCode ? { destinationCode: search.destinationCode } : {}),
-        ...(search.hotelCodes?.length ? { hotelCodes: { hotelCode: search.hotelCodes } } : {}),
+        // 文档 nota1：province / zone / city / accomodationsCode 至少填一个
+        ...(search.destinationCode ? { city: search.destinationCode } : {}),
+        ...(search.hotelCodes?.length ? { accomodationsCode: search.hotelCodes.join(',') } : {}),
       },
     };
     const parsed = await this.callWithSession('getAccomodationAvail', 'getAccomodationAvail', body, this.timeouts.availMs);
@@ -132,6 +134,9 @@ export class T10Client {
       currencyCode: acc?.currencyCode,
       status: acc?.status,
       rooms: acc?.rooms ?? [],
+      // 核价响应是取消政策的权威来源（可用性阶段可能只有 NS）
+      cancelPolicies: acc?.cancelPolicies,
+      structuredCancelPolicies: acc?.structuredCancelPolicies,
       raw: parsed,
     };
   }
@@ -277,6 +282,12 @@ export class T10Client {
 
 /* ── 解析辅助 ───────────────────────────────────── */
 
+/** mealPlan 等标签因 Mapping 列表被强制数组化，取首个标量值 */
+function scalar(v: unknown): string | undefined {
+  const first = Array.isArray(v) ? v[0] : v;
+  return first === undefined || first === null || first === '' ? undefined : String(first);
+}
+
 function toArray<T = any>(v: T | T[] | undefined | null): T[] {
   if (v === undefined || v === null) return [];
   return Array.isArray(v) ? v : [v];
@@ -322,26 +333,81 @@ function normalizeRooms(acc: any): RoomOffer[] {
   }));
 }
 
+/**
+ * 结构化取消政策解析。NS（Next Step）= 本步骤未能取回政策，
+ * 需要在 value 步骤重新获取（测试环境下可用性响应 100% 为 NS）。
+ */
+function normalizeStructuredPolicies(node: any): { policies: StructuredCancelPolicy[]; pending: boolean } {
+  const policies = toArray(node?.structuredCancelPolicie).map((p: any) => ({
+    hoursFrom: p.hoursFrom !== undefined ? String(p.hoursFrom) : undefined,
+    calculationType: p.calculationType !== undefined ? String(p.calculationType) : undefined,
+    amountType: p.amountType !== undefined ? String(p.amountType) : undefined,
+    amount: p.amount !== undefined ? String(p.amount) : undefined,
+    raw: p,
+  }));
+  // NS 规范上在 calculationType，但文档示例中也出现在 amountType —— 两处都检测
+  return { policies, pending: policies.some(p => p.calculationType === 'NS' || p.amountType === 'NS') };
+}
+
+function normalizeCancelPolicies(node: any): CancelPolicy[] {
+  return toArray(node?.cancelPolicy ?? node?.policy ?? node?.cancelPolicie)
+    .map((p: any) => typeof p === 'string'
+      ? { raw: p }
+      : { from: p.from ? String(p.from) : undefined, amount: p.amount ? String(p.amount) : undefined, raw: p });
+}
+
 function normalizeAccommodation(acc: any): AccommodationOffer {
+  const structured = normalizeStructuredPolicies(acc.structuredCancelPolicies);
   return {
     code: String(acc.code ?? ''),
     name: acc.name ? String(acc.name) : undefined,
-    mealPlan: acc.mealPlan ? String(acc.mealPlan) : undefined,
+    category: acc.category ? String(acc.category) : acc.categoryCode ? String(acc.categoryCode) : undefined,
+    mealPlan: scalar(acc.mealPlan),
     pvp: acc.pvp !== undefined ? String(acc.pvp) : undefined,
     neto: acc.neto !== undefined ? String(acc.neto) : undefined,
     currencyCode: acc.currencyCode ? String(acc.currencyCode) : undefined,
     status: acc.status ? String(acc.status) : undefined,
     idDistributions: acc.idDistributions ? String(acc.idDistributions) : undefined,
     rooms: normalizeRooms(acc),
-    cancelPolicies: toArray(acc.cancelPolicies?.cancelPolicy ?? acc.cancelPolicies?.policy)
-      .map((p: any) => ({ from: p.from ? String(p.from) : undefined, amount: p.amount ? String(p.amount) : undefined, raw: p })),
+    cancelPolicies: normalizeCancelPolicies(acc.cancelPolicies),
+    structuredCancelPolicies: structured.policies.length ? structured.policies : undefined,
+    cancelPoliciesPending: structured.pending || undefined,
     raw: acc,
   };
 }
 
+/**
+ * 可用性响应实际结构为 accomodation > distributions > distribution[]（价格、
+ * idDistributions、房型与取消政策都在 distribution 层）。这里按
+ * 酒店 × distribution 展开为一条条报价，酒店层字段（编码/名称/星级/城市/币种）下沉合并。
+ */
 function normalizeAccommodations(parsed: any): AccommodationOffer[] {
-  const list = parsed?.accomodations?.accomodation ?? parsed?.accomodation;
-  return toArray(list).map(normalizeAccommodation);
+  const list = toArray(parsed?.accomodations?.accomodation ?? parsed?.accomodation);
+  return list.flatMap((acc: any) => {
+    const distributions = toArray(acc?.distributions?.distribution);
+    if (!distributions.length) return [normalizeAccommodation(acc)]; // 兼容无 distributions 的响应
+    return distributions.map((d: any) => {
+      const structured = normalizeStructuredPolicies(d.structuredCancelPolicies);
+      const confirmed = String(d.confirmed ?? acc.confirmed ?? '');
+      return {
+        code: String(acc.code ?? ''),
+        name: acc.name ? String(acc.name) : undefined,
+        category: acc.categoryCode ? String(acc.categoryCode) : acc.category ? String(acc.category) : undefined,
+        cityName: acc.cityName ? String(acc.cityName) : undefined,
+        mealPlan: scalar(d.mealPlan),
+        pvp: d.pvp !== undefined ? String(d.pvp) : undefined,
+        neto: d.neto !== undefined ? String(d.neto) : undefined,
+        currencyCode: acc.currencyCode ? String(acc.currencyCode) : undefined,
+        status: confirmed === 'Y' ? 'SALE' : confirmed === 'N' ? 'ON_REQUEST' : undefined,
+        idDistributions: d.idDistributions ? String(d.idDistributions) : undefined,
+        rooms: normalizeRooms(d),
+        cancelPolicies: normalizeCancelPolicies(d.cancelPolicies),
+        structuredCancelPolicies: structured.policies.length ? structured.policies : undefined,
+        cancelPoliciesPending: structured.pending || undefined,
+        raw: d,
+      } satisfies AccommodationOffer;
+    });
+  });
 }
 
 function firstAccommodation(reservation: any): AccommodationOffer | undefined {

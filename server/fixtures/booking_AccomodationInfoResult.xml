@@ -39,8 +39,8 @@
  		    <discount>
    	             <name>Descuento por venta anticipada</name>
                     <value>50</value>
-                 <discount/>
-               <discounts/>
+                 </discount>
+               </discounts>
             </room>
             <room>            
                <code>DB</code>
@@ -49,7 +49,7 @@
                <adults>2</adults>
                <children>0</children>                            
                <pvp>620.48</pvp>
-       	  <neto>620.48<neto>
+       	  <neto>620.48</neto>
                <mandatory_pvp/>
        	  <observations/>
                <restrictions/>
@@ -87,7 +87,7 @@
  <children>2</children>
  <pvp>586.88</pvp>
  <neto>586.88</neto>
- <mandatory_pvp/>590</mandatory_pvp>
+ <mandatory_pvp>590</mandatory_pvp>
  <observations/>
  <restrictions/>
  <suplements/>
