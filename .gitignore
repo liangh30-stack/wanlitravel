@@ -9,3 +9,6 @@ coverage/
 server/data/
 *.bundle
 *.command
+
+# Logs de intercambio T10 (contienen datos de reservas — nunca al repo)
+logs/
