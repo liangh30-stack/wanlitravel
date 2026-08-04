@@ -205,22 +205,40 @@ export class T10Client {
     return { user: this.opts.user, password: this.opts.password, ...extra };
   }
 
-  async getAllHotels(): Promise<T10Hotel[]> {
-    const parsed = await this.call('getAllHotels', 'getAllHotels', this.credentialBody({ operationCode: '' }), this.timeouts.defaultMs);
-    return toArray(parsed?.hotels?.hotel ?? parsed?.hotel).map((h: any) => ({
-      code: String(h.code ?? ''),
-      name: h.name ? String(h.name) : undefined,
-      category: h.category ? String(h.category) : undefined,
-      countryCode: h.countryCode ? String(h.countryCode) : undefined,
-      provinceCode: h.provinceCode ? String(h.provinceCode) : undefined,
-      cityCode: h.cityCode ? String(h.cityCode) : undefined,
-      address: h.address ? String(h.address) : undefined,
-      raw: h,
-    }));
+  /**
+   * Catálogo completo de hoteles. La respuesta real es paginada
+   * (totalHotels / totalHotelsRetrieved / operationCode): se repite la llamada
+   * pasando el operationCode devuelto hasta agotar el catálogo.
+   */
+  async getAllHotels(opts?: { maxPages?: number }): Promise<T10Hotel[]> {
+    const out: T10Hotel[] = [];
+    let operationCode = '';
+    const maxPages = opts?.maxPages ?? 1000;
+    for (let page = 0; page < maxPages; page++) {
+      const parsed = await this.call('getAllHotels', 'getAllHotels', this.credentialBody({ operationCode }), this.timeouts.defaultMs);
+      const beans = toArray(parsed?.hotelDescriptions?.hotelDescriptionsBean ?? parsed?.hotels?.hotel ?? parsed?.hotel);
+      for (const h of beans) {
+        out.push({
+          code: String(h.hotelID ?? h.code ?? ''),
+          name: h.hotelName ? String(h.hotelName) : h.name ? String(h.name) : undefined,
+          category: h.category?.claveCategoria !== undefined ? String(h.category.claveCategoria) : h.category ? String(h.category) : undefined,
+          countryCode: h.codeCountry ? String(h.codeCountry) : h.countryCode ? String(h.countryCode) : undefined,
+          provinceCode: h.codeDistrict ? String(h.codeDistrict) : h.provinceCode ? String(h.provinceCode) : undefined,
+          cityCode: h.codeCity ? String(h.codeCity) : h.cityCode ? String(h.cityCode) : undefined,
+          address: h.address ? String(h.address) : undefined,
+          raw: h,
+        });
+      }
+      const total = Number(parsed?.totalHotels ?? 0);
+      operationCode = String(parsed?.operationCode ?? '');
+      if (!beans.length || !operationCode || out.length >= total) break;
+    }
+    return out;
   }
 
-  async getHotelDetails(hotelCode: string): Promise<any> {
-    return this.call('getHotelDetails', 'getHotelDetails', this.credentialBody({ hotelCode }), this.timeouts.defaultMs);
+  async getHotelDetails(hotelID: string): Promise<any> {
+    // 文档字段名为 hotelID（getAllHotels 响应中的 hotelID）
+    return this.call('getHotelDetails', 'getHotelDetails', this.credentialBody({ hotelID }), this.timeouts.defaultMs);
   }
 
   async getMealPlans(): Promise<CodeName[]> {
@@ -248,8 +266,21 @@ export class T10Client {
     return codeNameList(parsed?.provinces?.province ?? parsed?.province);
   }
 
-  async getCities(provinceCode?: string): Promise<CodeName[]> {
-    const parsed = await this.call('getCities', 'getCities', this.credentialBody(provinceCode ? { provinceCode } : {}), this.timeouts.defaultMs);
+  /**
+   * 城市列表。文档要求 provinceCode 不带国家前缀（如 Mlg），并同时提供 countryCode；
+   * 传入 getProvinces 返回的组合码（如 ESMlg）时自动拆分。
+   */
+  async getCities(provinceCode?: string, countryCode?: string): Promise<CodeName[]> {
+    let province = provinceCode;
+    let country = countryCode;
+    if (province && !country && /^[A-Z]{2}/.test(province) && province.length > 2) {
+      country = province.slice(0, 2);
+      province = province.slice(2);
+    }
+    const parsed = await this.call('getCities', 'getCities', this.credentialBody({
+      ...(province ? { provinceCode: province } : {}),
+      ...(country ? { countryCode: country } : {}),
+    }), this.timeouts.defaultMs);
     return codeNameList(parsed?.cities?.city ?? parsed?.city);
   }
 

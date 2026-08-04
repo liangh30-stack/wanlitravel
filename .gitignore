@@ -12,3 +12,6 @@ server/data/
 
 # Logs de intercambio T10 (contienen datos de reservas — nunca al repo)
 logs/
+
+# SQLite auxiliares
+server/data/*.db*

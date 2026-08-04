@@ -4,12 +4,14 @@
  * 2. confirm 超时后的状态核实（对照 getReservations）
  * 3. 每日对账
  *
- * 骨架实现为单文件 JSON 存储（server/data/orders.json，已 gitignore）。
- * 生产环境替换为 Postgres/SQLite 时只需重写本文件，接口保持不变。
+ * 实现：SQLite（node:sqlite，server/data/wanli.db，已 gitignore）。
+ * 首次启动时自动导入旧的 orders.json（若存在），导入后重命名为 .imported。
  */
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync, renameSync } from 'node:fs';
 import path from 'node:path';
 import { randomUUID } from 'node:crypto';
+import type { DatabaseSync } from 'node:sqlite';
+import { openDb } from './db.js';
 
 export type OrderStatus =
   | 'CONFIRMED'        // confirm 成功
@@ -34,61 +36,92 @@ export interface OrderRecord {
   updatedAt: string;
 }
 
+const COLS = ['id', 'clientLocalizer', 'locator', 'status', 'hotelCode', 'checkIn', 'checkOut',
+  'valuedNeto', 'confirmedNeto', 'currencyCode', 'priceChanged', 'createdAt', 'updatedAt'] as const;
+
+function fromRow(row: any): OrderRecord {
+  const o: any = {};
+  for (const c of COLS) {
+    if (row[c] === null || row[c] === undefined) continue;
+    o[c] = c === 'priceChanged' ? Boolean(row[c]) : row[c];
+  }
+  return o as OrderRecord;
+}
+
+function toParams(o: OrderRecord): Record<string, string | number | null> {
+  const p: Record<string, string | number | null> = {};
+  for (const c of COLS) {
+    const v = (o as any)[c];
+    p[c] = v === undefined ? null : c === 'priceChanged' ? (v ? 1 : 0) : String(v);
+  }
+  return p;
+}
+
 export class OrderStore {
-  private orders = new Map<string, OrderRecord>();
-  private readonly file: string;
+  private readonly db: DatabaseSync;
 
   constructor(dataDir = './server/data') {
-    this.file = path.join(dataDir, 'orders.json');
-    if (existsSync(this.file)) {
-      try {
-        const list: OrderRecord[] = JSON.parse(readFileSync(this.file, 'utf-8'));
-        for (const o of list) this.orders.set(o.id, o);
-      } catch {
-        console.error('[orders] 订单文件损坏，从空库启动（原文件保留）');
-      }
-    } else {
-      mkdirSync(path.dirname(this.file), { recursive: true });
-    }
+    this.db = openDb(dataDir);
+    this.importLegacyJson(path.join(dataDir, 'orders.json'));
   }
 
-  private persist() {
-    writeFileSync(this.file, JSON.stringify([...this.orders.values()], null, 2));
+  /** 一次性迁移：旧 JSON 存量导入 SQLite 后把文件改名留档 */
+  private importLegacyJson(file: string) {
+    if (!existsSync(file)) return;
+    try {
+      const list: OrderRecord[] = JSON.parse(readFileSync(file, 'utf-8'));
+      const insert = this.db.prepare(
+        `INSERT OR IGNORE INTO orders (${COLS.join(',')}) VALUES (${COLS.map(c => `:${c}`).join(',')})`);
+      for (const o of list) insert.run(toParams(o));
+      renameSync(file, `${file}.imported`);
+      console.log(`[orders] importados ${list.length} pedidos de orders.json a SQLite`);
+    } catch (err) {
+      console.error('[orders] fallo importando orders.json (se deja intacto):', err);
+    }
   }
 
   create(fields: Omit<OrderRecord, 'id' | 'createdAt' | 'updatedAt'>): OrderRecord {
     const now = new Date().toISOString();
     const record: OrderRecord = { id: randomUUID(), createdAt: now, updatedAt: now, ...fields };
-    this.orders.set(record.id, record);
-    this.persist();
+    this.db.prepare(
+      `INSERT INTO orders (${COLS.join(',')}) VALUES (${COLS.map(c => `:${c}`).join(',')})`,
+    ).run(toParams(record));
     return record;
   }
 
   update(id: string, patch: Partial<OrderRecord>): OrderRecord | undefined {
-    const cur = this.orders.get(id);
+    const cur = this.get(id);
     if (!cur) return undefined;
-    const next = { ...cur, ...patch, id: cur.id, updatedAt: new Date().toISOString() };
-    this.orders.set(id, next);
-    this.persist();
+    const next: OrderRecord = { ...cur, ...patch, id: cur.id, updatedAt: new Date().toISOString() };
+    this.db.prepare(
+      `UPDATE orders SET ${COLS.filter(c => c !== 'id').map(c => `${c} = :${c}`).join(', ')} WHERE id = :id`,
+    ).run(toParams(next));
     return next;
   }
 
+  get(id: string): OrderRecord | undefined {
+    const row = this.db.prepare('SELECT * FROM orders WHERE id = ?').get(id);
+    return row ? fromRow(row) : undefined;
+  }
+
   findByLocator(locator: string): OrderRecord | undefined {
-    for (const o of this.orders.values()) if (o.locator === locator) return o;
-    return undefined;
+    const row = this.db.prepare('SELECT * FROM orders WHERE locator = ?').get(locator);
+    return row ? fromRow(row) : undefined;
   }
 
   findByClientLocalizer(clientLocalizer: string): OrderRecord | undefined {
-    for (const o of this.orders.values()) if (o.clientLocalizer === clientLocalizer) return o;
-    return undefined;
+    const row = this.db.prepare('SELECT * FROM orders WHERE clientLocalizer = ?').get(clientLocalizer);
+    return row ? fromRow(row) : undefined;
   }
 
   list(): OrderRecord[] {
-    return [...this.orders.values()].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    return (this.db.prepare('SELECT * FROM orders ORDER BY createdAt DESC').all() as any[]).map(fromRow);
   }
 
   /** 待对账的订单（confirm 超时后状态未知） */
   listPendingUnknown(): OrderRecord[] {
-    return this.list().filter(o => o.status === 'PENDING_UNKNOWN');
+    return (this.db.prepare(
+      "SELECT * FROM orders WHERE status = 'PENDING_UNKNOWN' ORDER BY createdAt DESC",
+    ).all() as any[]).map(fromRow);
   }
 }
