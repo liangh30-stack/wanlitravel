@@ -68,12 +68,23 @@ confirm 网络超时会抛 `ConfirmTimeoutError`（API 返回 504 + `CONFIRM_TIM
 
 `T10Error` 携带三个标记：`isSessionExpired`（M5，client 内部已自动重登）、`isRetryable`（M3/M4/M30）、`needsManualHandling`（M40/M41/M60/M81，转人工，API 返回 409）。完整码表见 `codes.ts`。
 
-## 尚未实现（接测试凭证后补）
+## 已验证（entorno TEST, 2026-08-04）
 
-- Mapping 静态数据的定时同步任务与本地存储（酒店映射表）
-- 每日 `getReservations` 对账任务与状态告警
-- confirm 超时后的自动对账恢复流程
-- T10 认证（certificación）要求的用例回归
+- ✔ Ciclo completo Booking: login → avail (ES00634, 5 ofertas) → value (políticas
+  reales por tramos) → confirm (locator 1031120) → getReservations/Details → cancel
+  （el último cancel dio un M3 puntual y funcionó al reintentar — M3 es reintentable）
+- ✔ Mapping: getAllHotels paginado (801 hoteles), países/provincias/regímenes/categorías,
+  getHotelDetails (campo `hotelID`). `getCities` responde "sin datos" incluso con
+  provinceCode+countryCode correctos — pendiente confirmar con T10 si es limitación del test
+- ✔ Conciliación: `server/scripts/reconcile.ts` (cron diario en producción)
+- Scripts: `smoke.ts` / `cert-booking.ts` / `cancel-retry.ts` / `mapping-smoke.ts` / `reconcile.ts`
+  — todos con `npx tsx --env-file=.env.local server/scripts/<script>.ts`
+
+## 尚未实现
+
+- Mapping 静态数据的定时同步任务与本地存储（酒店映射表；getAllHotels 已支持分页全量拉取）
+- 对账任务的自动调度（脚本已就绪，需接 cron）与状态告警
+- T10 认证（certificación）表单/Excel 的正式提交
 
 ## 关于 fixtures
 
