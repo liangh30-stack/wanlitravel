@@ -26,6 +26,7 @@ interface Accommodation {
   restrictions?: { code: string; description?: string }[];
 }
 interface SearchResponse { demo: boolean; idOperation: string; accommodations: Accommodation[] }
+interface DestinationsResponse { destinations?: Destination[]; limited?: boolean; catalogTotal?: number }
 interface Destination { code: string; label: string; countryCode?: string; hotels?: number }
 
 const plus = (days: number) => {
@@ -38,6 +39,7 @@ const HotelSearch = () => {
   useEffect(() => { window.scrollTo(0, 0); }, []);
 
   const [destinations, setDestinations] = useState<Destination[]>([]);
+  const [limited, setLimited] = useState<{ total: number } | null>(null);
   const [destination, setDestination] = useState('AGP');
   const [checkIn, setCheckIn] = useState(plus(30));
   const [checkOut, setCheckOut] = useState(plus(34));
@@ -64,9 +66,10 @@ const HotelSearch = () => {
   useEffect(() => {
     fetch('/api/hotels/destinations')
       .then(r => r.json())
-      .then(d => {
+      .then((d: DestinationsResponse) => {
         const list: Destination[] = d.destinations ?? [];
         setDestinations(list);
+        if (d.limited && d.catalogTotal) setLimited({ total: d.catalogTotal });
         // Seleccionar el primero real en cuanto llega el catálogo (evita quedarse
         // con un código por defecto que quizá ya no exista en el catálogo)
         if (list.length && !list.some(x => x.code === destination)) {
@@ -161,6 +164,17 @@ const HotelSearch = () => {
         <h1 style={{ fontFamily: '"Cormorant Garamond",serif', fontStyle: 'italic', fontWeight: 300, fontSize: 'clamp(40px,6vw,64px)', color: '#0E1117', lineHeight: 1, marginBottom: 36 }}>
           {t.hotels.title}
         </h1>
+
+        {limited && (
+          <div className="flex items-start gap-3 mb-5" style={{
+            background: 'rgba(196,146,58,0.09)', border: '1px solid rgba(196,146,58,0.28)',
+            borderRadius: 14, padding: '13px 16px' }}>
+            <Info size={15} style={{ color: '#8A6420', flexShrink: 0, marginTop: 1 }} />
+            <p style={{ fontSize: 13, color: '#6B4F19', lineHeight: 1.5 }}>
+              {t.hotels.limitedDestinations.replace('{total}', String(limited.total))}
+            </p>
+          </div>
+        )}
 
         {/* Search form */}
         <form onSubmit={onSearch} className="card" style={{ padding: 24, marginBottom: 28 }}>
