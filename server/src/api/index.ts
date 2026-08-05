@@ -124,14 +124,32 @@ const manualDestinations = (process.env.T10_DESTINATIONS ?? '')
     return idx > 0 ? { code: s.slice(0, idx), label: s.slice(idx + 1) } : { code: s, label: s };
   });
 
+/**
+ * Lista blanca de destinos (fase de pruebas).
+ *
+ * El catálogo de Mapping trae 237 ciudades, pero el entorno de TEST de T10 solo
+ * tiene tarifas cargadas en Torremolinos: ofrecer las otras 236 hace que el
+ * buscador parezca roto ("sin disponibilidad" siempre). Mientras estemos en
+ * test se limita el desplegable a los códigos de T10_DESTINATION_WHITELIST.
+ * En producción basta con dejar la variable vacía y vuelve el catálogo completo.
+ */
+const destinationWhitelist = new Set(
+  (process.env.T10_DESTINATION_WHITELIST ?? '')
+    .split(',').map(s => s.trim().toUpperCase()).filter(Boolean),
+);
+
 app.get('/api/hotels/destinations', searchLimiter, (req, res) => {
   const country = typeof req.query.country === 'string' ? req.query.country.slice(0, 2).toUpperCase() : undefined;
   if (!demoMode) {
-    const synced = destinations.list(country);
+    const all = destinations.list(country);
+    const synced = destinationWhitelist.size
+      ? all.filter(d => destinationWhitelist.has(d.code.toUpperCase()))
+      : all;
     if (synced.length) {
       res.json({
         demo: false,
         syncedAt: destinations.lastSync(),
+        ...(destinationWhitelist.size ? { limited: true, catalogTotal: all.length } : {}),
         destinations: synced.map(d => ({ code: d.code, label: d.name, countryCode: d.countryCode, hotels: d.hotelCount })),
       });
       return;
