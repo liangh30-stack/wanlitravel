@@ -107,8 +107,15 @@ const HotelSearch = () => {
     setQStatus(ok ? 'success' : 'error');
   };
 
-  const mealLabel = (mp?: string) =>
-    mp === 'BB' ? t.hotels.mealBB : mp === 'HB' ? t.hotels.mealHB : t.hotels.mealSA;
+  /* T10 devuelve 13 regímenes (AP,CB,DE,FD,HC,HD,HL,IG,IM,MP,PC,SA,TI).
+     Mapeamos los reales; si aparece uno desconocido mostramos el código tal
+     cual — NUNCA caer por defecto en "solo alojamiento": un TI (todo incluido)
+     etiquetado como solo alojamiento es un error de cotización grave. */
+  const mealLabel = (mp?: string) => {
+    if (!mp) return t.hotels.mealUnknown;
+    const m = t.hotels.mealPlans as Record<string, string>;
+    return m[mp.toUpperCase()] ?? mp.toUpperCase();
+  };
 
   const inputStyle: React.CSSProperties = {
     background: 'white', border: '1px solid rgba(14,17,23,0.12)', borderRadius: 12,

@@ -198,6 +198,13 @@ const en = {
       mealSA: "Room only",
       mealBB: "Breakfast included",
       mealHB: "Half board",
+      mealUnknown: "Board: on request",
+      mealPlans: {
+        SA: "Room only", AP: "Room only (apartment)", CB: "Breakfast included",
+        BB: "Breakfast included", HD: "Half board", MP: "Half board", HB: "Half board",
+        PC: "Full board", FD: "Full board", TI: "All inclusive", HL: "All inclusive",
+        DE: "Dinner included", IG: "Not specified", IM: "Not specified", HC: "Full board",
+      } as Record<string, string>,
     },
     form: {
       sending: "Sending…",
@@ -532,6 +539,13 @@ const zh: TranslationSchema = {
       mealSA: "仅住宿",
       mealBB: "含早餐",
       mealHB: "半食宿",
+      mealUnknown: "餐型：需确认",
+      mealPlans: {
+        SA: "仅住宿", AP: "仅住宿（公寓）", CB: "含早餐",
+        BB: "含早餐", HD: "半食宿", MP: "半食宿", HB: "半食宿",
+        PC: "全食宿", FD: "全食宿", TI: "全包", HL: "全包",
+        DE: "含晚餐", IG: "未标明", IM: "未标明", HC: "全食宿",
+      } as Record<string, string>,
     },
     form: {
       sending: "提交中…",
@@ -863,6 +877,13 @@ const es: TranslationSchema = {
       mealSA: "Solo alojamiento",
       mealBB: "Desayuno incluido",
       mealHB: "Media pensión",
+      mealUnknown: "Régimen: a consultar",
+      mealPlans: {
+        SA: "Solo alojamiento", AP: "Solo alojamiento (apto.)", CB: "Desayuno incluido",
+        BB: "Desayuno incluido", HD: "Media pensión", MP: "Media pensión", HB: "Media pensión",
+        PC: "Pensión completa", FD: "Pensión completa", TI: "Todo incluido", HL: "Todo incluido",
+        DE: "Cena incluida", IG: "Sin especificar", IM: "Sin especificar", HC: "Pensión completa",
+      } as Record<string, string>,
     },
     form: {
       sending: "Enviando…",
