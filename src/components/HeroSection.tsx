@@ -17,22 +17,55 @@ import { useLanguage } from '../context';
    pantalla y revelando España detrás.
 ───────────────────────────────────────────────────────────── */
 
-const WIN_X = 44.5;   // % de la foto — ventanilla del fuselaje
-const WIN_Y = 41.5;
-const AR = 1380 / 768; // proporción de hero-plane-sky.jpg
+/* Medidas tomadas sobre la foto (1376×768):
+   la fila de ventanillas desciende hacia la derecha ~27°; la ventanilla
+   elegida está centrada en (588.8, 318.8) px y mide ~4.6×7.6 px. */
+const IMG_W = 1376;
+const IMG_H = 768;
+const WIN_PX = 588.8;      // centro de la ventanilla, en px de la foto
+const WIN_PY = 318.8;
+const WIN_X = (WIN_PX / IMG_W) * 100;  // 42.79 %
+const WIN_Y = (WIN_PY / IMG_H) * 100;  // 41.51 %
+const TILT = 27;           // inclinación del fuselaje (grados, horario)
+const BASE_RX = 4.3;       // semiejes del agujero en px de la foto (×1.8 la ventanilla real)
+const BASE_RY = 6.9;
+const HOLE_GROW = 15;      // factor de crecimiento del agujero en la fase final
+const AR = IMG_W / IMG_H;
 
-/** Actualiza la máscara: agujero elíptico que crece en espacio-imagen */
+/** Trazado SVG de una elipse rotada (dos arcos con x-axis-rotation) */
+const rotatedEllipsePath = (cx: number, cy: number, rx: number, ry: number, deg: number) => {
+  const rad = (deg * Math.PI) / 180;
+  const dx = rx * Math.cos(rad);
+  const dy = rx * Math.sin(rad);
+  const x1 = (cx + dx).toFixed(1), y1 = (cy + dy).toFixed(1);
+  const x2 = (cx - dx).toFixed(1), y2 = (cy - dy).toFixed(1);
+  return `M${x1} ${y1}A${rx.toFixed(1)} ${ry.toFixed(1)} ${deg} 1 0 ${x2} ${y2}A${rx.toFixed(1)} ${ry.toFixed(1)} ${deg} 1 0 ${x1} ${y1}Z`;
+};
+
+/**
+ * Máscara SVG: rectángulo opaco con un agujero elíptico ROTADO 27° que
+ * coincide exactamente con la ventanilla de la foto (evenodd = agujero
+ * transparente). El borde se suaviza con un blur proporcional al radio.
+ */
 const useWindowMask = (ref: React.RefObject<HTMLDivElement | null>, progress: MotionValue<number>) => {
   useEffect(() => {
     const apply = (v: number) => {
       if (!ref.current) return;
-      // rx en % del ancho: 0.8% (tamaño ventanilla) → 6% a partir de v=0.5
       const grow = Math.max(0, Math.min(1, (v - 0.5) / 0.35));
-      const rx = 0.8 + grow * 5.2;
-      const ry = rx * 3; // ventanilla vertical (en % de alto ≈ ×3 por la proporción)
-      const mask = `radial-gradient(ellipse ${rx}% ${ry}% at ${WIN_X}% ${WIN_Y}%, transparent 88%, black 100%)`;
-      ref.current.style.webkitMaskImage = mask;
-      (ref.current.style as any).maskImage = mask;
+      const g = 1 + grow * (HOLE_GROW - 1);
+      const rx = BASE_RX * g;
+      const ry = BASE_RY * g;
+      const blur = 0.35 + rx * 0.05;
+      const hole = rotatedEllipsePath(WIN_PX, WIN_PY, rx, ry, TILT);
+      const svg =
+        `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 ${IMG_W} ${IMG_H}' preserveAspectRatio='none'>` +
+        `<filter id='f' x='-20%' y='-20%' width='140%' height='140%'><feGaussianBlur stdDeviation='${blur.toFixed(2)}'/></filter>` +
+        `<path filter='url(%23f)' fill='white' fill-rule='evenodd' d='M0 0H${IMG_W}V${IMG_H}H0Z ${hole}'/>` +
+        `</svg>`;
+      const url = `url("data:image/svg+xml,${svg.replace(/#/g, '%23')}")`;
+      const s = ref.current.style as any;
+      s.webkitMaskImage = url; s.maskImage = url;
+      s.webkitMaskSize = '100% 100%'; s.maskSize = '100% 100%';
     };
     apply(progress.get());
     return progress.on('change', apply);
@@ -60,9 +93,14 @@ const HeroSection = () => {
   /* España, detrás: respira hacia su encuadre final mientras se revela */
   const spainScale   = useTransform(smooth, [0.2, 0.95], [1.18, 1]);
   const spainOpacity = useTransform(smooth, [0, 0.3], [0.85, 1]);
+  /* De lejos, el paisaje se ve oscurecido y teñido por el atardecer;
+     se aclara según nos acercamos al cristal */
+  const spainTint    = useTransform(smooth, [0, 0.4, 0.62], [0.65, 0.45, 0]);
 
   /* Cristal de la ventanilla: brillo que desaparece al atravesarlo */
   const glassOpacity = useTransform(smooth, [0, 0.45, 0.68], [0.9, 0.7, 0]);
+  /* El marco crece al mismo ritmo que el agujero de la máscara */
+  const frameScale = useTransform(smooth, [0.5, 0.85], [1, HOLE_GROW]);
 
   /* Texto y señales */
   const textOpacity    = useTransform(smooth, [0, 0.08], [1, 0]);
@@ -81,6 +119,8 @@ const HeroSection = () => {
           <img src="/hero-spain-arrival.jpg" alt="España" className="img-cover"
             style={{ filter: 'brightness(0.92) saturate(1.1)' }} />
           <div className="absolute inset-0 bg-gradient-to-b from-black/15 via-transparent to-black/55" />
+          <motion.div style={{ opacity: spainTint, background: 'linear-gradient(180deg, rgba(64,32,8,0.85) 0%, rgba(40,22,10,0.8) 100%)' }}
+            className="absolute inset-0" aria-hidden />
         </motion.div>
 
         {/* AVIÓN — wrapper con proporción de la foto; escala hacia la ventanilla */}
@@ -100,31 +140,32 @@ const HeroSection = () => {
               className="absolute inset-0 w-full h-full object-fill"
               style={{ filter: 'brightness(0.85) saturate(1.05)' }} />
 
-            {/* Marco y cristal de LA ventanilla (viaja y escala con la foto) */}
-            <motion.div style={{ opacity: glassOpacity }}
-              className="absolute pointer-events-none"
-              // mismo punto y tamaño que el agujero de la máscara
-              // (1.6% de ancho ≈ la ventanilla, con margen para el marco)
-              // eslint-disable-next-line react/no-unknown-property
-            >
+            {/* Marco y cristal de LA ventanilla: mismo centro, misma
+                inclinación (27°) y mismo tamaño que el agujero; crece con él */}
+            <motion.div className="absolute pointer-events-none" style={{
+              left: `${WIN_X}%`, top: `${WIN_Y}%`,
+              width: `${((2 * BASE_RX) / IMG_W) * 100}%`,
+              aspectRatio: `${BASE_RX} / ${BASE_RY}`,
+              x: '-50%', y: '-50%',
+              rotate: TILT,
+              scale: frameScale,
+              opacity: glassOpacity,
+            }}>
+              {/* Aro del marco, sutil como el de las ventanillas vecinas */}
               <div className="absolute" style={{
-                left: `${WIN_X}%`, top: `${WIN_Y}%`, width: '1.9%', aspectRatio: '0.62 / 1',
-                transform: 'translate(-50%, -50%)',
-              }}>
+                inset: '-14%',
+                borderRadius: '50%',
+                boxShadow: 'inset 0 0 0.09vw rgba(235,240,250,0.75), inset 0 0.05vw 0.22vw rgba(0,0,0,0.5)',
+              }} />
+              {/* Cristal: reflejo del atardecer, como en el resto del fuselaje */}
+              <div className="absolute inset-0 overflow-hidden" style={{ borderRadius: '50%' }}>
                 <div className="absolute inset-0" style={{
-                  borderRadius: '46%',
-                  border: '0.18vw solid rgba(215,225,245,0.55)',
-                  boxShadow: 'inset 0 0.1vw 0.35vw rgba(255,255,255,0.4), 0 0 0.4vw rgba(0,0,0,0.35)',
+                  background: 'linear-gradient(155deg, rgba(255,205,140,0.5) 0%, rgba(255,170,90,0.18) 38%, transparent 62%)',
                 }} />
-                <div className="absolute inset-0 overflow-hidden" style={{ borderRadius: '46%' }}>
-                  <div className="absolute inset-0" style={{
-                    background: 'radial-gradient(ellipse at 32% 20%, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.12) 30%, transparent 60%)',
-                  }} />
-                  <div className="absolute inset-0" style={{
-                    background: 'linear-gradient(180deg, rgba(140,180,255,0.14) 0%, transparent 55%)',
-                    mixBlendMode: 'screen',
-                  }} />
-                </div>
+                <div className="absolute inset-0" style={{
+                  background: 'radial-gradient(ellipse at 34% 18%, rgba(255,240,220,0.55) 0%, transparent 45%)',
+                  mixBlendMode: 'screen',
+                }} />
               </div>
             </motion.div>
           </motion.div>
