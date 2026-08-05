@@ -83,6 +83,10 @@ export interface AccommodationOffer {
   structuredCancelPolicies?: StructuredCancelPolicy[];
   /** true = 本步骤未能取回取消政策（NS），需在 value 步骤获取后才能展示 */
   cancelPoliciesPending?: boolean;
+  /** 费率限制（NR/+65/RESCAN…）—— 决定能否销售以及如何提示客户 */
+  restrictions?: { code: string; description?: string }[];
+  /** true = 不可退款，必须向客户明示 */
+  nonRefundable?: boolean;
   /** 城市名（可用性响应的 cityName） */
   cityName?: string;
   raw?: unknown;

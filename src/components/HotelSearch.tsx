@@ -21,6 +21,9 @@ interface Accommodation {
   cancelPolicies?: { from?: string; amount?: string }[];
   /* T10: NS en disponibilidad — las condiciones de cancelación llegan en el paso de cotización */
   cancelPoliciesPending?: boolean;
+  /* Tarifa sin devolución: hay que avisarlo de forma destacada */
+  nonRefundable?: boolean;
+  restrictions?: { code: string; description?: string }[];
 }
 interface SearchResponse { demo: boolean; idOperation: string; accommodations: Accommodation[] }
 interface Destination { code: string; label: string; countryCode?: string; hotels?: number }
@@ -276,11 +279,19 @@ const HotelSearch = () => {
                           {a.status === 'SALE'
                             ? <span className="flex items-center gap-1.5" style={{ color: '#1B8A4C' }}><CheckCircle2 size={11} />{t.hotels.instantConfirm}</span>
                             : <span className="flex items-center gap-1.5" style={{ color: '#8A6420' }}><Clock3 size={11} />{t.hotels.onRequest}</span>}
-                          {a.cancelPolicies?.[0]?.from ? (
+                          {a.nonRefundable ? (
+                            <span className="flex items-center gap-1.5" style={{ color: '#B31C2E', fontWeight: 700 }}>
+                              <CalendarX2 size={11} />{t.hotels.nonRefundable}
+                            </span>
+                          ) : a.cancelPolicies?.[0]?.from ? (
                             <span className="flex items-center gap-1.5"><CalendarX2 size={11} />{t.hotels.freeCancelBefore} {a.cancelPolicies[0].from}</span>
                           ) : a.cancelPoliciesPending ? (
                             <span className="flex items-center gap-1.5"><CalendarX2 size={11} />{t.hotels.cancelAtQuote}</span>
                           ) : null}
+                          {a.restrictions?.filter(r => r.code !== 'NR').map(r => (
+                            <span key={r.code} className="tag tag-light" style={{ fontSize: 8 }}
+                              title={r.description}>{t.hotels.restrictionLabels?.[r.code] ?? r.code}</span>
+                          ))}
                         </div>
                       </div>
                       {/* Price */}

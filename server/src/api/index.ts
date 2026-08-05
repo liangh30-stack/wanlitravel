@@ -19,6 +19,7 @@ import { DestinationStore } from '../store/destinations.js';
 import { apiKeyAuth, generalLimiter, bookingLimiter, inquiryLimiter, searchLimiter } from './middleware.js';
 import { searchSchema, valueSchema, confirmSchema, cancelSchema, inquirySchema } from './schemas.js';
 import { buildDemoAvailability, DEMO_DESTINATIONS } from '../t10/demo.js';
+import { isSellable, blockingRestrictions } from '../t10/restrictions.js';
 
 const {
   // 三个模块各有独立入口（如缺省，Mapping/Reservations 回落到 Booking 的 URL）
@@ -159,6 +160,9 @@ const publicOffer = (a: any) => ({
   mealPlan: a.mealPlan, pvp: a.pvp, currencyCode: a.currencyCode, status: a.status,
   idOperation: a.idOperation, idDistributions: a.idDistributions,
   cancelPoliciesPending: a.cancelPoliciesPending,
+  // El cliente debe saber SIEMPRE si la tarifa no admite devolución
+  nonRefundable: a.nonRefundable,
+  restrictions: a.restrictions,
   rooms: (a.rooms ?? []).map((r: any) => ({
     code: r.code, name: r.name, units: r.units, adults: r.adults, children: r.children,
   })),
@@ -173,12 +177,28 @@ app.post('/api/hotels/search', searchLimiter, async (req, res) => {
       return;
     }
     const result = await client.getAccommodationAvail(input);
+    /*
+     * Filtro de restricciones: T10 devuelve tarifas baratas que solo puede usar
+     * un perfil concreto (residentes canarios, mayores de 65, desempleados…).
+     * No podemos acreditar ese perfil, así que el hotel rechazaría al huésped en
+     * recepción — se descartan. Las vendibles (NR/EPKT/ADLT) sí se muestran, con
+     * su aviso correspondiente.
+     */
+    const vendibles = result.accommodations.filter(a => isSellable(a.restrictions ?? []));
+    const descartadas = result.accommodations.length - vendibles.length;
+    if (descartadas > 0) {
+      const motivos = [...new Set(result.accommodations
+        .flatMap(a => blockingRestrictions(a.restrictions ?? []))
+        .map(r => r.code))];
+      console.log(`[search] ${descartadas} tarifas descartadas por restricción: ${motivos.join(',')}`);
+    }
     // Endpoint PÚBLICO: nunca exponer el neto (coste mayorista) ni el desglose
     // por habitación. Solo PVP y lo necesario para pedir cotización.
     res.json({
       demo: false,
       idOperation: result.idOperation,
-      accommodations: result.accommodations.map(a => publicOffer(a)),
+      accommodations: vendibles.map(a => publicOffer(a)),
+      ...(descartadas ? { filteredOut: descartadas } : {}),
     });
   } catch (err) { handleError(err, res); }
 });
