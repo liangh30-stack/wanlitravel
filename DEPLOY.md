@@ -42,7 +42,7 @@ no hay CORS y la URL del backend no queda expuesta.
 ## 2. Frontend en Vercel
 
 1. *Add New Project* → importar el mismo repo. Framework: **Vite** (autodetectado).
-2. En `vercel.json`, sustituir `REEMPLAZAR-BACKEND.up.railway.app` por la URL real
+2. En `vercel.json`, sustituir `wanlitravel-production.up.railway.app` por la URL real
    de Railway del paso 1.
 3. Desplegar. Probar en la URL temporal `*.vercel.app` **antes** de tocar el dominio.
 
