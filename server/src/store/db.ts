@@ -31,6 +31,14 @@ export function openDb(dataDir: string): DatabaseSync {
     );
     CREATE INDEX IF NOT EXISTS idx_orders_clientLocalizer ON orders(clientLocalizer);
     CREATE INDEX IF NOT EXISTS idx_orders_locator ON orders(locator);
+    CREATE TABLE IF NOT EXISTS destinations (
+      code        TEXT PRIMARY KEY,
+      name        TEXT NOT NULL,
+      countryCode TEXT NOT NULL,
+      hotelCount  INTEGER NOT NULL DEFAULT 0,
+      updatedAt   TEXT NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_destinations_country ON destinations(countryCode);
     CREATE TABLE IF NOT EXISTS inquiries (
       id           TEXT PRIMARY KEY,
       type         TEXT NOT NULL,

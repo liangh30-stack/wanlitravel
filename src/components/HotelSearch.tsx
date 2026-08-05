@@ -23,7 +23,7 @@ interface Accommodation {
   cancelPoliciesPending?: boolean;
 }
 interface SearchResponse { demo: boolean; idOperation: string; accommodations: Accommodation[] }
-interface Destination { code: string; label: string }
+interface Destination { code: string; label: string; countryCode?: string; hotels?: number }
 
 const plus = (days: number) => {
   const d = new Date(); d.setDate(d.getDate() + days);
@@ -61,8 +61,17 @@ const HotelSearch = () => {
   useEffect(() => {
     fetch('/api/hotels/destinations')
       .then(r => r.json())
-      .then(d => setDestinations(d.destinations ?? []))
+      .then(d => {
+        const list: Destination[] = d.destinations ?? [];
+        setDestinations(list);
+        // Seleccionar el primero real en cuanto llega el catálogo (evita quedarse
+        // con un código por defecto que quizá ya no exista en el catálogo)
+        if (list.length && !list.some(x => x.code === destination)) {
+          setDestination(list[0].code);
+        }
+      })
       .catch(() => setDestinations([]));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const nights = Math.max(1, Math.round(
@@ -154,9 +163,35 @@ const HotelSearch = () => {
         <form onSubmit={onSearch} className="card" style={{ padding: 24, marginBottom: 28 }}>
           <div className="grid grid-cols-2 lg:grid-cols-6 gap-4 items-end">
             <div className="col-span-2">
-              <label style={labelStyle}>{t.hotels.destination}</label>
+              <label style={labelStyle}>
+                {t.hotels.destination}
+                {destinations.length > 1 && (
+                  <span style={{ fontWeight: 400, letterSpacing: 0, textTransform: 'none', opacity: 0.55 }}>
+                    {' '}· {destinations.length}
+                  </span>
+                )}
+              </label>
               <select value={destination} onChange={e => setDestination(e.target.value)} style={inputStyle}>
-                {destinations.map(d => <option key={d.code} value={d.code}>{d.label}</option>)}
+                {/* Agrupado por país cuando el catálogo viene del módulo Mapping */}
+                {Object.entries(
+                  destinations.reduce<Record<string, Destination[]>>((acc, d) => {
+                    const k = d.countryCode ?? '';
+                    (acc[k] ??= []).push(d);
+                    return acc;
+                  }, {}),
+                ).map(([cc, list]) =>
+                  cc ? (
+                    <optgroup key={cc} label={t.hotels.countries?.[cc] ?? cc}>
+                      {list.map(d => (
+                        <option key={d.code} value={d.code}>
+                          {d.label}{d.hotels ? ` (${d.hotels})` : ''}
+                        </option>
+                      ))}
+                    </optgroup>
+                  ) : (
+                    list.map(d => <option key={d.code} value={d.code}>{d.label}</option>)
+                  ),
+                )}
               </select>
             </div>
             <div>

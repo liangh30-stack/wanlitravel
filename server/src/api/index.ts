@@ -15,6 +15,7 @@ import { ZodError } from 'zod';
 import { T10Client, createModuleTransport, T10Error, ConfirmTimeoutError } from '../t10/index.js';
 import { OrderStore } from '../store/orders.js';
 import { InquiryStore } from '../store/inquiries.js';
+import { DestinationStore } from '../store/destinations.js';
 import { apiKeyAuth, generalLimiter, bookingLimiter, inquiryLimiter, searchLimiter } from './middleware.js';
 import { searchSchema, valueSchema, confirmSchema, cancelSchema, inquirySchema } from './schemas.js';
 import { buildDemoAvailability, DEMO_DESTINATIONS } from '../t10/demo.js';
@@ -51,6 +52,7 @@ const client = new T10Client({
 });
 const orders = new OrderStore();
 const inquiries = new InquiryStore();
+const destinations = new DestinationStore();
 
 /** 新询盘 webhook 通知（飞书/企微/Slack 皆兼容 {text} 格式；不配置则跳过） */
 async function notifyInquiry(r: { type: string; companyName: string; workEmail: string; message?: string; routeCode?: string }) {
@@ -100,8 +102,12 @@ app.post('/api/inquiries', inquiryLimiter, async (req, res) => {
 const t10Configured = Boolean(T10_BOOKING_URL && T10_USER && T10_PASSWORD);
 const demoMode = !t10Configured || process.env.DEMO_MODE === 'true';
 
-/** 非演示模式的目的地列表：从 T10_DESTINATIONS（code:label,…）读取；将来改为 Mapping 同步库 */
-const configuredDestinations = (process.env.T10_DESTINATIONS ?? '')
+/**
+ * Destinos: prioridad (1) catálogo sincronizado del módulo Mapping,
+ * (2) lista manual T10_DESTINATIONS, (3) datos de demostración.
+ * Sincronizar con: npx tsx --env-file=.env.local server/scripts/sync-mapping.ts
+ */
+const manualDestinations = (process.env.T10_DESTINATIONS ?? '')
   .split(',')
   .map(s => s.trim())
   .filter(Boolean)
@@ -110,9 +116,24 @@ const configuredDestinations = (process.env.T10_DESTINATIONS ?? '')
     return idx > 0 ? { code: s.slice(0, idx), label: s.slice(idx + 1) } : { code: s, label: s };
   });
 
-app.get('/api/hotels/destinations', searchLimiter, (_req, res) => {
-  const destinations = demoMode || !configuredDestinations.length ? DEMO_DESTINATIONS : configuredDestinations;
-  res.json({ demo: demoMode, destinations });
+app.get('/api/hotels/destinations', searchLimiter, (req, res) => {
+  const country = typeof req.query.country === 'string' ? req.query.country.slice(0, 2).toUpperCase() : undefined;
+  if (!demoMode) {
+    const synced = destinations.list(country);
+    if (synced.length) {
+      res.json({
+        demo: false,
+        syncedAt: destinations.lastSync(),
+        destinations: synced.map(d => ({ code: d.code, label: d.name, countryCode: d.countryCode, hotels: d.hotelCount })),
+      });
+      return;
+    }
+    if (manualDestinations.length) {
+      res.json({ demo: false, destinations: manualDestinations });
+      return;
+    }
+  }
+  res.json({ demo: demoMode, destinations: DEMO_DESTINATIONS });
 });
 
 /** Proyección pública de una oferta: sin neto (coste mayorista) ni raw. */

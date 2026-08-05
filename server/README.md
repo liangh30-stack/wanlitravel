@@ -80,10 +80,29 @@ confirm 网络超时会抛 `ConfirmTimeoutError`（API 返回 504 + `CONFIRM_TIM
 - Scripts: `smoke.ts` / `cert-booking.ts` / `cancel-retry.ts` / `mapping-smoke.ts` / `reconcile.ts`
   — todos con `npx tsx --env-file=.env.local server/scripts/<script>.ts`
 
+## 目的地目录（Mapping 同步）
+
+搜索页的目的地下拉框**不再手写** —— 由 `sync-mapping.ts` 从 Mapping 模块拉取
+全量酒店目录，按城市聚合后写入 SQLite（`destinations` 表），API 直接读该表：
+
+```bash
+npx tsx --env-file=.env.local server/scripts/sync-mapping.ts            # 全部国家
+npx tsx --env-file=.env.local server/scripts/sync-mapping.ts --country=ES
+```
+
+测试环境实测：801 家酒店 → **237 个城市**（ES 205 / PT 32），前五名为
+Benidorm(63)、Torremolinos(29)、Benalmádena Costa(25)、Fuengirola(25)、
+La Manga(22)。建议生产环境每周跑一次 cron。
+
+⚠ 注意：测试环境**只有 ES00634（Torremolinos）挂了价格**，其余城市搜索会
+正常返回"无可用房态"。这是数据限制而非代码问题。
+
+`/api/hotels/destinations` 的优先级：同步表 → `T10_DESTINATIONS` 手写列表 → 演示数据。
+
 ## 尚未实现
 
-- Mapping 静态数据的定时同步任务与本地存储（酒店映射表；getAllHotels 已支持分页全量拉取）
 - 对账任务的自动调度（脚本已就绪，需接 cron）与状态告警
+- 酒店详情（getHotelDetails）的本地缓存与图片同步
 - T10 认证（certificación）表单/Excel 的正式提交
 
 ## 关于 fixtures
