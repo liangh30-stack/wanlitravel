@@ -15,3 +15,6 @@ logs/
 
 # SQLite auxiliares
 server/data/*.db*
+
+# Entregables de certificación generados (contienen datos de reservas reales)
+Certificacion_*_WANLI.xlsx
