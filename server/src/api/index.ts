@@ -303,6 +303,38 @@ function handleError(err: unknown, res: express.Response) {
   res.status(500).json({ error: 'INTERNAL' });
 }
 
+/**
+ * Auto-sincronización del catálogo de destinos al arrancar.
+ *
+ * Sin catálogo el buscador no ofrece ningún destino, así que en un despliegue
+ * nuevo (volumen vacío) el sitio nacería inservible hasta que alguien ejecutase
+ * el script a mano. Si la tabla está vacía y hay credenciales, se sincroniza en
+ * segundo plano — no bloquea el arranque ni el healthcheck. Las
+ * resincronizaciones periódicas siguen siendo tarea del cron semanal.
+ */
+async function autoSyncDestinations() {
+  if (demoMode || destinations.count() > 0) return;
+  try {
+    console.log('[destinos] catálogo vacío — sincronizando desde Mapping…');
+    const hotels = await client.getAllHotels();
+    const byCity = new Map<string, { name: string; countryCode: string; hotelCount: number }>();
+    for (const h of hotels) {
+      const code = h.cityCode?.trim();
+      if (!code) continue;
+      const name = String((h.raw as any)?.city ?? '').trim() || code;
+      const cur = byCity.get(code) ?? { name, countryCode: (h.countryCode ?? '').trim(), hotelCount: 0 };
+      cur.hotelCount++;
+      byCity.set(code, cur);
+    }
+    const n = destinations.replaceAll([...byCity.entries()].map(([code, v]) => ({ code, ...v })));
+    console.log(`[destinos] sincronizados ${n} destinos desde ${hotels.length} hoteles`);
+  } catch (err) {
+    // Nunca tumbar el servidor por esto: el resto de la API funciona igual
+    console.error('[destinos] fallo en la sincronización automática:', err);
+  }
+}
+
 app.listen(Number(PORT), () => {
   console.log(`[t10 api] listening on http://localhost:${PORT}`);
+  void autoSyncDestinations();
 });
