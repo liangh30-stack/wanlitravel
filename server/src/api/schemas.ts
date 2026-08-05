@@ -5,12 +5,16 @@ const dateStr = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, '日期格式须为 YYYY
 
 export const roomSchema = z.object({
   adults: z.number().int().min(1).max(6),
-  children: z.number().int().min(0).max(4),
+  // T10 solo admite dos edades de niño por habitación (first/second childAge)
+  children: z.number().int().min(0).max(2),
   firstChildAge: z.number().int().min(0).max(17).optional(),
   secondChildAge: z.number().int().min(0).max(17).optional(),
   units: z.number().int().min(1).max(9),
-}).refine(r => r.children === 0 || r.firstChildAge !== undefined,
-  { message: '有儿童时必须提供 firstChildAge' });
+})
+  .refine(r => r.children < 1 || r.firstChildAge !== undefined,
+    { message: 'falta la edad del primer niño (firstChildAge)' })
+  .refine(r => r.children < 2 || r.secondChildAge !== undefined,
+    { message: 'falta la edad del segundo niño (secondChildAge)' });
 
 export const searchSchema = z.object({
   checkIn: dateStr,
@@ -21,7 +25,15 @@ export const searchSchema = z.object({
   destinationCode: z.string().max(20).optional(),
   hotelCodes: z.array(z.string().max(20)).max(50).optional(),
 }).refine(s => s.checkOut > s.checkIn, { message: 'checkOut 必须晚于 checkIn' })
-  .refine(s => s.checkIn >= new Date().toISOString().slice(0, 10), { message: 'checkIn 不能早于今天' });
+  // 用马德里当地日期做“今天”的下限，避免 UTC 边界把当天的合法查询判为过去
+  .refine(s => s.checkIn >= madridToday(), { message: 'checkIn 不能早于今天' });
+
+/** 马德里本地的 YYYY-MM-DD（供应商与业务所在时区），避免 UTC 跨日误差 */
+function madridToday(): string {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Europe/Madrid', year: 'numeric', month: '2-digit', day: '2-digit',
+  }).format(new Date());
+}
 
 export const valueSchema = z.object({
   idOperation: z.string().min(1).max(200),

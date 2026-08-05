@@ -107,7 +107,9 @@ async function logExchange(dir: string, operation: string, startedAt: Date, req:
       ts: startedAt.toISOString(),
       operation,
       // 登录报文含密码，脱敏后再落盘
-      request: operation.toLowerCase() === 'login' ? req.replace(/<password>.*?<\/password>/, '<password>***</password>') : req,
+      // 所有操作都可能带 <password>（Mapping/Reservations 每次请求都发 user+password），
+      // 全局脱敏，绝不只对 login 处理
+      request: req.replace(/<password>.*?<\/password>/g, '<password>***</password>'),
       response: res,
     });
     await appendFile(path.join(dir, `t10-${day}.jsonl`), line + '\n');

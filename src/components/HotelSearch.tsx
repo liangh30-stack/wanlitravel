@@ -40,6 +40,12 @@ const HotelSearch = () => {
   const [checkOut, setCheckOut] = useState(plus(34));
   const [adults, setAdults] = useState(2);
   const [children, setChildren] = useState(0);
+  // Edad real de cada niño (T10 tarifica por edad; 0–17). Sin default inventado.
+  const [childAges, setChildAges] = useState<number[]>([]);
+  const setChildCount = (n: number) => {
+    setChildren(n);
+    setChildAges(prev => Array.from({ length: n }, (_, i) => prev[i] ?? 6));
+  };
 
   const [searching, setSearching] = useState(false);
   const [result, setResult] = useState<SearchResponse | null>(null);
@@ -71,7 +77,11 @@ const HotelSearch = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           checkIn, checkOut, destinationCode: destination,
-          rooms: [{ adults, children, units: 1, ...(children > 0 ? { firstChildAge: 8 } : {}) }],
+          rooms: [{
+            adults, children, units: 1,
+            ...(children >= 1 ? { firstChildAge: childAges[0] } : {}),
+            ...(children >= 2 ? { secondChildAge: childAges[1] } : {}),
+          }],
         }),
       });
       if (!res.ok) throw new Error(String(res.status));
@@ -156,10 +166,23 @@ const HotelSearch = () => {
                 <select value={adults} onChange={e => setAdults(Number(e.target.value))} style={inputStyle}>
                   {[1, 2, 3, 4].map(n => <option key={n} value={n}>{n}</option>)}
                 </select>
-                <select value={children} onChange={e => setChildren(Number(e.target.value))} style={inputStyle}>
+                <select value={children} onChange={e => setChildCount(Number(e.target.value))} style={inputStyle}>
                   {[0, 1, 2].map(n => <option key={n} value={n}>{n}</option>)}
                 </select>
               </div>
+              {children > 0 && (
+                <div className="flex gap-2 mt-2">
+                  {Array.from({ length: children }, (_, i) => (
+                    <select key={i} value={childAges[i] ?? 6} aria-label={`${t.hotels.childAge} ${i + 1}`}
+                      onChange={e => setChildAges(a => { const n = [...a]; n[i] = Number(e.target.value); return n; })}
+                      style={inputStyle}>
+                      {Array.from({ length: 18 }, (_, age) => (
+                        <option key={age} value={age}>{age} {t.hotels.yearsShort}</option>
+                      ))}
+                    </select>
+                  ))}
+                </div>
+              )}
             </div>
             <button type="submit" disabled={searching} className="btn btn-primary justify-center"
               style={{ fontSize: 10, padding: '13px 18px', opacity: searching ? 0.6 : 1 }}>
@@ -224,7 +247,7 @@ const HotelSearch = () => {
                           {t.hotels.netTotal}
                         </p>
                         <p style={{ fontSize: 26, fontWeight: 800, color: '#B31C2E', lineHeight: 1.2 }}>
-                          €{a.neto}
+                          €{a.pvp ?? a.neto}
                         </p>
                         <p style={{ fontSize: 10, color: 'rgba(14,17,23,0.35)' }}>{nights} {t.hotels.nightsLabel} · {a.code}</p>
                       </div>

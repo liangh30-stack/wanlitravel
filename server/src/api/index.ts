@@ -115,19 +115,32 @@ app.get('/api/hotels/destinations', searchLimiter, (_req, res) => {
   res.json({ demo: demoMode, destinations });
 });
 
+/** Proyección pública de una oferta: sin neto (coste mayorista) ni raw. */
+const publicOffer = (a: any) => ({
+  code: a.code, name: a.name, category: a.category, cityName: a.cityName,
+  mealPlan: a.mealPlan, pvp: a.pvp, currencyCode: a.currencyCode, status: a.status,
+  idOperation: a.idOperation, idDistributions: a.idDistributions,
+  cancelPoliciesPending: a.cancelPoliciesPending,
+  rooms: (a.rooms ?? []).map((r: any) => ({
+    code: r.code, name: r.name, units: r.units, adults: r.adults, children: r.children,
+  })),
+});
+
 app.post('/api/hotels/search', searchLimiter, async (req, res) => {
   try {
     const input = searchSchema.parse(req.body);
     if (demoMode) {
       const result = buildDemoAvailability(input);
-      res.json({ demo: true, ...result });
+      res.json({ demo: true, idOperation: result.idOperation, accommodations: result.accommodations.map(publicOffer) });
       return;
     }
     const result = await client.getAccommodationAvail(input);
+    // Endpoint PÚBLICO: nunca exponer el neto (coste mayorista) ni el desglose
+    // por habitación. Solo PVP y lo necesario para pedir cotización.
     res.json({
       demo: false,
       idOperation: result.idOperation,
-      accommodations: result.accommodations.map(a => ({ ...strip(a), rooms: a.rooms })),
+      accommodations: result.accommodations.map(a => publicOffer(a)),
     });
   } catch (err) { handleError(err, res); }
 });

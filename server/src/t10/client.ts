@@ -162,11 +162,13 @@ export class T10Client {
         ...(req.invoicingRegime ? { invoicingRegime: req.invoicingRegime } : {}),
       }, this.timeouts.confirmMs);
     } catch (err) {
-      // 网络层超时/中断：订单状态未知，交由调用方对账，绝不自动重试
-      if (err instanceof Error && (err.name === 'AbortError' || err.name === 'TimeoutError')) {
-        throw new ConfirmTimeoutError(req.clientLocalizer);
-      }
-      throw err;
+      // Un T10Error significa que T10 procesó la petición y devolvió un código
+      // (estado CONOCIDO: no creada, o creada con ese código → se relanza tal cual).
+      // Cualquier OTRO fallo (timeout/abort, ECONNRESET, "fetch failed", HTTP 5xx
+      // de un proxy tras enviar el body) deja el estado DESCONOCIDO: la reserva
+      // pudo crearse en T10. Nunca reintentar a ciegas → forzar conciliación.
+      if (err instanceof T10Error) throw err;
+      throw new ConfirmTimeoutError(req.clientLocalizer);
     }
     const reservation = toArray(parsed?.reservation)[0] ?? {};
     const acc = firstAccommodation(reservation);
@@ -218,10 +220,13 @@ export class T10Client {
       const parsed = await this.call('getAllHotels', 'getAllHotels', this.credentialBody({ operationCode }), this.timeouts.defaultMs);
       const beans = toArray(parsed?.hotelDescriptions?.hotelDescriptionsBean ?? parsed?.hotels?.hotel ?? parsed?.hotel);
       for (const h of beans) {
+        // 'category' 在 xml.ts 里被强制数组化（getAccomodationCategories 需要），
+        // 但酒店的 category 是对象 {claveCategoria, nombre} → 先解包首元素
+        const cat = Array.isArray(h.category) ? h.category[0] : h.category;
         out.push({
           code: String(h.hotelID ?? h.code ?? ''),
           name: h.hotelName ? String(h.hotelName) : h.name ? String(h.name) : undefined,
-          category: h.category?.claveCategoria !== undefined ? String(h.category.claveCategoria) : h.category ? String(h.category) : undefined,
+          category: cat?.claveCategoria !== undefined ? String(cat.claveCategoria) : cat && typeof cat !== 'object' ? String(cat) : undefined,
           countryCode: h.codeCountry ? String(h.codeCountry) : h.countryCode ? String(h.countryCode) : undefined,
           provinceCode: h.codeDistrict ? String(h.codeDistrict) : h.provinceCode ? String(h.provinceCode) : undefined,
           cityCode: h.codeCity ? String(h.codeCity) : h.cityCode ? String(h.cityCode) : undefined,
@@ -324,10 +329,12 @@ function toArray<T = any>(v: T | T[] | undefined | null): T[] {
   return Array.isArray(v) ? v : [v];
 }
 
-/** Mapping 接口通用的 编码+名称 列表（名称字段在不同接口叫 name 或 description） */
+/** Mapping 接口通用的 编码+名称 列表。
+ * 不同接口的编码字段名不一致：code（países/provincias/ciudades/categorías/regímenes）
+ * 或 zoneCode（zonas）；名称在 name 或 description。 */
 function codeNameList(v: any): CodeName[] {
   return toArray(v).map((item: any) => ({
-    code: String(item.code ?? ''),
+    code: String(item.code ?? item.zoneCode ?? item.cityCode ?? ''),
     name: String(item.name ?? item.description ?? ''),
     raw: item,
   }));

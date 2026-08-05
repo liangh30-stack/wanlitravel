@@ -78,8 +78,17 @@ export function extractResult(parsed: any): { cod_result: string; des_result: st
   };
 }
 
-/** T10 日期格式：DDMMYYYY（如 22062012） */
+/** T10 日期格式：DDMMYYYY（如 22062012）
+ *
+ * ⚠ 一个 'YYYY-MM-DD' 字符串会被 new Date() 解析成 UTC 午夜；若再用本地
+ * getDate()/getMonth() 取值，在 UTC 以西的时区会整整差一天（如纽约 → 前一天）。
+ * 因此对 'YYYY-MM-DD' 直接按字面拆分，不经过 Date；只有传入 Date 对象时才用本地字段。
+ */
 export function toT10Date(d: Date | string): string {
+  if (typeof d === 'string') {
+    const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(d);
+    if (m) return `${m[3]}${m[2]}${m[1]}`;
+  }
   const date = typeof d === 'string' ? new Date(d) : d;
   const dd = String(date.getDate()).padStart(2, '0');
   const mm = String(date.getMonth() + 1).padStart(2, '0');

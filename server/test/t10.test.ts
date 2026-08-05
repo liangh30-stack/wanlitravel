@@ -256,3 +256,49 @@ test('value 响应携带取消政策（NS 场景的权威来源）', async () =>
   assert.ok(valued.structuredCancelPolicies?.length, 'value 应返回结构化取消政策');
   assert.ok(valued.cancelPolicies?.length, 'value 应返回文本取消政策');
 });
+
+/* ── Regresiones de la auditoría ─────────────────── */
+
+test('toT10Date no se desplaza un día en zonas al oeste de UTC', () => {
+  // Con un string YYYY-MM-DD el resultado no debe depender de la TZ del proceso
+  assert.equal(toT10Date('2026-06-22'), '22062026');
+  assert.equal(toT10Date('2026-01-01'), '01012026');
+});
+
+test('máscara de password: se enmascara en operaciones distintas de login', async () => {
+  const { logExchange } = await import('../src/t10/transport.js') as any;
+  // getAllHotels lleva user+password en el body; el log NO debe contener la password
+  const captured: string[] = [];
+  const orig = console.log;
+  // usamos el propio transport con un logDir temporal
+  const { mkdtempSync, readFileSync, readdirSync } = await import('node:fs');
+  const { tmpdir } = await import('node:os');
+  const path2 = await import('node:path');
+  const dir = mkdtempSync(path2.join(tmpdir(), 't10log-'));
+  const { createHttpTransport } = await import('../src/t10/transport.js');
+  // transport que falla al conectar, pero igualmente registra el request
+  const t = createHttpTransport({ baseUrl: 'http://127.0.0.1:1/none', logDir: dir });
+  await t('getAllHotels', '<getAllHotels><user>U</user><password>SECRET123</password></getAllHotels>', 500).catch(() => {});
+  const file = readdirSync(dir).find(f => f.endsWith('.jsonl'))!;
+  const content = readFileSync(path2.join(dir, file), 'utf-8');
+  assert.ok(!content.includes('SECRET123'), 'la password NO debe aparecer en el log');
+  assert.ok(content.includes('***'), 'debe quedar enmascarada');
+  void captured; void orig; void logExchange;
+});
+
+test('getAllHotels: categoría no queda como [object Object]', async () => {
+  const { client } = makeClient([fx('mapping_hotelDescriptionsResult.xml')]);
+  const hoteles = await client.getAllHotels({ maxPages: 1 });
+  assert.ok(hoteles.length > 0);
+  for (const h of hoteles) {
+    if (h.category !== undefined) assert.doesNotMatch(h.category, /\[object/);
+  }
+});
+
+test('getZones: los códigos no vienen vacíos (usa zoneCode)', async () => {
+  const { client } = makeClient([fx('mapping_ZonesResult.xml')]);
+  const zonas = await client.getZones('ES');
+  assert.ok(zonas.length > 0);
+  assert.ok(zonas.every(z => z.code.length > 0), 'toda zona debe traer código');
+  assert.equal(zonas[0].code, 'Esg0001');
+});

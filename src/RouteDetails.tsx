@@ -148,8 +148,11 @@ export default function RouteDetails() {
               <div className="timeline-line" />
 
               <div className="space-y-0">
-                {route.itinerary.map((step, i) => (
-                  <ItineraryStep key={i} step={step} index={i} total={route.itinerary.length} />
+                {/* El TEXTO del itinerario es el traducido (tr.itinerary, 3 idiomas);
+                    la imagen se toma de data.ts por índice si existe. */}
+                {tr.itinerary.map((step, i) => (
+                  <ItineraryStep key={i} step={step} img={route.itinerary[i]?.img}
+                    index={i} total={tr.itinerary.length} badges={t.routeDetails.stepBadges} />
                 ))}
               </div>
             </div>
@@ -263,9 +266,10 @@ export default function RouteDetails() {
 }
 
 /* ── Itinerary Step ─────────────────────────────────────────── */
-function ItineraryStep({ step, index, total }: {
-  step: { location: string; activity: string; img: string };
-  index: number; total: number;
+function ItineraryStep({ step, img, index, badges }: {
+  step: { location: string; activity: string };
+  img?: string;
+  index: number; total: number; badges: string[];
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: '-60px' });
@@ -295,16 +299,18 @@ function ItineraryStep({ step, index, total }: {
           <p style={{ fontSize:14, color:'rgba(14,17,23,0.65)', lineHeight:1.65 }}>{step.activity}</p>
 
           <div className="flex flex-wrap gap-2 mt-5">
-            {['Licensed Guide','Private Transfer','4★+ Hotel'].map((b,i)=>(
+            {badges.map((b,i)=>(
               <span key={i} className="tag tag-light" style={{ fontSize:8 }}>{b}</span>
             ))}
           </div>
         </div>
 
-        {/* Image */}
-        <div className="img-zoom-wrap rounded-2xl overflow-hidden" style={{ aspectRatio:'4/3', background:'#F0EDE8' }}>
-          <img src={step.img} alt={step.location} loading="lazy" decoding="async" className="img-cover" referrerPolicy="no-referrer" />
-        </div>
+        {/* Image (opcional: solo las primeras etapas tienen foto en data.ts) */}
+        {img && (
+          <div className="img-zoom-wrap rounded-2xl overflow-hidden" style={{ aspectRatio:'4/3', background:'#F0EDE8' }}>
+            <img src={img} alt={step.location} loading="lazy" decoding="async" className="img-cover" referrerPolicy="no-referrer" />
+          </div>
+        )}
       </div>
     </motion.div>
   );
