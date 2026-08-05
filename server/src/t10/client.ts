@@ -14,6 +14,7 @@
  */
 import { buildRequestXml, parseResponseXml, extractResult, toT10Date } from './xml.js';
 import { T10Error, OK_CODE } from './codes.js';
+import { normalizeRestrictions, isNonRefundable } from './restrictions.js';
 import type { Transport } from './transport.js';
 import type {
   AvailabilitySearch, AvailabilityResponse, AccommodationOffer, RoomOffer,
@@ -358,6 +359,20 @@ function roomsToT10(rooms: AvailabilitySearch['rooms']): Record<string, unknown>
   return out;
 }
 
+/** Restricciones de una distribución: unión de las de todas sus habitaciones. */
+function restriccionesDeDistribucion(d: any) {
+  const out = new Map<string, { code: string; description?: string }>();
+  for (const room of toArray(d?.rooms?.room)) {
+    for (const r of normalizeRestrictions(room?.restrictions)) {
+      if (!out.has(r.code)) out.set(r.code, r);
+    }
+  }
+  for (const r of normalizeRestrictions(d?.restrictions)) {
+    if (!out.has(r.code)) out.set(r.code, r);
+  }
+  return [...out.values()];
+}
+
 function normalizeRooms(acc: any): RoomOffer[] {
   return toArray(acc?.rooms?.room).map((room: any) => ({
     code: String(room.code ?? ''),
@@ -442,6 +457,9 @@ function normalizeAccommodations(parsed: any): AccommodationOffer[] {
         cancelPolicies: normalizeCancelPolicies(d.cancelPolicies),
         structuredCancelPolicies: structured.policies.length ? structured.policies : undefined,
         cancelPoliciesPending: structured.pending || undefined,
+        // Las restricciones vienen por habitación; se agregan a nivel de tarifa
+        restrictions: restriccionesDeDistribucion(d).length ? restriccionesDeDistribucion(d) : undefined,
+        nonRefundable: isNonRefundable(restriccionesDeDistribucion(d)) || undefined,
         raw: d,
       } satisfies AccommodationOffer;
     });

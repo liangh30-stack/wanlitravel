@@ -17,7 +17,7 @@ const parser = new XMLParser({
     // 这些标签在响应里可能出现 0..n 次，强制数组化，避免单元素时解析成对象
     ['accomodation', 'room', 'hotel', 'category', 'mealPlan', 'country',
      'zone', 'province', 'city', 'reservation', 'cancelPolicy', 'policy',
-     'cancelPolicie', 'structuredCancelPolicie',
+     'cancelPolicie', 'structuredCancelPolicie', 'restriction',
      'supplement', 'discount', 'observation', 'distribution'].includes(name),
 });
 
