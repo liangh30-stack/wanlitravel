@@ -226,8 +226,8 @@ const HotelSearch = () => {
                 </div>
               )}
             </div>
-            <button type="submit" disabled={searching} className="btn btn-primary justify-center"
-              style={{ fontSize: 10, padding: '13px 18px', opacity: searching ? 0.6 : 1 }}>
+            <button type="submit" disabled={searching || !destinations.length} className="btn btn-primary justify-center"
+              style={{ fontSize: 10, padding: '13px 18px', opacity: searching || !destinations.length ? 0.6 : 1 }}>
               <Search size={13} /> {searching ? t.hotels.searching : t.hotels.search}
             </button>
           </div>

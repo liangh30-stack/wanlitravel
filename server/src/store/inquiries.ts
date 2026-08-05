@@ -53,7 +53,7 @@ function toParams(o: InquiryRecord): Record<string, string | number | null> {
 export class InquiryStore {
   private readonly db: DatabaseSync;
 
-  constructor(dataDir = './server/data') {
+  constructor(dataDir = process.env.DATA_DIR ?? './server/data') {
     this.db = openDb(dataDir);
     this.importLegacyJson(path.join(dataDir, 'inquiries.json'));
   }

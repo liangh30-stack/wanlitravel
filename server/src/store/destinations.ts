@@ -21,7 +21,7 @@ export interface DestinationRecord {
 export class DestinationStore {
   private readonly db: DatabaseSync;
 
-  constructor(dataDir = './server/data') {
+  constructor(dataDir = process.env.DATA_DIR ?? './server/data') {
     this.db = openDb(dataDir);
   }
 

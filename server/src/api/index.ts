@@ -66,7 +66,14 @@ async function notifyInquiry(r: { type: string; companyName: string; workEmail: 
 }
 
 const app = express();
-app.set('trust proxy', 1);
+/**
+ * Capas de proxy delante del servidor. Debe coincidir EXACTAMENTE con la
+ * realidad del despliegue: si se pone de más, un atacante puede falsear su IP
+ * con X-Forwarded-For y saltarse el rate limit; si se pone de menos, todas las
+ * peticiones parecen venir del proxy y el rate limit bloquea a usuarios reales.
+ * Vercel → Railway = 2. Solo Railway = 1. Sin proxy = 0.
+ */
+app.set('trust proxy', Number(process.env.TRUST_PROXY ?? 1));
 app.use(express.json({ limit: '100kb' }));
 
 // 健康检查不鉴权（供负载均衡探活）
@@ -132,8 +139,18 @@ app.get('/api/hotels/destinations', searchLimiter, (req, res) => {
       res.json({ demo: false, destinations: manualDestinations });
       return;
     }
+    // T10 conectado pero catálogo sin sincronizar: NUNCA servir los códigos de
+    // demostración (AGP/MAD/BCN son códigos IATA, no cityCode de T10 → toda
+    // búsqueda saldría vacía). Mejor lista vacía + aviso explícito.
+    res.json({
+      demo: false,
+      destinations: [],
+      warning: 'CATALOG_NOT_SYNCED',
+      hint: 'Ejecuta: npm run sync:mapping',
+    });
+    return;
   }
-  res.json({ demo: demoMode, destinations: DEMO_DESTINATIONS });
+  res.json({ demo: true, destinations: DEMO_DESTINATIONS });
 });
 
 /** Proyección pública de una oferta: sin neto (coste mayorista) ni raw. */

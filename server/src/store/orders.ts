@@ -60,7 +60,7 @@ function toParams(o: OrderRecord): Record<string, string | number | null> {
 export class OrderStore {
   private readonly db: DatabaseSync;
 
-  constructor(dataDir = './server/data') {
+  constructor(dataDir = process.env.DATA_DIR ?? './server/data') {
     this.db = openDb(dataDir);
     this.importLegacyJson(path.join(dataDir, 'orders.json'));
   }
