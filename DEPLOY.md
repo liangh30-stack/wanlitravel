@@ -42,8 +42,9 @@ no hay CORS y la URL del backend no queda expuesta.
 ## 2. Frontend en Vercel
 
 1. *Add New Project* → importar el mismo repo. Framework: **Vite** (autodetectado).
-2. En `vercel.json`, sustituir `wanlitravel-production.up.railway.app` por la URL real
-   de Railway del paso 1.
+2. El `rewrite` de `/api/*` en `vercel.json` ya apunta al backend real
+   (`wanlitravel-production.up.railway.app`). Si cambia la URL de Railway,
+   hay que actualizar esa linea: es lo unico que conecta front y back.
 3. Desplegar. Probar en la URL temporal `*.vercel.app` **antes** de tocar el dominio.
 
 ## 3. Dominio (Arsys — lo gestiona Andrés)
