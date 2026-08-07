@@ -3,7 +3,7 @@ export type Language = 'en' | 'zh' | 'es';
 const en = {
     meta: {
       title: "Wanlitravel — B2B Travel Gateway · Europe & China",
-      description: "The leading B2B wholesale travel operator bridging Europe and China. Exclusive allotments, 48h quote SLA, white-label itineraries for agency partners.",
+      description: "The B2B gateway between Europe and China, with our own teams in Madrid, Lisbon, Beijing and Shanghai. Tailor-made solutions and a guaranteed response in under 24 hours.",
     },
     nav: {
       spainCollections: "Spain Collections",
@@ -18,7 +18,7 @@ const en = {
       scale: "We Deliver",
       trust: "Both.",
       subtitle: "Wanlitravel — Europe · China B2B Gateway",
-      description: "The only wholesale operator with dual on-the-ground teams in Madrid, Beijing & Shanghai. Exclusive allotments, 48h response SLA, zero middlemen.",
+      description: "The B2B gateway between Europe and China, with our own teams in Madrid, Lisbon, Beijing and Shanghai. Tailor-made solutions and a guaranteed response in under 24 hours.",
       scroll: "Scroll to explore",
       cta: "Request Partner Access",
       ctaSub: "Free. No commitment.",
@@ -27,10 +27,12 @@ const en = {
     // 必须逐条核实为真实持有的资质与可佐证的数据，否则删除 —— 虚假资质声明有法律风险。
     trust: {
       label: "Trusted by 120+ agencies across 18 countries",
-      item1: "Certified IATA Member",
-      item2: "UNWTO Affiliate",
-      item3: "China Approved Outbound",
-      item4: "ATA Carnet Operator",
+      item1: "Own teams in Madrid, Lisbon, Beijing & Shanghai",
+      item2: "Europe–China market specialists",
+      item3: "Guaranteed response in under 24 hours",
+      item4: "Tailor-made solutions for agencies and tour operators",
+      item5: "Multilingual support",
+      item6: "International network of partners and suppliers",
     },
     stats: {
       label: "By the Numbers",
@@ -40,7 +42,7 @@ const en = {
       s2desc: "On-Time Delivery",
       s3: "120+",
       s3desc: "Agency Partners",
-      s4: "48h",
+      s4: "24h",
       s4desc: "Quote Response SLA",
     },
     exchange: {
@@ -127,7 +129,7 @@ const en = {
           country: "United Kingdom",
         },
         {
-          quote: "48h quote SLA is real. I've tested it 40 times. They've never missed it. That reliability is what my corporate clients pay a premium for.",
+          quote: "The 24h quote SLA is real. I've tested it 40 times. They've never missed it. That reliability is what my corporate clients pay a premium for.",
           name: "S. M.",
           title: "Head of Groups, European travel group",
           country: "Spain",
@@ -135,11 +137,11 @@ const en = {
       ],
     },
     community: {
-      title: "Join the Network.",
+      title: "Start operating between Europe and China.",
       subtitle: "Partner Inquiry",
       trustedBy: "Trusted by 120+ agencies in 18 countries",
       inquiry: "Start the Conversation",
-      description: "Most agencies see their first quote within 48 hours. No contracts required to get started.",
+      description: "Most agencies see their first quote within 24 hours. No contracts required to get started.",
       companyName: "Company Name",
       companyPlaceholder: "e.g. Global Travel Co.",
       businessType: "Business Type",
@@ -155,7 +157,7 @@ const en = {
       primaryInterest: "Primary Interest",
       interestPlaceholder: "Which routes are you looking to sell? Annual pax volume? Current DMC?",
       submit: "Request Partner Access →",
-      privacy: "We'll respond within 48 hours. No spam, ever.",
+      privacy: "We'll respond within 24 hours. No spam, ever.",
     },
     footer: {
       description: "The B2B bridge between Europe and China. Wholesale rates, ground handling, and private-label itineraries for ambitious travel agencies.",
@@ -233,7 +235,7 @@ const en = {
     form: {
       sending: "Sending…",
       successTitle: "Request received.",
-      successDesc: "Our partnership team will get back to you within 48 hours.",
+      successDesc: "Our partnership team will get back to you within 24 hours.",
       error: "Something went wrong. Please try again or email us directly.",
       consentPrefix: "I have read and agree to the",
       privacyPolicy: "Privacy Policy",
@@ -372,7 +374,7 @@ export type TranslationSchema = typeof en;
 const zh: TranslationSchema = {
     meta: {
       title: "万里旅行 — 欧洲·中国 B2B 旅游批发平台",
-      description: "连接欧洲与中国的 B2B 批发旅游运营商。独家配额、48小时报价承诺、白标行程，服务全球旅行社伙伴。",
+      description: "连接欧洲与中国的 B2B 通道，在马德里、里斯本、北京、上海设有自有团队。定制方案，24 小时内保证回复。",
     },
     nav: {
       spainCollections: "西班牙线路",
@@ -387,17 +389,19 @@ const zh: TranslationSchema = {
       scale: "我们提供",
       trust: "两者兼顾。",
       subtitle: "万里旅行 — 欧洲·中国B2B批发平台",
-      description: "唯一在马德里、北京、上海同时设有地接团队的批发运营商。独家配额、48小时报价SLA、零中间商。",
+      description: "连接欧洲与中国的 B2B 通道，在马德里、里斯本、北京、上海设有自有团队。定制方案，24 小时内保证回复。",
       scroll: "向下探索",
       cta: "申请合作资质",
       ctaSub: "免费·无需承诺",
     },
     trust: {
       label: "已有18个国家120+家旅行社的信任",
-      item1: "IATA认证会员",
-      item2: "UNWTO联系会员",
-      item3: "中国出境游批准运营商",
-      item4: "ATA单证册运营商",
+      item1: "马德里、里斯本、北京、上海自有团队",
+      item2: "欧洲—中国市场专家",
+      item3: "24小时内保证回复",
+      item4: "为旅行社与旅游批发商定制方案",
+      item5: "多语种服务",
+      item6: "国际合作伙伴与供应商网络",
     },
     stats: {
       label: "用数据说话",
@@ -407,7 +411,7 @@ const zh: TranslationSchema = {
       s2desc: "准时交付率",
       s3: "120+",
       s3desc: "合作旅行社",
-      s4: "48小时",
+      s4: "24小时",
       s4desc: "报价响应承诺",
     },
     exchange: {
@@ -492,7 +496,7 @@ const zh: TranslationSchema = {
           country: "英国",
         },
         {
-          quote: "48小时报价承诺是真实的。我测试了40次，从未失约。这种可靠性正是我企业客户愿意为之溢价的理由。",
+          quote: "24小时报价承诺是真实的。我测试了40次，从未失约。这种可靠性正是我企业客户愿意为之溢价的理由。",
           name: "S. M.",
           title: "团队总监，欧洲旅游集团",
           country: "西班牙",
@@ -500,11 +504,11 @@ const zh: TranslationSchema = {
       ],
     },
     community: {
-      title: "加入合作网络。",
+      title: "开启欧洲—中国业务。",
       subtitle: "伙伴申请",
       trustedBy: "已有18个国家120+家旅行社的信任",
       inquiry: "开始对话",
-      description: "大多数旅行社在48小时内收到第一份报价。无需签订合同即可开始。",
+      description: "大多数旅行社在24小时内收到第一份报价。无需签订合同即可开始。",
       companyName: "公司名称",
       companyPlaceholder: "例如：全球旅行有限公司",
       businessType: "业务类型",
@@ -520,7 +524,7 @@ const zh: TranslationSchema = {
       primaryInterest: "主要需求",
       interestPlaceholder: "您希望销售哪些线路？年接待量？现有DMC合作商？",
       submit: "申请合作资质 →",
-      privacy: "我们将在48小时内回复。绝不发送垃圾邮件。",
+      privacy: "我们将在24小时内回复。绝不发送垃圾邮件。",
     },
     footer: {
       description: "欧洲与中国之间的B2B桥梁。为有抱负的旅行社提供批发价格、地接服务和私标行程。",
@@ -734,7 +738,7 @@ const zh: TranslationSchema = {
 const es: TranslationSchema = {
     meta: {
       title: "Wanlitravel — Pasarela B2B de Viajes · Europa y China",
-      description: "Operador mayorista B2B que une Europa y China. Cupos exclusivos, SLA de cotización de 48h e itinerarios white-label para agencias.",
+      description: "La pasarela B2B entre Europa y China con equipos propios en Madrid, Lisboa, Pekín y Shanghái. Soluciones a medida y respuesta garantizada en menos de 24 horas.",
     },
     nav: {
       spainCollections: "Colecciones España",
@@ -749,17 +753,19 @@ const es: TranslationSchema = {
       scale: "Nosotros lo",
       trust: "Garantizamos.",
       subtitle: "Wanlitravel — Pasarela B2B Europa · China",
-      description: "El único operador mayorista con equipos propios en Madrid, Pekín y Shanghái. Cupos exclusivos, SLA de respuesta 48h, cero intermediarios.",
+      description: "La pasarela B2B entre Europa y China con equipos propios en Madrid, Lisboa, Pekín y Shanghái. Soluciones a medida y respuesta garantizada en menos de 24 horas.",
       scroll: "Explorar",
       cta: "Solicitar Acceso de Socio",
       ctaSub: "Gratis. Sin compromisos.",
     },
     trust: {
       label: "La confianza de 120+ agencias en 18 países",
-      item1: "Miembro IATA Certificado",
-      item2: "Afiliado UNWTO",
-      item3: "Operador Outbound China Aprobado",
-      item4: "Operador ATA Carnet",
+      item1: "Equipos propios en Madrid, Lisboa, Pekín y Shanghái",
+      item2: "Especialistas en el mercado Europa–China",
+      item3: "Respuesta garantizada en menos de 24 horas",
+      item4: "Soluciones a medida para agencias y turoperadores",
+      item5: "Atención multilingüe",
+      item6: "Red internacional de socios y proveedores",
     },
     stats: {
       label: "En Cifras",
@@ -769,7 +775,7 @@ const es: TranslationSchema = {
       s2desc: "Entrega Puntual",
       s3: "120+",
       s3desc: "Agencias Socias",
-      s4: "48h",
+      s4: "24h",
       s4desc: "SLA Respuesta Cotización",
     },
     exchange: {
@@ -854,7 +860,7 @@ const es: TranslationSchema = {
           country: "Reino Unido",
         },
         {
-          quote: "El SLA de 48h es real. Lo he testado 40 veces. Nunca han fallado. Esa fiabilidad es por la que mis clientes corporativos pagan una prima.",
+          quote: "El SLA de 24h es real. Lo he testado 40 veces. Nunca han fallado. Esa fiabilidad es por la que mis clientes corporativos pagan una prima.",
           name: "S. M.",
           title: "Jefa de Grupos, grupo turístico europeo",
           country: "España",
@@ -862,11 +868,11 @@ const es: TranslationSchema = {
       ],
     },
     community: {
-      title: "Únase a la Red.",
+      title: "Empiece a operar entre Europa y China.",
       subtitle: "Consulta de Socio",
       trustedBy: "La confianza de 120+ agencias en 18 países",
       inquiry: "Inicie la Conversación",
-      description: "La mayoría de agencias reciben su primera cotización en 48 horas. Sin contratos para empezar.",
+      description: "La mayoría de agencias reciben su primera cotización en 24 horas. Sin contratos para empezar.",
       companyName: "Nombre de la Empresa",
       companyPlaceholder: "ej. Global Travel S.L.",
       businessType: "Tipo de Negocio",
@@ -882,7 +888,7 @@ const es: TranslationSchema = {
       primaryInterest: "Interés Principal",
       interestPlaceholder: "¿Qué rutas busca vender? Volumen anual de PAX. DMC actual.",
       submit: "Solicitar Acceso de Socio →",
-      privacy: "Respondemos en 48 horas. Sin spam.",
+      privacy: "Respondemos en 24 horas. Sin spam.",
     },
     footer: {
       description: "El puente B2B entre Europa y China. Tarifas mayoristas, handling local e itinerarios de marca propia para agencias ambiciosas.",
@@ -960,7 +966,7 @@ const es: TranslationSchema = {
     form: {
       sending: "Enviando…",
       successTitle: "Solicitud recibida.",
-      successDesc: "Nuestro equipo de alianzas le responderá en un plazo de 48 horas.",
+      successDesc: "Nuestro equipo de alianzas le responderá en un plazo de 24 horas.",
       error: "Algo ha fallado. Inténtelo de nuevo o escríbanos directamente.",
       consentPrefix: "He leído y acepto la",
       privacyPolicy: "Política de Privacidad",

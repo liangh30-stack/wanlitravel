@@ -65,7 +65,7 @@ const PartnerForm = () => {
 
             {/* Certifications */}
             <div className="flex flex-wrap gap-2 mb-12">
-              {[t.trust.item1, t.trust.item2, t.trust.item3].map((item,i)=>(
+              {[t.trust.item1, t.trust.item2, t.trust.item3, t.trust.item4, t.trust.item5, t.trust.item6].map((item,i)=>(
                 <span key={i} className="tag tag-light">
                   <CheckCircle2 size={10} style={{ color:'#B31C2E' }} />{item}
                 </span>

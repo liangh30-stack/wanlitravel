@@ -15,7 +15,7 @@ const Stats = () => {
     { value: '8,400+', label: t.stats.s1desc, icon: <Globe2 size={20} /> },
     { value: '98.7%',  label: t.stats.s2desc, icon: <CheckCircle2 size={20} /> },
     { value: '120+',   label: t.stats.s3desc, icon: <Users2 size={20} /> },
-    { value: '48h',    label: t.stats.s4desc, icon: <Clock3 size={20} /> },
+    { value: t.stats.s4,  label: t.stats.s4desc, icon: <Clock3 size={20} /> },
   ];
 
   return (

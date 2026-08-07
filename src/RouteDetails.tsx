@@ -172,7 +172,7 @@ export default function RouteDetails() {
                   {t.routeDetails.requestQuote.replace(' →','')}
                 </h3>
                 <p style={{ fontSize:13, color:'rgba(255,255,255,0.4)', marginBottom:24, lineHeight:1.6 }}>
-                  Net rates within 48h. White-label itinerary included. No commitment.
+                  Net rates within 24h. White-label itinerary included. No commitment.
                 </p>
                 {quoteStatus === 'success' ? (
                   <div className="text-center py-8">
@@ -221,7 +221,7 @@ export default function RouteDetails() {
                 </form>
                 )}
                 <p style={{ fontSize:9, textAlign:'center', color:'rgba(255,255,255,0.22)', marginTop:14 }}>
-                  Response within 48h · No commitment
+                  Response within 24h · No commitment
                 </p>
               </div>
 
@@ -230,7 +230,7 @@ export default function RouteDetails() {
                 {[
                   { icon:<Mail size={13}/>, text:'partnerships@wanlitravel.com' },
                   { icon:<Phone size={13}/>, text:'+34 91 000 0000 · +86 10 0000 0000' },
-                  { icon:<Clock size={13}/>, text:'48h SLA · Mon–Fri 9:00–18:00 CET' },
+                  { icon:<Clock size={13}/>, text:'24h SLA · Mon–Fri 9:00–18:00 CET' },
                 ].map((c,i)=>(
                   <div key={i} className="flex items-center gap-3"
                     style={{ fontSize:12, color:'rgba(255,255,255,0.35)' }}>
