@@ -47,7 +47,7 @@ export default function RouteDetails() {
     setQuoteStatus('sending');
     const ok = await submitInquiry({
       type: 'quote', companyName: qCompany, workEmail: qEmail,
-      message: qPax ? `Annual PAX volume: ${qPax}` : undefined,
+      message: qPax ? `${t.routeDetails.quotePax}: ${qPax}` : undefined,
       routeCode: route.code, language, consent: true, website: qHoneypot,
     });
     setQuoteStatus(ok ? 'success' : 'error');
@@ -172,7 +172,7 @@ export default function RouteDetails() {
                   {t.routeDetails.requestQuote.replace(' →','')}
                 </h3>
                 <p style={{ fontSize:13, color:'rgba(255,255,255,0.4)', marginBottom:24, lineHeight:1.6 }}>
-                  Net rates within 24h. White-label itinerary included. No commitment.
+                  {t.routeDetails.quoteSub}
                 </p>
                 {quoteStatus === 'success' ? (
                   <div className="text-center py-8">
@@ -181,23 +181,20 @@ export default function RouteDetails() {
                   </div>
                 ) : (
                 <form className="space-y-3" onSubmit={onQuoteSubmit}>
-                  <input type="text" required placeholder="Company name" value={qCompany} onChange={e=>setQCompany(e.target.value)}
+                  <input type="text" required placeholder={t.routeDetails.quoteCompany} value={qCompany} onChange={e=>setQCompany(e.target.value)}
                     className="w-full rounded-xl px-4 py-3 text-sm outline-none transition-all"
                     style={{ background:'rgba(255,255,255,0.07)', border:'1px solid rgba(255,255,255,0.1)', color:'white' }}
                     onFocus={e=>(e.currentTarget.style.borderColor='#C4923A')}
                     onBlur={e=>(e.currentTarget.style.borderColor='rgba(255,255,255,0.1)')} />
-                  <input type="email" required placeholder="Work email" value={qEmail} onChange={e=>setQEmail(e.target.value)}
+                  <input type="email" required placeholder={t.routeDetails.quoteEmail} value={qEmail} onChange={e=>setQEmail(e.target.value)}
                     className="w-full rounded-xl px-4 py-3 text-sm outline-none transition-all"
                     style={{ background:'rgba(255,255,255,0.07)', border:'1px solid rgba(255,255,255,0.1)', color:'white' }}
                     onFocus={e=>(e.currentTarget.style.borderColor='#C4923A')}
                     onBlur={e=>(e.currentTarget.style.borderColor='rgba(255,255,255,0.1)')} />
                   <select className="w-full rounded-xl px-4 py-3 text-sm outline-none" value={qPax} onChange={e=>setQPax(e.target.value)}
                     style={{ background:'rgba(255,255,255,0.07)', border:'1px solid rgba(255,255,255,0.1)', color:'rgba(255,255,255,0.6)' }}>
-                    <option value="">Annual PAX volume</option>
-                    <option>Under 100 PAX</option>
-                    <option>100–500 PAX</option>
-                    <option>500–2,000 PAX</option>
-                    <option>2,000+ PAX</option>
+                    <option value="">{t.routeDetails.quotePax}</option>
+                    {t.routeDetails.quotePaxOptions.map(o => <option key={o}>{o}</option>)}
                   </select>
                   <input type="text" value={qHoneypot} onChange={e=>setQHoneypot(e.target.value)}
                     name="website" tabIndex={-1} autoComplete="off" aria-hidden="true"
@@ -221,7 +218,7 @@ export default function RouteDetails() {
                 </form>
                 )}
                 <p style={{ fontSize:9, textAlign:'center', color:'rgba(255,255,255,0.22)', marginTop:14 }}>
-                  Response within 24h · No commitment
+                  {t.routeDetails.quoteFootnote}
                 </p>
               </div>
 
@@ -230,7 +227,7 @@ export default function RouteDetails() {
                 {[
                   { icon:<Mail size={13}/>, text:'partnerships@wanlitravel.com' },
                   { icon:<Phone size={13}/>, text:'+34 91 000 0000 · +86 10 0000 0000' },
-                  { icon:<Clock size={13}/>, text:'24h SLA · Mon–Fri 9:00–18:00 CET' },
+                  { icon:<Clock size={13}/>, text:t.routeDetails.quoteSla },
                 ].map((c,i)=>(
                   <div key={i} className="flex items-center gap-3"
                     style={{ fontSize:12, color:'rgba(255,255,255,0.35)' }}>

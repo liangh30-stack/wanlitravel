@@ -12,9 +12,9 @@ const B2BSection = () => {
   const inView = useInView(ref, { once: true, margin: '-80px' });
 
   const features = [
-    { icon: <Zap size={18}/>,        title: t.b2b.inventory, desc: t.b2b.inventoryDesc,  tag: 'Real-time' },
-    { icon: <Sparkles size={18}/>,   title: t.b2b.dynamic,   desc: t.b2b.dynamicDesc,    tag: 'White-label' },
-    { icon: <ShieldCheck size={18}/>,title: t.b2b.api,       desc: t.b2b.apiDesc,         tag: 'API-first' },
+    { icon: <Zap size={18}/>,        title: t.b2b.inventory, desc: t.b2b.inventoryDesc,  tag: t.b2b.inventoryTag },
+    { icon: <Sparkles size={18}/>,   title: t.b2b.dynamic,   desc: t.b2b.dynamicDesc,    tag: t.b2b.dynamicTag },
+    { icon: <ShieldCheck size={18}/>,title: t.b2b.api,       desc: t.b2b.apiDesc,         tag: t.b2b.apiTag },
   ];
 
   return (
@@ -35,7 +35,7 @@ const B2BSection = () => {
                 {t.b2b.title}
               </h2>
               <p className="text-white/40 leading-relaxed mb-10" style={{ fontSize: 15, maxWidth: 400 }}>
-                {t.curation.description}
+                {t.b2b.description}
               </p>
 
               {/* Features */}
