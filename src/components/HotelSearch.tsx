@@ -243,7 +243,8 @@ const HotelSearch = () => {
                 </div>
               )}
             </div>
-            <button type="submit" disabled={searching || !destinations.length} className="btn btn-primary justify-center"
+            {/* En movil ocupa la fila entera: a media columna el texto del boton se sale */}
+            <button type="submit" disabled={searching || !destinations.length} className="btn btn-primary justify-center col-span-2 lg:col-span-1"
               style={{ fontSize: 10, padding: '13px 18px', opacity: searching || !destinations.length ? 0.6 : 1 }}>
               <Search size={13} /> {searching ? t.hotels.searching : t.hotels.search}
             </button>
