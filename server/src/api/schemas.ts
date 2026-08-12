@@ -24,6 +24,7 @@ export const searchSchema = z.object({
   rooms: z.array(roomSchema).min(1).max(3),
   destinationCode: z.string().max(20).optional(),
   hotelCodes: z.array(z.string().max(20)).max(50).optional(),
+  countryCode: z.string().length(2).optional(),
 }).refine(s => s.checkOut > s.checkIn, { message: 'checkOut 必须晚于 checkIn' })
   // 用马德里当地日期做“今天”的下限，避免 UTC 边界把当天的合法查询判为过去
   .refine(s => s.checkIn >= madridToday(), { message: 'checkIn 不能早于今天' });

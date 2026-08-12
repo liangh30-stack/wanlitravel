@@ -104,8 +104,19 @@ export class T10Client {
         retrieveCancelPolicies: search.retrieveCancelPolicies ?? true,
         ...roomsToT10(search.rooms),
         // 文档 nota1：province / zone / city / accomodationsCode 至少填一个
-        ...(search.destinationCode ? { city: search.destinationCode } : {}),
-        ...(search.hotelCodes?.length ? { accomodationsCode: search.hotelCodes.join(',') } : {}),
+        //
+        // ⚠ countryCode 是必填的，虽然文档没写清楚。少了它，按酒店代码搜索
+        // 永远返回 "No existen datos"（按城市搜索碰巧还能work，因为城市码本身
+        // 带国家前缀）。TourDiez 2026-08-11 邮件确认：
+        // "countryCode ESTE SE DEBE ENVIAR TANTO EN PETICIONES POR CIUDAD
+        //  COMO POR CODIGOS DE HOTEL"
+        //
+        // 同一封邮件还说明 city 与 accomodationsCode 互斥：按酒店代码搜索时
+        // city 必须不发或发空值。
+        ...(search.hotelCodes?.length
+          ? { accomodationsCode: search.hotelCodes.join(',') }
+          : search.destinationCode ? { city: search.destinationCode } : {}),
+        countryCode: resolveCountryCode(search),
       },
     };
     const parsed = await this.callWithSession('getAccomodationAvail', 'getAccomodationAvail', body, this.timeouts.availMs);
@@ -318,6 +329,19 @@ export class T10Client {
 }
 
 /* ── 解析辅助 ───────────────────────────────────── */
+
+/**
+ * País de la búsqueda. Orden: el que venga en la petición → el prefijo del
+ * cityCode (ES00634 → ES) → T10_DEFAULT_COUNTRY → ES.
+ */
+function resolveCountryCode(search: AvailabilitySearch): string {
+  const explicito = search.countryCode?.trim().toUpperCase();
+  if (explicito) return explicito;
+  const prefijo = search.destinationCode?.slice(0, 2).toUpperCase();
+  if (prefijo && /^[A-Z]{2}$/.test(prefijo)) return prefijo;
+  return (process.env.T10_DEFAULT_COUNTRY ?? 'ES').toUpperCase();
+}
+
 
 /** mealPlan 等标签因 Mapping 列表被强制数组化，取首个标量值 */
 function scalar(v: unknown): string | undefined {

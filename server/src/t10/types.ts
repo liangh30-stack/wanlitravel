@@ -26,6 +26,8 @@ export interface AvailabilitySearch {
   /** 目的地/酒店过滤，二选一 */
   destinationCode?: string;
   hotelCodes?: string[];
+  /** Obligatorio para T10 aunque no figure asi en la documentacion */
+  countryCode?: string;
 }
 
 export interface CancelPolicy {

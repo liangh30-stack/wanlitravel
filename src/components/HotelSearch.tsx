@@ -92,6 +92,10 @@ const HotelSearch = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           checkIn, checkOut, destinationCode: destination,
+          // T10 exige el pais en toda busqueda de disponibilidad
+          ...(destinations.find(d => d.code === destination)?.countryCode
+            ? { countryCode: destinations.find(d => d.code === destination)!.countryCode }
+            : {}),
           rooms: [{
             adults, children, units: 1,
             ...(children >= 1 ? { firstChildAge: childAges[0] } : {}),
