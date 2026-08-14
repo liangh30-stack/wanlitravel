@@ -19,7 +19,8 @@ interface Accommodation {
   code: string; name?: string; category?: string; mealPlan?: string; pvp?: string; neto?: string;
   currencyCode?: string; status?: string; rooms: RoomOffer[];
   cancelPolicies?: { from?: string; amount?: string }[];
-  /* T10: NS en disponibilidad — las condiciones de cancelación llegan en el paso de cotización */
+  structuredCancelPolicies?: { hoursFrom?: string; calculationType?: string; amountType?: string; amount?: string }[];
+  /* NS: en este paso T10 no ha podido determinar los gastos; se resuelven al cotizar */
   cancelPoliciesPending?: boolean;
   /* Tarifa sin devolución: hay que avisarlo de forma destacada */
   nonRefundable?: boolean;
@@ -134,6 +135,24 @@ const HotelSearch = () => {
     if (!mp) return t.hotels.mealUnknown;
     const m = t.hotels.mealPlans as Record<string, string>;
     return m[mp.toUpperCase()] ?? mp.toUpperCase();
+  };
+
+  /*
+   * Cancelación gratuita a partir de las políticas estructuradas: el primer
+   * tramo con importe 0 marca hasta cuándo no hay gastos. Se ignora NS, que
+   * significa "aún sin determinar", no "gratis".
+   */
+  const horasCancelacionGratis = (a: Accommodation): string | null => {
+    const tramos = a.structuredCancelPolicies ?? [];
+    const gratis = tramos.find(p =>
+      p.calculationType !== 'NS' && p.amountType !== 'NS' &&
+      p.amount !== undefined && Number(p.amount) === 0 && p.hoursFrom);
+    if (!gratis?.hoursFrom) return null;
+    const horas = Number(gratis.hoursFrom);
+    if (!Number.isFinite(horas) || horas >= 9999) return null;
+    return horas >= 48
+      ? `${Math.round(horas / 24)} ${t.hotels.daysBefore}`
+      : `${horas} ${t.hotels.hoursBefore}`;
   };
 
   const inputStyle: React.CSSProperties = {
@@ -304,6 +323,8 @@ const HotelSearch = () => {
                             </span>
                           ) : a.cancelPolicies?.[0]?.from ? (
                             <span className="flex items-center gap-1.5"><CalendarX2 size={11} />{t.hotels.freeCancelBefore} {a.cancelPolicies[0].from}</span>
+                          ) : horasCancelacionGratis(a) ? (
+                            <span className="flex items-center gap-1.5"><CalendarX2 size={11} />{t.hotels.freeCancelUntil} {horasCancelacionGratis(a)}</span>
                           ) : a.cancelPoliciesPending ? (
                             <span className="flex items-center gap-1.5"><CalendarX2 size={11} />{t.hotels.cancelAtQuote}</span>
                           ) : null}

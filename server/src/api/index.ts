@@ -178,6 +178,19 @@ const publicOffer = (a: any) => ({
   mealPlan: a.mealPlan, pvp: a.pvp, currencyCode: a.currencyCode, status: a.status,
   idOperation: a.idOperation, idDistributions: a.idDistributions,
   cancelPoliciesPending: a.cancelPoliciesPending,
+  /*
+   * Las condiciones de cancelación que ya vienen en disponibilidad se
+   * publican tal cual. En el entorno de test siempre llegan como NS
+   * (pendientes), pero Tour10 confirma (correo del 14/08/2026) que en
+   * producción el NS es un porcentaje muy pequeño: ocultar estas
+   * condiciones hasta el paso de cotización nos dejaría en desventaja
+   * frente a proveedores que sí las enseñan en el listado.
+   *
+   * Siguen recalculándose en `value`, que es la fuente autorizada: si
+   * cambian entre disponibilidad y cotización, se avisa al cliente.
+   */
+  cancelPolicies: a.cancelPolicies,
+  structuredCancelPolicies: a.structuredCancelPolicies,
   // El cliente debe saber SIEMPRE si la tarifa no admite devolución
   nonRefundable: a.nonRefundable,
   restrictions: a.restrictions,
