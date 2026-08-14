@@ -284,15 +284,22 @@ export class T10Client {
   }
 
   /**
-   * 城市列表。文档要求 provinceCode 不带国家前缀（如 Mlg），并同时提供 countryCode；
-   * 传入 getProvinces 返回的组合码（如 ESMlg）时自动拆分。
+   * Ciudades de una provincia.
+   *
+   * ⚠ Hay que enviar el provinceCode ENTERO, tal cual lo devuelve getProvinces
+   * (p. ej. `ESMlg`), y ADEMÁS el countryCode por separado. Quitarle el prefijo
+   * de país al código —que es lo que hacíamos— devuelve siempre "No existen
+   * datos". Comprobado contra el entorno de test el 14/08/2026:
+   *   provinceCode=ESMlg                    → 0 ciudades
+   *   provinceCode=Mlg   + countryCode=ES   → 0 ciudades
+   *   provinceCode=ESMlg + countryCode=ES   → 74 ciudades
+   * Si no llega countryCode, se deduce del prefijo pero el código se mantiene.
    */
   async getCities(provinceCode?: string, countryCode?: string): Promise<CodeName[]> {
-    let province = provinceCode;
+    const province = provinceCode;
     let country = countryCode;
-    if (province && !country && /^[A-Z]{2}/.test(province) && province.length > 2) {
-      country = province.slice(0, 2);
-      province = province.slice(2);
+    if (province && !country && /^[A-Z]{2}/i.test(province) && province.length > 2) {
+      country = province.slice(0, 2).toUpperCase();
     }
     const parsed = await this.call('getCities', 'getCities', this.credentialBody({
       ...(province ? { provinceCode: province } : {}),
