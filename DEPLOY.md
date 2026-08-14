@@ -91,6 +91,17 @@ Solo hacen falta dos registros DNS. Vercel indica los valores exactos en
 
 El certificado HTTPS lo emite Vercel automáticamente (unos minutos tras propagar DNS).
 
+## 3.b Tipografías y fotos
+
+Las fuentes (Cormorant Garamond y Jost) se sirven desde `/public/fonts`, no desde
+Google Fonts: en China continental Google está bloqueado y allí está media
+clientela. Para el chino se usa la fuente del sistema (`Noto Serif SC`,
+`Songti SC`…) en vez de cargar 10 MB de subconjuntos CJK.
+
+Las fotos de rutas están en `/public/photos`, descargadas de Wikimedia Commons
+con su licencia anotada en `CREDITOS-FOTOS.md`. Si se cambia alguna, hay que
+actualizar ese fichero: es la prueba de que tenemos derecho a usarlas.
+
 ## 4. Tareas programadas (cron)
 
 - **Conciliación diaria** con T10 (detecta reservas huérfanas y resuelve
@@ -104,11 +115,21 @@ scheduler externo.
 
 ## Antes de publicar — pendientes NO técnicos
 
-- [ ] **Verificar o eliminar** las cifras y acreditaciones de la web (120+ agencias,
-      8.400+ grupos, IATA/UNWTO, testimonios). Hoy son texto de relleno; declarar
-      acreditaciones falsas tiene riesgo legal en España. Ver TODOs en `src/translations.ts`.
+- [ ] **Datos de contacto** (`src/contact.ts`): `partner@wanlitravel.com`,
+      `hello@wanlitravel.com` y `+34 912 345 678` vienen del diseño y **no están
+      verificados**. Si un buzón no existe, cada cliente que escriba por correo en
+      vez de por el formulario se pierde sin que nos enteremos.
+- [ ] **Las cuatro garantías** de la sección «Una casa acreditada» (agencia
+      licenciada, seguro de RC, DMC certificado, facturación B2B) tienen que
+      corresponder a documentos reales. Es el mismo motivo por el que se retiró
+      IATA/UNWTO. Ver `src/components/site/Credentials.tsx`.
 - [ ] Rellenar los datos reales de la empresa en la política de privacidad
-      (razón social, CIF, domicilio) y añadir Aviso Legal.
+      (razón social, CIF, domicilio). El Aviso Legal y la Política de Cookies ya
+      existen en `/es/legal` y `/es/cookies`, pero el aviso legal también pide
+      datos registrales y número de licencia.
+- [ ] Decidir si son **tres oficinas o cuatro**: el diseño dice Madrid, Pekín y
+      Shanghái; el texto que aprobó Andrés en agosto decía «Madrid, Lisboa, Pekín
+      y Shanghái». Hoy la web dice tres.
 - [ ] Certificación de TourDiez (formulario Booking 2.9 + Excel de Mapping y
       Reservations) y sustituir las URLs de test por las de producción.
 - [ ] Confirmar que las URLs de producción de T10 son **HTTPS** (las de test son HTTP).
