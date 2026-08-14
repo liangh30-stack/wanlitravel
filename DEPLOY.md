@@ -47,6 +47,26 @@ no hay CORS y la URL del backend no queda expuesta.
    hay que actualizar esa linea: es lo unico que conecta front y back.
 3. Desplegar. Probar en la URL temporal `*.vercel.app` **antes** de tocar el dominio.
 
+## 2.b Avisos de nuevas solicitudes
+
+Sin esto una solicitud se guarda y nadie se entera hasta que alguien abre el
+panel `/es/admin`. Configurar al menos un canal en Railway:
+
+| Variable | Para qué |
+|---|---|
+| `INQUIRY_EMAIL_TO` | Destinatario del aviso (varios separados por coma) |
+| `RESEND_API_KEY` | Clave de https://resend.com (plan gratuito: 3.000 correos/mes) |
+| `INQUIRY_EMAIL_FROM` | Remitente. Sin dominio propio verificado, dejar el valor por defecto |
+| `INQUIRY_WEBHOOK_URL` | Alternativa o complemento: Slack, Telegram, pasarela de WhatsApp |
+
+Con el remitente de pruebas de Resend (`onboarding@resend.dev`) solo se puede
+escribir a la dirección de la cuenta de Resend. Para enviar a cualquier
+destinatario hay que verificar wanlitravel.com en Resend y poner algo como
+`Wanlitravel <avisos@wanlitravel.com>`.
+
+Si no hay ningún canal configurado, el servidor avisa al arrancar y en cada
+solicitud recibida.
+
 ## 3. Dominio (Arsys — lo gestiona Andrés)
 
 Solo hacen falta dos registros DNS. Vercel indica los valores exactos en

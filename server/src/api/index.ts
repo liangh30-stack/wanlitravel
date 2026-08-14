@@ -20,6 +20,7 @@ import { apiKeyAuth, generalLimiter, bookingLimiter, inquiryLimiter, searchLimit
 import { searchSchema, valueSchema, confirmSchema, cancelSchema, inquirySchema } from './schemas.js';
 import { buildDemoAvailability, DEMO_DESTINATIONS } from '../t10/demo.js';
 import { isSellable, blockingRestrictions } from '../t10/restrictions.js';
+import { notifyInquiry } from './notify.js';
 
 const {
   // 三个模块各有独立入口（如缺省，Mapping/Reservations 回落到 Booking 的 URL）
@@ -30,12 +31,14 @@ const {
   T10_PASSWORD = '',
   T10_LOG_DIR = './logs/t10',
   API_SHARED_KEY,
-  INQUIRY_WEBHOOK_URL,
   PORT = '3001',
 } = process.env;
 
 if (!T10_BOOKING_URL || !T10_USER || !T10_PASSWORD) {
   console.warn('[t10] 缺少 T10_BOOKING_URL / T10_USER / T10_PASSWORD 环境变量 — API 将以未配置状态启动');
+}
+if (!process.env.INQUIRY_EMAIL_TO && !process.env.INQUIRY_WEBHOOK_URL) {
+  console.warn('[inquiries] sin canal de aviso: las solicitudes solo se verán entrando al panel /admin');
 }
 if (!API_SHARED_KEY) {
   console.warn('[auth] 未配置 API_SHARED_KEY — 仅接受本机请求（开发模式）');
@@ -54,17 +57,6 @@ const client = new T10Client({
 const orders = new OrderStore();
 const inquiries = new InquiryStore();
 const destinations = new DestinationStore();
-
-/** 新询盘 webhook 通知（飞书/企微/Slack 皆兼容 {text} 格式；不配置则跳过） */
-async function notifyInquiry(r: { type: string; companyName: string; workEmail: string; message?: string; routeCode?: string }) {
-  if (!INQUIRY_WEBHOOK_URL) return;
-  const text = `📩 新询盘 [${r.type === 'partner' ? '合作伙伴申请' : `路线报价 ${r.routeCode ?? ''}`}]\n公司: ${r.companyName}\n邮箱: ${r.workEmail}\n留言: ${r.message ?? '-'}`;
-  await fetch(INQUIRY_WEBHOOK_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ text, msg_type: 'text', content: { text } }),
-  });
-}
 
 const app = express();
 /**
@@ -96,7 +88,8 @@ app.post('/api/inquiries', inquiryLimiter, async (req, res) => {
     const input = inquirySchema.parse(req.body);
     const { consent, ...fields } = input;
     const record = inquiries.create({ ...fields, consentAt: new Date().toISOString() });
-    notifyInquiry(record).catch(err => console.error('[inquiries] webhook 通知失败:', err));
+    // El aviso nunca puede tumbar el guardado: notifyInquiry no lanza
+    void notifyInquiry(record);
     res.json({ ok: true, id: record.id });
   } catch (err) { handleError(err, res); }
 });
