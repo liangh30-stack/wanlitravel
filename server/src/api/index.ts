@@ -378,7 +378,39 @@ async function autoSyncDestinations() {
   }
 }
 
-app.listen(Number(PORT), () => {
+const server = app.listen(Number(PORT), () => {
   console.log(`[t10 api] listening on http://localhost:${PORT}`);
   void autoSyncDestinations();
 });
+
+/*
+ * Apagado ordenado.
+ *
+ * Railway envía SIGTERM en cada redespliegue. Sin manejarlo, el proceso muere
+ * con código distinto de cero: la plataforma lo cuenta como caída, manda un
+ * correo de "Deploy Crashed" por cada despliegue, y las peticiones en vuelo se
+ * cortan a media respuesta — incluido un `confirm` contra T10, que es
+ * justamente el caso que no queremos dejar a medias.
+ *
+ * Cerramos el servidor (deja de aceptar conexiones nuevas y espera a las
+ * abiertas) y salimos con 0. Si algo se queda colgado más de 10 segundos,
+ * salimos igual: mejor un corte que un contenedor zombi bloqueando el volumen.
+ */
+let apagando = false;
+for (const senal of ['SIGTERM', 'SIGINT'] as const) {
+  process.on(senal, () => {
+    if (apagando) return;
+    apagando = true;
+    console.log(`[t10 api] ${senal} recibido, cerrando…`);
+    const plazo = setTimeout(() => {
+      console.warn('[t10 api] cierre forzado tras 10s de espera');
+      process.exit(0);
+    }, 10_000);
+    plazo.unref();
+    server.close(err => {
+      if (err) console.error('[t10 api] error al cerrar:', err);
+      console.log('[t10 api] cerrado limpiamente');
+      process.exit(0);
+    });
+  });
+}

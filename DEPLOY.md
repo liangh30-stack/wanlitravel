@@ -47,6 +47,15 @@ no hay CORS y la URL del backend no queda expuesta.
    hay que actualizar esa linea: es lo unico que conecta front y back.
 3. Desplegar. Probar en la URL temporal `*.vercel.app` **antes** de tocar el dominio.
 
+### Por qué el arranque no pasa por `npm run`
+
+`railway.json` arranca `./node_modules/.bin/tsx` directamente y no
+`npm run server:start`. Con npm de por medio, el SIGTERM que Railway envía en
+cada redespliegue se queda en el proceso de npm y no llega a Node: el servidor
+muere de golpe con código 143, Railway lo cuenta como caída y manda un correo
+de *Deploy Crashed* en cada despliegue. Lanzando tsx directamente, el proceso
+recibe la señal, cierra ordenadamente y sale con 0.
+
 ## 2.b Avisos de nuevas solicitudes
 
 Sin esto una solicitud se guarda y nadie se entera hasta que alguien abre el
