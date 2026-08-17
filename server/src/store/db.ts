@@ -39,6 +39,24 @@ export function openDb(dataDir: string): DatabaseSync {
       updatedAt   TEXT NOT NULL
     );
     CREATE INDEX IF NOT EXISTS idx_destinations_country ON destinations(countryCode);
+    CREATE TABLE IF NOT EXISTS partners (
+      id           TEXT PRIMARY KEY,
+      companyName  TEXT NOT NULL,
+      contactName  TEXT,
+      email        TEXT NOT NULL UNIQUE COLLATE NOCASE,
+      passwordHash TEXT NOT NULL,
+      status       TEXT NOT NULL DEFAULT 'ACTIVE',
+      notes        TEXT,
+      createdAt    TEXT NOT NULL,
+      lastLoginAt  TEXT
+    );
+    CREATE TABLE IF NOT EXISTS portal_sessions (
+      tokenHash  TEXT PRIMARY KEY,
+      partnerId  TEXT NOT NULL,
+      createdAt  TEXT NOT NULL,
+      expiresAt  TEXT NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_sessions_partner ON portal_sessions(partnerId);
     CREATE TABLE IF NOT EXISTS inquiries (
       id           TEXT PRIMARY KEY,
       type         TEXT NOT NULL,
@@ -55,5 +73,18 @@ export function openDb(dataDir: string): DatabaseSync {
       handled      INTEGER NOT NULL DEFAULT 0
     );
   `);
+  /*
+   * Migración suave: la columna partnerId no existía en los despliegues
+   * anteriores. ALTER TABLE falla si ya existe, así que se sondea antes.
+   * (node:sqlite no soporta IF NOT EXISTS en ADD COLUMN.)
+   */
+  const cols = db.prepare("SELECT name FROM pragma_table_info('orders')").all() as { name: string }[];
+  if (!cols.some(c => c.name === 'partnerId')) {
+    db.exec('ALTER TABLE orders ADD COLUMN partnerId TEXT;');
+    db.exec('CREATE INDEX IF NOT EXISTS idx_orders_partner ON orders(partnerId);');
+  }
+  if (!cols.some(c => c.name === 'pvp')) {
+    db.exec('ALTER TABLE orders ADD COLUMN pvp TEXT;');
+  }
   return db;
 }

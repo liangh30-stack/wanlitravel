@@ -6,6 +6,7 @@ import { api, ApiError, S } from './shared';
 import InquiriesDesk from './InquiriesDesk';
 import BookingDesk from './BookingDesk';
 import OrdersDesk from './OrdersDesk';
+import PartnersDesk from './PartnersDesk';
 
 /* ─────────────────────────────────────────────────────────────
    CENTRO DE OPERACIONES — /:lang/admin
@@ -20,12 +21,13 @@ import OrdersDesk from './OrdersDesk';
    producción, sin esperar al portal de clientes.
 ───────────────────────────────────────────────────────────── */
 
-type Mesa = 'solicitudes' | 'reservar' | 'pedidos';
+type Mesa = 'solicitudes' | 'reservar' | 'pedidos' | 'partners';
 
 const MESAS: { id: Mesa; texto: string }[] = [
   { id: 'solicitudes', texto: 'Solicitudes' },
   { id: 'reservar', texto: 'Reservar' },
   { id: 'pedidos', texto: 'Pedidos' },
+  { id: 'partners', texto: 'Partners' },
 ];
 
 const AdminConsole = () => {
@@ -104,6 +106,7 @@ const AdminConsole = () => {
             {mesa === 'solicitudes' && <InquiriesDesk apiKey={clave} />}
             {mesa === 'reservar' && <BookingDesk apiKey={clave} />}
             {mesa === 'pedidos' && <OrdersDesk apiKey={clave} />}
+            {mesa === 'partners' && <PartnersDesk apiKey={clave} />}
           </>
         )}
       </div>

@@ -102,6 +102,9 @@ const OrdersDesk = ({ apiKey }: Props) => {
                 <span style={{ ...S.tag, borderColor: '#8A6420', color: '#8A6420' }}>PRECIO CAMBIÓ EN CONFIRM</span>
               )}
               <span style={{ fontSize: 12, color: soft(0.5) }}>ref. {p.clientLocalizer}</span>
+              {p.partnerCompany && (
+                <span style={{ ...S.tag, borderColor: '#A6803D', color: '#8A6420' }}>PORTAL · {p.partnerCompany}</span>
+              )}
             </div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 18px', fontSize: 13, color: soft(0.65) }}>
               {p.hotelCode && <span>Hotel {p.hotelCode}</span>}

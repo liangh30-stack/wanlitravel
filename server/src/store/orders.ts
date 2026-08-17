@@ -30,6 +30,10 @@ export interface OrderRecord {
   checkOut?: string;
   valuedNeto?: string;
   confirmedNeto?: string;
+  /** PVP confirmado — el precio que ve el partner (el neto es confidencial) */
+  pvp?: string;
+  /** Cuenta de partner que hizo la reserva desde el portal (null = mesa interna) */
+  partnerId?: string;
   currencyCode?: string;
   priceChanged?: boolean;
   createdAt: string;
@@ -37,7 +41,7 @@ export interface OrderRecord {
 }
 
 const COLS = ['id', 'clientLocalizer', 'locator', 'status', 'hotelCode', 'checkIn', 'checkOut',
-  'valuedNeto', 'confirmedNeto', 'currencyCode', 'priceChanged', 'createdAt', 'updatedAt'] as const;
+  'valuedNeto', 'confirmedNeto', 'pvp', 'partnerId', 'currencyCode', 'priceChanged', 'createdAt', 'updatedAt'] as const;
 
 function fromRow(row: any): OrderRecord {
   const o: any = {};
@@ -116,6 +120,12 @@ export class OrderStore {
 
   list(): OrderRecord[] {
     return (this.db.prepare('SELECT * FROM orders ORDER BY createdAt DESC').all() as any[]).map(fromRow);
+  }
+
+  /** Pedidos de un partner concreto (para el portal: solo se ven los propios) */
+  listByPartner(partnerId: string): OrderRecord[] {
+    return (this.db.prepare('SELECT * FROM orders WHERE partnerId = ? ORDER BY createdAt DESC')
+      .all(partnerId) as any[]).map(fromRow);
   }
 
   /** 待对账的订单（confirm 超时后状态未知） */

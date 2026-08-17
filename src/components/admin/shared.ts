@@ -116,6 +116,8 @@ export interface OrderRecord {
   hotelCode?: string; checkIn?: string; checkOut?: string;
   valuedNeto?: string; confirmedNeto?: string; currencyCode?: string;
   priceChanged?: boolean; createdAt: string; updatedAt: string;
+  /** Empresa del partner si el pedido entró por el portal */
+  partnerCompany?: string;
 }
 export interface Destination { code: string; label: string; countryCode?: string; hotels?: number }
 

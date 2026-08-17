@@ -56,6 +56,16 @@ muere de golpe con código 143, Railway lo cuenta como caída y manda un correo
 de *Deploy Crashed* en cada despliegue. Lanzando tsx directamente, el proceso
 recibe la señal, cierra ordenadamente y sale con 0.
 
+## 2.a Portal de partners (/es/portal)
+
+Cuentas SOLO por alta manual: pestaña **Partners** del panel `/es/admin` →
+«Crear cuenta y generar clave» → entregar email+clave al cliente. El partner
+entra en `/es/portal`, reserva en vivo y ve sus pedidos. **Ve únicamente el
+PVP orientativo**: el neto no sale del servidor (proyección en
+`server/src/api/portal.ts`) hasta que se decida el modelo de precios
+(neto+markup o neto directo). Sesiones de 30 días revocables (desactivar
+cuenta o restablecer clave las corta al instante).
+
 ## 2.b Avisos de nuevas solicitudes
 
 Sin esto una solicitud se guarda y nadie se entera hasta que alguien abre el

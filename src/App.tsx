@@ -20,6 +20,7 @@ import RouteDetails from './RouteDetails';
 import LegalPage from './components/LegalPage';
 import NotFound from './components/NotFound';
 import AdminConsole from './components/admin/AdminConsole';
+import PortalPage from './components/portal/PortalPage';
 
 const SOPORTADOS: Language[] = ['en', 'zh', 'es'];
 const CLAVE_IDIOMA = 'wanli.lang';
@@ -85,7 +86,7 @@ const LanguageLayout = () => {
     <LanguageContext.Provider value={value!}>
       <Outlet />
       {/* El aviso de cookies no pinta nada en la herramienta interna */}
-      {!location.pathname.endsWith('/admin') && <CookieBanner />}
+      {!/\/(admin|portal)$/.test(location.pathname) && <CookieBanner />}
     </LanguageContext.Provider>
   );
 };
@@ -174,6 +175,7 @@ export default function App() {
             <Route path="cookies" element={<LegalPage doc="cookies" />} />
             <Route path="legal" element={<LegalPage doc="legal" />} />
             <Route path="admin" element={<AdminConsole />} />
+            <Route path="portal" element={<PortalPage />} />
             <Route path="*" element={<NotFound />} />
           </Route>
           <Route path="*" element={<Navigate to={`/${idiomaGuardado()}`} replace />} />

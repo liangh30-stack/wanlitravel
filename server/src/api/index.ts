@@ -11,9 +11,11 @@
  * 启动：npm run server:dev（需先在 .env.local 配置 T10_* 与 API_SHARED_KEY）
  */
 import express from 'express';
-import { ZodError } from 'zod';
+import { z, ZodError } from 'zod';
 import { T10Client, createModuleTransport, T10Error, ConfirmTimeoutError } from '../t10/index.js';
 import { OrderStore } from '../store/orders.js';
+import { PartnerStore, generarClave } from '../store/partners.js';
+import { portalRouter } from './portal.js';
 import { InquiryStore } from '../store/inquiries.js';
 import { DestinationStore } from '../store/destinations.js';
 import { apiKeyAuth, generalLimiter, bookingLimiter, inquiryLimiter, searchLimiter } from './middleware.js';
@@ -55,6 +57,7 @@ const client = new T10Client({
   }),
 });
 const orders = new OrderStore();
+const partners = new PartnerStore();
 const inquiries = new InquiryStore();
 const destinations = new DestinationStore();
 
@@ -227,6 +230,13 @@ app.post('/api/hotels/search', searchLimiter, async (req, res) => {
   } catch (err) { handleError(err, res); }
 });
 
+/*
+ * Portal de partners: SU PROPIA autenticación (sesión Bearer por cuenta),
+ * por eso se monta antes del apiKeyAuth global. Un partner no conoce la
+ * clave de operaciones ni la necesita.
+ */
+app.use('/api/portal', portalRouter({ client, orders, partners, demoMode }));
+
 // 其余 /api 全部鉴权 + 限流
 app.use('/api', apiKeyAuth(API_SHARED_KEY), generalLimiter);
 
@@ -268,8 +278,49 @@ app.post('/api/admin/search', async (req, res) => {
   } catch (err) { handleError(err, res); }
 });
 
-/** Lista completa de pedidos para el panel interno */
-app.get('/api/orders', (_req, res) => { res.json(orders.list()); });
+/** Lista completa de pedidos para el panel interno (con empresa del partner) */
+app.get('/api/orders', (_req, res) => {
+  res.json(orders.list().map(o => ({
+    ...o,
+    partnerCompany: o.partnerId ? partners.get(o.partnerId)?.companyName : undefined,
+  })));
+});
+
+/* ── Gestión de cuentas de partner (solo panel de operaciones) ── */
+
+const partnerCreateSchema = z.object({
+  companyName: z.string().min(2).max(120),
+  contactName: z.string().max(120).optional(),
+  email: z.string().email().max(120),
+  notes: z.string().max(500).optional(),
+});
+
+app.get('/api/partners', (_req, res) => { res.json(partners.list()); });
+
+app.post('/api/partners', (req, res) => {
+  try {
+    const input = partnerCreateSchema.parse(req.body);
+    if (partners.findByEmail(input.email)) {
+      res.status(409).json({ error: 'EMAIL_EXISTS' });
+      return;
+    }
+    // La clave se genera aquí y se muestra UNA vez: no se guarda en claro
+    const password = generarClave();
+    const partner = partners.create(input, password);
+    res.json({ partner, password });
+  } catch (err) { handleError(err, res); }
+});
+
+app.post('/api/partners/:id/status', (req, res) => {
+  const status = req.body?.status === 'DISABLED' ? 'DISABLED' : 'ACTIVE';
+  res.json({ ok: partners.setStatus(req.params.id, status) });
+});
+
+app.post('/api/partners/:id/reset-password', (req, res) => {
+  const password = generarClave();
+  const ok = partners.resetPassword(req.params.id, password);
+  res.json(ok ? { ok, password } : { ok });
+});
 
 /** 核价（下单前必须调用，防 M12） */
 app.post('/api/hotels/value', async (req, res) => {
