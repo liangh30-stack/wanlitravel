@@ -129,7 +129,7 @@ const es = {
     },
     legal: {
       title: "Aviso Legal",
-      paras: ["El contenido de este sitio se ofrece únicamente con fines informativos y de comunicación comercial. No puede copiarse, distribuirse ni reutilizarse sin autorización escrita.", "Wanli Travel opera como agencia de viajes y operador receptivo registrado en España. Los datos registrales y el número de licencia se facilitan a petición en el proceso de contratación.", "Para cualquier consulta legal, contacte con info@wanlitravel.com."],
+      paras: ["El contenido de este sitio se ofrece únicamente con fines informativos y de comunicación comercial. No puede copiarse, distribuirse ni reutilizarse sin autorización escrita.", "Titular del sitio: ONBUS TRAVEL, LDA, agencia de viajes registrada en Portugal. NIF: PT518615120. Domicilio: Praça da República 1, 4980-619 Ponte da Barca, Portugal. Wanli Travel opera como marca comercial de ONBUS TRAVEL, LDA al amparo de su licencia de agencia de viajes (RNAVT); el número de registro se facilita en el proceso de contratación y se publicará aquí.", "Para cualquier consulta legal, contacte con info@wanlitravel.com."],
     },
     updated: "Última actualización: abril de 2026",
     back: "Volver",
@@ -238,7 +238,7 @@ const es = {
     sections: [
       {
         h: "1. Responsable del Tratamiento",
-        p: "Este sitio web es operado por Wanlitravel (TODO: completar razón social, domicilio y NIF antes del lanzamiento). Para cualquier cuestión de privacidad, contacte con partnerships@wanlitravel.com.",
+        p: "Wanli Travel es una marca comercial operada por ONBUS TRAVEL, LDA, agencia de viajes registrada en Portugal (NIF PT518615120, RNAVT en trámite de publicación), con domicilio en Praça da República 1, 4980-619 Ponte da Barca, Portugal. ONBUS TRAVEL, LDA es el responsable del tratamiento de los datos recogidos en este sitio. Para cualquier cuestión de privacidad, escriba a info@onbustravel.com o a partnerships@wanlitravel.com.",
       },
       {
         h: "2. Datos que Recogemos",
@@ -446,7 +446,7 @@ const en = {
     },
     legal: {
       title: "Legal Notice",
-      paras: ["The content of this website is provided for business presentation and commercial communication purposes only. It may not be copied, distributed or reused without written permission.", "Wanli Travel operates as a travel agency and inbound operator registered in Spain. Registry details and licence number are provided on request during contracting.", "For legal inquiries, please contact info@wanlitravel.com."],
+      paras: ["The content of this website is provided for business presentation and commercial communication purposes only. It may not be copied, distributed or reused without written permission.", "Site owner: ONBUS TRAVEL, LDA, a travel agency registered in Portugal. VAT: PT518615120. Registered office: Praça da República 1, 4980-619 Ponte da Barca, Portugal. Wanli Travel operates as a trade name of ONBUS TRAVEL, LDA under its travel agency licence (RNAVT); the registration number is provided during contracting and will be published here.", "For legal inquiries, please contact info@wanlitravel.com."],
     },
     updated: "Last updated: April 2026",
     back: "Back",
@@ -555,7 +555,7 @@ const en = {
     sections: [
       {
         h: "1. Data Controller",
-        p: "This website is operated by Wanlitravel (TODO: legal entity name, registered address, company number — complete before launch). For any privacy matter, contact us at partnerships@wanlitravel.com.",
+        p: "Wanli Travel is a trade name operated by ONBUS TRAVEL, LDA, a travel agency registered in Portugal (VAT PT518615120, RNAVT publication pending), with registered office at Praça da República 1, 4980-619 Ponte da Barca, Portugal. ONBUS TRAVEL, LDA is the data controller for the personal data collected on this site. For any privacy matter, write to info@onbustravel.com or partnerships@wanlitravel.com.",
       },
       {
         h: "2. Data We Collect",
@@ -763,7 +763,7 @@ const zh = {
     },
     legal: {
       title: "法律声明",
-      paras: ["本网站内容仅用于业务展示与合作沟通。未经书面许可，不得复制、传播或用于其他商业用途。", "Wanli Travel 为在西班牙注册的旅行社及入境地接运营商。注册信息与牌照编号可在签约过程中按需提供。", "如有任何法律相关咨询，请联系 info@wanlitravel.com。"],
+      paras: ["本网站内容仅用于业务展示与合作沟通。未经书面许可，不得复制、传播或用于其他商业用途。", "本网站所有者：ONBUS TRAVEL, LDA，在葡萄牙注册的旅行社。税号：PT518615120。注册地址：Praça da República 1, 4980-619 Ponte da Barca, 葡萄牙。万里旅行（Wanli Travel）作为 ONBUS TRAVEL, LDA 的商业品牌，依托其旅行社牌照（RNAVT）开展经营；登记号将在签约过程中提供并在本页公布。", "如有任何法律相关咨询，请联系 info@wanlitravel.com。"],
     },
     updated: "最后更新：2026 年 4 月",
     back: "返回",
@@ -872,7 +872,7 @@ const zh = {
     sections: [
       {
         h: "1. 数据控制者",
-        p: "本网站由万里旅行运营（TODO：上线前补全法定主体名称、注册地址与公司编号）。任何隐私相关事宜请联系 partnerships@wanlitravel.com。",
+        p: "万里旅行（Wanli Travel）是 ONBUS TRAVEL, LDA 运营的商业品牌。ONBUS TRAVEL, LDA 为在葡萄牙注册的旅行社（税号 PT518615120，RNAVT 登记号待公布），注册地址：Praça da República 1, 4980-619 Ponte da Barca, 葡萄牙，并且是本网站所收集个人数据的数据控制者。任何隐私相关事宜请联系 info@onbustravel.com 或 partnerships@wanlitravel.com。",
       },
       {
         h: "2. 我们收集的数据",

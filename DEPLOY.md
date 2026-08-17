@@ -126,10 +126,11 @@ scheduler externo.
       licenciada, seguro de RC, DMC certificado, facturación B2B) tienen que
       corresponder a documentos reales. Es el mismo motivo por el que se retiró
       IATA/UNWTO. Ver `src/components/site/Credentials.tsx`.
-- [ ] Rellenar los datos reales de la empresa en la política de privacidad
-      (razón social, CIF, domicilio). El Aviso Legal y la Política de Cookies ya
-      existen en `/es/legal` y `/es/cookies`, pero el aviso legal también pide
-      datos registrales y número de licencia.
+- [x] Datos reales de la empresa en privacidad y aviso legal: Wanli opera como
+      marca de **ONBUS TRAVEL, LDA** (NIF PT518615120, Praça da República 1,
+      4980-619 Ponte da Barca) mientras no exista la sociedad propia — decisión
+      de Andrés (nota del 17/08). **Pendiente: el número RNAVT** — pedírselo a
+      Andrés y sustituir "en trámite de publicación" en `src/translations.ts`.
 - [ ] Decidir si son **tres oficinas o cuatro**: el diseño dice Madrid, Pekín y
       Shanghái; el texto que aprobó Andrés en agosto decía «Madrid, Lisboa, Pekín
       y Shanghái». Hoy la web dice tres.
