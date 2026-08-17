@@ -84,6 +84,12 @@ img { display: block; }
 .hotel-filters { display: grid; grid-template-columns: 1.4fr 1fr 1fr auto; gap: 28px; align-items: end; }
 .hotel-pax { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
 
+/* /partner: foto + formulario a partes iguales; apilado en pantallas medias */
+@media (max-width: 1020px) {
+  .split-partner { grid-template-columns: 1fr !important; }
+  .split-partner > section:first-child { min-height: 480px !important; }
+}
+
 @media (max-width: 1120px) {
   .split, .split-even, .detail-grid { grid-template-columns: 1fr; gap: 48px; }
   /* Al apilarse, el texto de la derecha debe alinearse a la izquierda */

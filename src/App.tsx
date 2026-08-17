@@ -21,6 +21,7 @@ import LegalPage from './components/LegalPage';
 import NotFound from './components/NotFound';
 import AdminConsole from './components/admin/AdminConsole';
 import PortalPage from './components/portal/PortalPage';
+import PartnerPage from './components/site/PartnerPage';
 
 const SOPORTADOS: Language[] = ['en', 'zh', 'es'];
 const CLAVE_IDIOMA = 'wanli.lang';
@@ -171,6 +172,7 @@ export default function App() {
             <Route index element={<HomePage />} />
             <Route path="route/:id" element={<RouteDetails />} />
             <Route path="hotels" element={<HotelsPage />} />
+            <Route path="partner" element={<PartnerPage />} />
             <Route path="privacy" element={<LegalPage doc="privacy" />} />
             <Route path="cookies" element={<LegalPage doc="cookies" />} />
             <Route path="legal" element={<LegalPage doc="legal" />} />

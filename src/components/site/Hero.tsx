@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { useLanguage } from '../../context';
 import { C, lineOn, serif, softOn, solidBtn } from '../../theme';
 
@@ -11,7 +12,7 @@ const irA = (id: string) => (e: React.MouseEvent) => {
 };
 
 const Hero = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const u = t.ui;
 
   const mesas = [
@@ -58,10 +59,10 @@ const Hero = () => {
             style={{ ...solidBtn(C.bg, C.ink), padding: '17px 38px' }}>
             {u.heroCta1}
           </a>
-          <a href="#contacto" onClick={irA('contacto')} className="btn-ghost"
+          <Link to={`/${language}/partner`} className="btn-ghost"
             style={{ ...solidBtn('transparent', '#fff'), border: '1px solid rgba(255,255,255,0.45)', padding: '17px 38px' }}>
             {u.heroCta2}
-          </a>
+          </Link>
         </div>
       </div>
 

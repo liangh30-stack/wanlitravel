@@ -129,12 +129,12 @@ const Header = ({ overHero = false }: Props) => {
           </div>
 
           {!compact && (
-            <a href="#contacto" onClick={irA('contacto')} className="btn-solid" style={{
+            <Link to={`/${language}/partner`} className="btn-solid" style={{
               border: `1px solid ${textoNav}`, color: textoNav, padding: '11px 26px',
               fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.3em', transition: 'all .3s',
             }}>
               {u.navCta}
-            </a>
+            </Link>
           )}
 
           {compact && (
@@ -167,12 +167,12 @@ const Header = ({ overHero = false }: Props) => {
                 {u[s.key]}
               </a>
             ))}
-            <a href="#contacto" onClick={irA('contacto')} className="btn-solid" style={{
+            <Link to={`/${language}/partner`} onClick={() => setMenuOpen(false)} className="btn-solid" style={{
               marginTop: 20, background: C.ink, color: C.bg, textAlign: 'center',
               padding: '15px 20px', fontSize: 10, letterSpacing: '0.3em',
             }}>
               {u.navCta}
-            </a>
+            </Link>
           </nav>
         </div>
       )}
