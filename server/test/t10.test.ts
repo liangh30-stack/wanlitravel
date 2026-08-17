@@ -240,8 +240,12 @@ test('搜索请求按文档使用 city 与 accomodationsCode 标签', async () =
     hotelCodes: ['Mlg0846', 'Mlg1295'],
   });
   const xml = calls[1].xml;
-  assert.match(xml, /<city>ES00634<\/city>/);
+  // Indicación de Tour10 (correo 12/08/2026): city y accomodationsCode son
+  // EXCLUYENTES — con lista de hoteles se omite city — y countryCode es
+  // obligatorio en toda búsqueda (aquí inferido del prefijo ES de ES00634).
   assert.match(xml, /<accomodationsCode>Mlg0846,Mlg1295<\/accomodationsCode>/);
+  assert.doesNotMatch(xml, /<city>/);
+  assert.match(xml, /<countryCode>ES<\/countryCode>/);
   assert.doesNotMatch(xml, /destinationCode|hotelCodes/);
 });
 

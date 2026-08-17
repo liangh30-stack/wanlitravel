@@ -244,6 +244,33 @@ const strip = <T extends { raw?: unknown }>(o: T): Omit<T, 'raw'> => {
   return rest;
 };
 
+/**
+ * Búsqueda para el panel interno (autenticada): igual que la pública pero CON
+ * neto y desglose por habitación. El operador necesita ver el coste para poder
+ * cotizar a mano; el visitante de la web, no — por eso son dos endpoints.
+ */
+app.post('/api/admin/search', async (req, res) => {
+  try {
+    const input = searchSchema.parse(req.body);
+    if (demoMode) {
+      const result = buildDemoAvailability(input);
+      res.json({ demo: true, idOperation: result.idOperation, accommodations: result.accommodations.map(strip) });
+      return;
+    }
+    const result = await client.getAccommodationAvail({ ...input, retrieveCancelPolicies: true });
+    const vendibles = result.accommodations.filter(a => isSellable(a.restrictions ?? []));
+    res.json({
+      demo: false,
+      idOperation: result.idOperation,
+      accommodations: vendibles.map(a => strip(a as any)),
+      filteredOut: result.accommodations.length - vendibles.length,
+    });
+  } catch (err) { handleError(err, res); }
+});
+
+/** Lista completa de pedidos para el panel interno */
+app.get('/api/orders', (_req, res) => { res.json(orders.list()); });
+
 /** 核价（下单前必须调用，防 M12） */
 app.post('/api/hotels/value', async (req, res) => {
   try {

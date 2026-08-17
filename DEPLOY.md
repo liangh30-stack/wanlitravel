@@ -106,6 +106,9 @@ actualizar ese fichero: es la prueba de que tenemos derecho a usarlas.
 
 - **Conciliación diaria** con T10 (detecta reservas huérfanas y resuelve
   confirmaciones con estado desconocido): `npm run reconcile`
+- **Copia de seguridad diaria** de la base de datos (`/data/wanli.db` es el
+  libro de pedidos; el volumen protege de redespliegues, no de borrados):
+  `npm run backup` — escribe en `/data/backups/` y rota a 14 días.
 - **Sincronización semanal** del catálogo: `npm run sync:mapping`
 
 En Railway: *Settings → Cron Schedule* sobre un servicio duplicado, o un
