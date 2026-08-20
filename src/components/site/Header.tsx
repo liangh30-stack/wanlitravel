@@ -14,7 +14,6 @@ import { C, line, lineOn, sans } from '../../theme';
 const SECCIONES = [
   { id: 'colecciones', key: 'navIberia' },
   { id: 'china', key: 'navChina' },
-  { id: 'hoteles', key: 'navHotels' },
   { id: 'proceso', key: 'navProcess' },
   { id: 'oficinas', key: 'navOffices' },
 ] as const;

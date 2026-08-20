@@ -10,7 +10,6 @@ import Hero from './components/site/Hero';
 import Statement from './components/site/Statement';
 import Process from './components/site/Process';
 import Collection from './components/site/Collection';
-import HotelFinder from './components/site/HotelFinder';
 import Credentials from './components/site/Credentials';
 import Offices from './components/site/Offices';
 import Contact from './components/site/Contact';
@@ -115,7 +114,6 @@ const HomePage = () => {
           titulo={u.iberiaTitle} descripcion={u.iberiaDesc} />
         <Collection id="china" group="china" numeroColeccion="II"
           titulo={u.chinaTitle} descripcion={u.chinaDesc} />
-        <HotelFinder />
         <Credentials />
         <Offices />
         <Contact />
@@ -125,34 +123,14 @@ const HomePage = () => {
   );
 };
 
-/** /:lang/hotels — el buscador con su propia página, para enlazarlo directo */
-const HotelsPage = () => {
-  const { t } = useLanguage();
-  const u = t.ui;
-  useEffect(() => { window.scrollTo(0, 0); }, []);
-  return (
-    <>
-      <Header />
-      <main style={{ paddingTop: 130 }}>
-        <div className="wrap pad" style={{ paddingBottom: 30 }}>
-          <p style={{ margin: 0, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.44em', color: '#A6803D' }}>
-            {u.htKicker}
-          </p>
-          <h1 style={{
-            margin: '18px 0 0', fontFamily: "'Cormorant Garamond','Noto Serif SC',serif",
-            fontSize: 'clamp(34px,4.6vw,60px)', fontWeight: 300,
-          }}>
-            {u.htTitle}
-          </h1>
-          <p style={{ margin: '18px 0 0', maxWidth: 620, fontSize: 14, lineHeight: 2, color: 'rgba(16,21,27,0.62)' }}>
-            {u.htDesc}
-          </p>
-        </div>
-        <HotelFinder comoSeccion={false} />
-      </main>
-      <Footer />
-    </>
-  );
+/**
+ * /:lang/hotels — RETIRADO de la web pública (decisión de Andrés, 20/08):
+ * las tarifas hoteleras son B2B y solo se muestran dentro del portal de
+ * partners con sesión. El enlace antiguo lleva a la solicitud de acceso.
+ */
+const RedireccionHoteles = () => {
+  const { lang } = useParams();
+  return <Navigate to={`/${lang ?? idiomaGuardado()}/partner`} replace />;
 };
 
 /** Enlaces antiguos sin idioma: /route/:id → /es/route/:id */
@@ -171,7 +149,7 @@ export default function App() {
           <Route path="/:lang" element={<LanguageLayout />}>
             <Route index element={<HomePage />} />
             <Route path="route/:id" element={<RouteDetails />} />
-            <Route path="hotels" element={<HotelsPage />} />
+            <Route path="hotels" element={<RedireccionHoteles />} />
             <Route path="partner" element={<PartnerPage />} />
             <Route path="privacy" element={<LegalPage doc="privacy" />} />
             <Route path="cookies" element={<LegalPage doc="cookies" />} />

@@ -21,7 +21,7 @@ import { DestinationStore } from '../store/destinations.js';
 import { apiKeyAuth, generalLimiter, bookingLimiter, inquiryLimiter, searchLimiter } from './middleware.js';
 import { searchSchema, valueSchema, confirmSchema, cancelSchema, inquirySchema } from './schemas.js';
 import { buildDemoAvailability, DEMO_DESTINATIONS } from '../t10/demo.js';
-import { isSellable, blockingRestrictions } from '../t10/restrictions.js';
+import { isSellable } from '../t10/restrictions.js';
 import { notifyInquiry } from './notify.js';
 
 const {
@@ -168,67 +168,13 @@ app.get('/api/hotels/destinations', searchLimiter, (req, res) => {
   res.json({ demo: true, destinations: DEMO_DESTINATIONS });
 });
 
-/** Proyección pública de una oferta: sin neto (coste mayorista) ni raw. */
-const publicOffer = (a: any) => ({
-  code: a.code, name: a.name, category: a.category, cityName: a.cityName,
-  mealPlan: a.mealPlan, pvp: a.pvp, currencyCode: a.currencyCode, status: a.status,
-  idOperation: a.idOperation, idDistributions: a.idDistributions,
-  cancelPoliciesPending: a.cancelPoliciesPending,
-  /*
-   * Las condiciones de cancelación que ya vienen en disponibilidad se
-   * publican tal cual. En el entorno de test siempre llegan como NS
-   * (pendientes), pero Tour10 confirma (correo del 14/08/2026) que en
-   * producción el NS es un porcentaje muy pequeño: ocultar estas
-   * condiciones hasta el paso de cotización nos dejaría en desventaja
-   * frente a proveedores que sí las enseñan en el listado.
-   *
-   * Siguen recalculándose en `value`, que es la fuente autorizada: si
-   * cambian entre disponibilidad y cotización, se avisa al cliente.
-   */
-  cancelPolicies: a.cancelPolicies,
-  structuredCancelPolicies: a.structuredCancelPolicies,
-  // El cliente debe saber SIEMPRE si la tarifa no admite devolución
-  nonRefundable: a.nonRefundable,
-  restrictions: a.restrictions,
-  rooms: (a.rooms ?? []).map((r: any) => ({
-    code: r.code, name: r.name, units: r.units, adults: r.adults, children: r.children,
-  })),
-});
-
-app.post('/api/hotels/search', searchLimiter, async (req, res) => {
-  try {
-    const input = searchSchema.parse(req.body);
-    if (demoMode) {
-      const result = buildDemoAvailability(input);
-      res.json({ demo: true, idOperation: result.idOperation, accommodations: result.accommodations.map(publicOffer) });
-      return;
-    }
-    const result = await client.getAccommodationAvail(input);
-    /*
-     * Filtro de restricciones: T10 devuelve tarifas baratas que solo puede usar
-     * un perfil concreto (residentes canarios, mayores de 65, desempleados…).
-     * No podemos acreditar ese perfil, así que el hotel rechazaría al huésped en
-     * recepción — se descartan. Las vendibles (NR/EPKT/ADLT) sí se muestran, con
-     * su aviso correspondiente.
-     */
-    const vendibles = result.accommodations.filter(a => isSellable(a.restrictions ?? []));
-    const descartadas = result.accommodations.length - vendibles.length;
-    if (descartadas > 0) {
-      const motivos = [...new Set(result.accommodations
-        .flatMap(a => blockingRestrictions(a.restrictions ?? []))
-        .map(r => r.code))];
-      console.log(`[search] ${descartadas} tarifas descartadas por restricción: ${motivos.join(',')}`);
-    }
-    // Endpoint PÚBLICO: nunca exponer el neto (coste mayorista) ni el desglose
-    // por habitación. Solo PVP y lo necesario para pedir cotización.
-    res.json({
-      demo: false,
-      idOperation: result.idOperation,
-      accommodations: vendibles.map(a => publicOffer(a)),
-      ...(descartadas ? { filteredOut: descartadas } : {}),
-    });
-  } catch (err) { handleError(err, res); }
-});
+/*
+ * /api/hotels/search RETIRADO (decisión de Andrés, 20/08): la web es B2B y
+ * las tarifas no se muestran a particulares. La disponibilidad vive ahora
+ * solo en /api/portal/search (sesión de partner, PVP) y /api/admin/search
+ * (operaciones, con neto). /api/hotels/destinations sigue público: solo
+ * expone nombres de ciudad y nº de hoteles, sin precios.
+ */
 
 /*
  * Portal de partners: SU PROPIA autenticación (sesión Bearer por cuenta),
